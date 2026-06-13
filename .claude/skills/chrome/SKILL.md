@@ -42,3 +42,6 @@ Picks the first page target (or set `CDP_TARGET=<url-substring>` to choose a tab
 Decode base64 output with `... | jq -r .data | base64 -d > out.png`.
 
 For a higher-level headless browser with QA helpers, the gstack `/browse` daemon also speaks CDP - this skill is the raw escape hatch.
+
+<!-- skill-lint: ignore placeholder-example -->
+
