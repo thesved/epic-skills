@@ -6,13 +6,13 @@ A curated set of [Claude Code](https://claude.com/claude-code) skills: a **multi
 
 Paste this to your coding agent (Claude Code, etc.):
 
-> **Clone `https://github.com/thesved/epic-skills`, run `bash epic-skills/epic-install/install.sh copy --target ~/.claude/skills`, then walk me through the `epic-install` skill** (API keys, CLIs, verification).
+> **Clone `https://github.com/thesved/epic-skills`, run `bash epic-skills/.claude/skills/epic-install/install.sh copy --target ~/.claude/skills`, then walk me through the `epic-install` skill** (API keys, CLIs, verification).
 
 Or do it yourself:
 
 ```bash
 git clone https://github.com/thesved/epic-skills ~/epic-skills
-bash ~/epic-skills/epic-install/install.sh copy --target ~/.claude/skills
+bash ~/epic-skills/.claude/skills/epic-install/install.sh copy --target ~/.claude/skills
 # then, in Claude Code:  /epic-install   →  sets up keys, CLIs, and verifies the board
 ```
 

@@ -21,18 +21,18 @@ if [ -d "$CACHE/.git" ]; then
 else
   echo "→ cloning $REPO"; mkdir -p "$(dirname "$CACHE")"; git clone -q "$REPO" "$CACHE" || { echo "✗ clone failed" >&2; exit 1; }
 fi
-[ -f "$CACHE/MANIFEST" ] || { echo "✗ no MANIFEST in pulled repo" >&2; exit 1; }
+SRC="$CACHE/.claude/skills"   # skills live under .claude/skills in the published repo
+[ -f "$SRC/MANIFEST" ] || { echo "✗ no .claude/skills/MANIFEST in pulled repo" >&2; exit 1; }
 
 OLDV="$(cat "$TARGET/.installed-version" 2>/dev/null || echo '?')"
-NEWV="$(cat "$CACHE/VERSION" 2>/dev/null || echo '?')"
+NEWV="$(cat "$SRC/VERSION" 2>/dev/null || echo '?')"
 echo "→ installed $OLDV → available $NEWV"
 
-# 2) build the set of managed relative paths from the pulled repo
-DIRS=(); while IFS= read -r _l; do DIRS+=("$_l"); done < <(grep -vE '^[[:space:]]*(#|$)' "$CACHE/MANIFEST")
-ROOTF=(VERSION LICENSE README.md)
+# 2) apply managed skills (paths are relative to the repo's .claude/skills)
+DIRS=(); while IFS= read -r _l; do DIRS+=("$_l"); done < <(grep -vE '^[[:space:]]*(#|$)' "$SRC/MANIFEST")
 NEWMAN="$(mktemp)"; up=0; kept=0; add=0
-apply_file() { # repo-relpath
-  local rel="$1" rf="$CACHE/$rel" lf="$TARGET/$rel" nh lh rh
+apply_file() { # relpath under .claude/skills
+  local rel="$1" rf="$SRC/$rel" lf="$TARGET/$rel" nh lh rh
   nh="$(sha "$rf")"
   if [ ! -f "$lf" ]; then mkdir -p "$(dirname "$lf")"; cp "$rf" "$lf"; add=$((add+1)); echo "$nh  $rel" >> "$NEWMAN"; return; fi
   lh="$(sha "$lf")"
@@ -46,10 +46,10 @@ apply_file() { # repo-relpath
   fi
 }
 for d in "${DIRS[@]}"; do
-  [ -d "$CACHE/$d" ] || continue
-  while IFS= read -r rf; do apply_file "${rf#$CACHE/}"; done < <(find "$CACHE/$d" -type f ! -name '*.bak')
+  [ -d "$SRC/$d" ] || continue
+  while IFS= read -r rf; do apply_file "${rf#$SRC/}"; done < <(find "$SRC/$d" -type f ! -name '*.bak')
 done
-for rf in "${ROOTF[@]}"; do [ -f "$CACHE/$rf" ] && apply_file "$rf"; done
+[ -f "$SRC/VERSION" ] && apply_file "VERSION"
 
 mv "$NEWMAN" "$MAN"
 printf '%s\n' "$NEWV" > "$TARGET/.installed-version"
