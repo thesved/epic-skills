@@ -1,0 +1,11 @@
+# epic-skills (public) - published by publish.sh; do not commit secrets/runtime state
+.env
+.snap-*
+.updated
+.install-manifest
+.installed-version
+cache/
+__pycache__/
+*.pyc
+.DS_Store
+.chrome-cdp-profile/
