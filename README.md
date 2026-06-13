@@ -30,10 +30,11 @@ The skills are designed to chain. A typical session:
    └─ /codex-bridge   →  spec-grade prompts for Opus, gpt-image, a 2nd-architecture take
 /grill-me      →  get interviewed until the plan has no soft spots
 /ask           →  (the inverse) Claude asks YOU only when genuinely blocked
+/chrome        →  drive a real Chrome over CDP to verify/QA the change in-browser
 /wrap          →  close the session so a cold start resumes with zero context loss
 ```
 
-Plus standalone utilities: **`/caveman`** (terse mode, ~75% fewer tokens), **`/chrome`** (drive Chrome over the DevTools Protocol).
+Plus the always-on **`/caveman`** (terse mode, ~75% fewer tokens).
 
 ## Prerequisites
 
