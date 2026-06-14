@@ -41,6 +41,26 @@ Picks the first page target (or set `CDP_TARGET=<url-substring>` to choose a tab
 
 Decode base64 output with `... | jq -r .data | base64 -d > out.png`.
 
+## 4. Stay out of the way (one tab per session, shared Chrome)
+
+`cdp.py` is built to share **one** Chrome with you and other agents without stepping on anyone:
+
+- **One tab per session, reused.** Each session owns a tab (id remembered in `/tmp/cdp-tabs-<port>/<session>`) and navigates it *in place* on every call - no open/close churn. Session key = `CDP_SESSION`, else `CLAUDE_CODE_SESSION_ID` (so each agent auto-isolates), else `default`.
+- **Creates its own tab, never adopts yours.** On first use a session opens a fresh tab instead of grabbing an existing one, so it can't hijack the tab you're looking at or another agent's tab. Cost: one foreground flash when a session first appears. Attach to a specific existing tab on purpose with `CDP_TARGET=<url-substring>`.
+- **Refuses the focus-stealers.** `Page.bringToFront` and `Target.activateTarget` drag Chrome to the macOS foreground; `cdp.py` blocks them (exit 2). Override with `CDP_ALLOW_FOCUS=1`. Screenshots do **not** need them.
+- **Screenshots of a background tab** work without foregrounding. If a backgrounded tab returns stale/blank frames (render throttling), nudge it once: `cdp.py Emulation.setFocusEmulationEnabled '{"enabled":true}'`.
+
+Orphan tabs: a finished session leaves its tab open (we never auto-close, to avoid shutting one of your tabs by mistake). Close them by hand when they pile up.
+
+**Show that a tab is being driven** (no attention cost - lives on the session's own tab):
+```
+bash ~/.claude/skills/chrome/badge.sh on   [label] [dotcolor]   # red dot on a painted favicon + 🔴 title prefix
+bash ~/.claude/skills/chrome/badge.sh off
+```
+Paints its own favicon (never taints/depends on the page's real one) and re-applies via `MutationObserver` if an SPA overwrites it. A page navigation wipes it (new document), so re-run `on` after navigating if you want it to persist.
+
+**macOS caveat (10-yr Chromium bug):** on *stable headed* Chrome, CDP traffic can still trigger app activation on the create-tab flash even with the above. Kill the jarring Space-jump with `defaults write NSGlobalDomain AppleSpacesSwitchOnActivate -bool false && killall Dock`.
+
 For a higher-level headless browser with QA helpers, the gstack `/browse` daemon also speaks CDP - this skill is the raw escape hatch.
 
 <!-- skill-lint: ignore placeholder-example -->

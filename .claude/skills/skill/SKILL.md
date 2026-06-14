@@ -33,6 +33,7 @@ Pick the verb from the request. Read only the references a verb names; do not lo
 
 - **Default to the simplest skill that works.** Most skills are one `SKILL.md`, a short body, one real example, no references, no scripts. Earn every reference file, script, or phase section by answering "does the target task need this?". The skill you write is almost always simpler than this one; do not mirror this structure.
 - **Examples are a gate, not a suggestion.** Every skill you create or change must carry an `## Examples` block with at least one real Input to Output pair taken from the interview. Never use placeholders like `foo` or `example.com`.
+- **Rules must bind, not aspire.** For any behavior that matters, write a named ban plus a falsifiable test plus an enumerated gate plus a concrete negative example, never aspirational prose ("make it visual", "be thorough"). Procedures are numbered steps, not paragraphs. Verify behavior-heavy skills by forward-test (a fresh agent uses the skill, then inspect the output), not just `validate.py`. See `references/rubric.md`.
 - **No em dashes** in any skill you write or edit. Use commas, parentheses, or colons.
 - **Draft prompt-heavy text with codex-bridge, sanity-check with the board.** Descriptions and trigger phrasing decide whether a skill ever fires, so do not hand-write them solo. See `references/triggering.md`.
 - **Findings quote the offending line and name the fix.** Never emit a bare score or vague note.

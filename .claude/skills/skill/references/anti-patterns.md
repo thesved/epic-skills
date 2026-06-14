@@ -17,6 +17,8 @@ Named failure modes in skills, each with the fix. `validate.py` catches the mech
 | Time-sensitive info ("before August, use ...") | Goes stale and wrong | State the current way; put old ways in a collapsed "old patterns" note |
 | Em dashes | House rule; reads as AI slop | Use commas, parentheses, colons |
 | Over-broad `allowed-tools` | Grants tools the skill never uses | Grant only what it calls |
+| Paragraphs for a workflow | Ordered actions buried in prose get skipped; the model will not reliably run a sequence it must parse out of a paragraph | Numbered steps, each a verb-first atomic action, with an explicit Gate or stop-condition where one applies |
+| Aspirational rule for must-hold behavior | "Make it visual", "be thorough", "actually look" read fine and change nothing; the model satisfies them cosmetically | Named ban plus falsifiable test plus a concrete negative example (the Binding dimension in `rubric.md`) |
 
 ## Before/after: the bloat cut
 
