@@ -61,7 +61,5 @@ Paints its own favicon (never taints/depends on the page's real one) and re-appl
 
 **macOS caveat (10-yr Chromium bug):** on *stable headed* Chrome, CDP traffic can still trigger app activation on the create-tab flash even with the above. Kill the jarring Space-jump with `defaults write NSGlobalDomain AppleSpacesSwitchOnActivate -bool false && killall Dock`.
 
-For a higher-level headless browser with QA helpers, the gstack `/browse` daemon also speaks CDP - this skill is the raw escape hatch.
-
 <!-- skill-lint: ignore placeholder-example -->
 

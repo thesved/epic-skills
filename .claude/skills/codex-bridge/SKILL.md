@@ -74,7 +74,6 @@ Use for: consequential Agent calls (planning, risky-code review, decisions), a v
 - **Image not where you asked** → it's in `~/.codex/generated_images/…`; `cp` it.
 
 ## See also
-- `/codex` (gstack) - heavier code review / challenge / consult modes
 - `/gemini-bridge` - Gemini CLI; image gen, non-English copy, video, TTS
 - `/board` - multi-model panel (Opus + Gemini + Codex)
 - `/think` - escalate to Opus when the need is harder thinking, not a different model

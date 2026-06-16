@@ -73,5 +73,4 @@ One board per major decision per session unless asked. ~30-90s wall-clock. If th
 ## See also
 - `/gemini-bridge`, `/codex-bridge` - the individual seats (and where their gotchas live)
 - `/think` - more Opus reasoning, not more model variety
-- `/plan-ceo-review`, `/plan-eng-review` - structured single-model plan reviews
 - `/grill-me` - interview the *user*, not the models

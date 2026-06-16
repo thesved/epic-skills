@@ -4,7 +4,10 @@
 #
 #   install.sh copy   --target DIR [--from SRC]   copy managed skills + write install state
 #   install.sh store-key NAME [--target DIR]      read value on stdin -> OS store (or .env)
+#   install.sh min-header [CLAUDE_MD]             prepend keep-minimal banner (idempotent)
 #   install.sh caveman [CLAUDE_MD]                append caveman line (idempotent)
+#     CLAUDE_MD: pass the PROJECT's <project>/CLAUDE.md by default; the SKILL
+#     falls back to ~/.claude/CLAUDE.md (the arg default) only outside a project.
 #   install.sh check  [--target DIR]              CLI + key + smoke health report
 #
 # SRC defaults to this repo (the dir containing install/). TARGET defaults to
@@ -66,6 +69,15 @@ cmd_store_key() {
   echo "  ✓ $name → $envf (no OS secret store found; chmod 600)"
 }
 
+cmd_min_header() {
+  local md="${1:-$HOME/.claude/CLAUDE.md}"
+  local line='**KEEP THIS FILE MINIMAL - caveman-terse, prune the unnecessary, NEVER bloat/trash it. Top-rules + cheat-sheet ONLY; war-stories/rationale/derivations → `learnings/INDEX.md`. Every edit: shorten, don'\''t pad.**'
+  mkdir -p "$(dirname "$md")"; touch "$md"
+  grep -qF "KEEP THIS FILE MINIMAL" "$md" && { echo "  · minimal-header already in $md"; return; }
+  { printf '%s\n\n' "$line"; cat "$md"; } > "$md.tmp" && mv "$md.tmp" "$md"
+  echo "  ✓ prepended minimal-header to $md"
+}
+
 cmd_caveman() {
   local md="${1:-$HOME/.claude/CLAUDE.md}"
   local line='ALWAYS reply caveman mode: terse, drop articles/fillers/pleasantries. Tech terms exact. (skill: /caveman)'
@@ -89,7 +101,8 @@ cmd_check() {
 case "${1:-}" in
   copy)      shift; cmd_copy "$@";;
   store-key) shift; cmd_store_key "$@";;
+  min-header) shift; cmd_min_header "$@";;
   caveman)   shift; cmd_caveman "$@";;
   check)     shift; cmd_check "$@";;
-  *) echo "usage: install.sh {copy|store-key NAME|caveman|check} [opts]"; exit 1;;
+  *) echo "usage: install.sh {copy|store-key NAME|min-header|caveman|check} [opts]"; exit 1;;
 esac

@@ -45,12 +45,22 @@ The seats call two CLIs:
 - **Gemini**: `npm i -g @google/gemini-cli` (the bridge's REST features use `GEMINI_API_KEY`).
 - **Codex**: `npm i -g @openai/codex`, then **`codex login`** (ChatGPT account OAuth - the Codex seat needs this, not an API key).
 
-## 4. Caveman mode - ASK (opt-in)
-If the user wants terse-by-default replies globally:
+## 4. CLAUDE.md setup
+**Target = the PROJECT's CLAUDE.md by default** (`<project>/CLAUDE.md` at the repo root - NOT `.claude/skills`). User-level (`~/.claude/CLAUDE.md`) doesn't always apply, so prefer project scope. Fall back to `~/.claude/CLAUDE.md` ONLY when clearly not in a project (no `.git`/code in cwd). Set `MD` accordingly:
+- in a project → `MD=<project>/CLAUDE.md`
+- not in a project → `MD=~/.claude/CLAUDE.md`
+
+**a. Keep-minimal banner (default).** Prepend the hygiene rule that keeps `$MD` lean - top-rules + cheat-sheet only, war-stories to `learnings/INDEX.md`:
 ```
-bash <TARGET>/epic-install/install.sh caveman
+bash <TARGET>/epic-install/install.sh min-header "$MD"
 ```
-Appends one line to `~/.claude/CLAUDE.md` (idempotent). Skip it and `/caveman` still works on demand.
+Idempotent; prepends one banner line to the top of `$MD`.
+
+**b. Caveman mode - ASK (opt-in).** If the user wants terse-by-default replies:
+```
+bash <TARGET>/epic-install/install.sh caveman "$MD"
+```
+Appends one line to `$MD` (idempotent). Skip it and `/caveman` still works on demand.
 
 ## 5. Verify
 ```

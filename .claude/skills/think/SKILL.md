@@ -7,9 +7,9 @@ description: >-
 argument-hint: plan <task> | review <path|pr> | debug <symptom> | decide <question>
 ---
 
-Think carefully for yourself, ultrathink, from first principles.
+Think carefully for yourself, ultrathink, from first principles. We aim for Apple-level delight, think through the option tree carefully and meticulously, so NO hacking please.
 
-Getting help: instruct your helpers to use as many websearch as they need
+Get help: instruct your helpers to use as many websearch as they need
 
 - Invoke `Opus` subagent as many times as needed:
   - most senior model
