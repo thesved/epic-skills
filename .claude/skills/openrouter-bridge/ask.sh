@@ -4,12 +4,12 @@
 # works in the keychain-only setup where the session env has no OPENROUTER_API_KEY.
 #
 # Two modes:
-#   plain    bash openrouter/ask.sh /tmp/brief        (model = $OPENROUTER_MODEL, default z-ai/glm-5.2)
-#   fusion   bash openrouter/ask.sh --fusion /tmp/brief
+#   plain    bash openrouter-bridge/ask.sh /tmp/brief        (model = $OPENROUTER_MODEL, default z-ai/glm-5.2)
+#   fusion   bash openrouter-bridge/ask.sh --fusion /tmp/brief
 #            -> openrouter/fusion panel+judge deliberation. Panel + judge are env-overridable:
 #               OPENROUTER_FUSION_PANEL  (csv of provider/model, default GLM-5.2 + DeepSeek-V4-Pro)
 #               OPENROUTER_FUSION_JUDGE  (synthesizer that writes the final answer, default z-ai/glm-5.2)
-# Briefing from the file arg (if it exists) or stdin.   echo "..." | bash openrouter/ask.sh --fusion
+# Briefing from the file arg (if it exists) or stdin.   echo "..." | bash openrouter-bridge/ask.sh --fusion
 set -uo pipefail
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; . "$SELF/../_model-cache/lib.sh"
 key="$(resolve_key OPENROUTER_API_KEY)"

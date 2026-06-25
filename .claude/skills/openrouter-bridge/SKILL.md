@@ -1,5 +1,5 @@
 ---
-name: openrouter
+name: openrouter-bridge
 description: >-
   Query any model on OpenRouter (one OpenAI-compatible key fronting 300+ models:
   GLM, DeepSeek, Qwen, Kimi, Llama, Mistral, plus OpenAI/Anthropic/Google) and
@@ -24,9 +24,9 @@ One OpenAI-compatible endpoint proxying many providers behind a single prepaid k
 
 | Mode | Command | What it does |
 |------|---------|--------------|
-| plain | `bash openrouter/ask.sh <file-or-stdin>` | one model, default `z-ai/glm-5.2`. Override `OPENROUTER_MODEL=provider/model`. |
-| fusion | `bash openrouter/ask.sh --fusion <file-or-stdin>` | `openrouter/fusion`: panel answers in parallel (web search on) -> judge synthesizes one answer. |
-| smoke | `bash openrouter/smoke.sh` | cheap single-model ping; verifies key + endpoint (NOT fusion - that fans out paid calls). |
+| plain | `bash openrouter-bridge/ask.sh <file-or-stdin>` | one model, default `z-ai/glm-5.2`. Override `OPENROUTER_MODEL=provider/model`. |
+| fusion | `bash openrouter-bridge/ask.sh --fusion <file-or-stdin>` | `openrouter/fusion`: panel answers in parallel (web search on) -> judge synthesizes one answer. |
+| smoke | `bash openrouter-bridge/smoke.sh` | cheap single-model ping; verifies key + endpoint (NOT fusion - that fans out paid calls). |
 
 Briefing comes from the file arg if it exists, else stdin.
 
@@ -38,7 +38,7 @@ Briefing comes from the file arg if it exists, else stdin.
 ```bash
 OPENROUTER_FUSION_PANEL="z-ai/glm-5.2,deepseek/deepseek-v4-pro"   # csv, 1-8 models
 OPENROUTER_FUSION_JUDGE="z-ai/glm-5.2"                            # synthesizer that writes the answer
-bash openrouter/ask.sh --fusion /tmp/brief
+bash openrouter-bridge/ask.sh --fusion /tmp/brief
 ```
 Add a 3rd panel model (e.g. `moonshotai/kimi-k2.6`) for more robustness at more cost. Use Fusion for research / high-stakes / compare-and-contrast prompts; skip it for simple lookups, code-gen (style drift), and creative writing (voice dilution).
 

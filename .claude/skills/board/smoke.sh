@@ -8,7 +8,7 @@ echo "SEAT CHECK:"
 echo "- Opus   - ok (in-session, Agent tool)"
 printf -- '- '; bash "$SKILLS/gemini-bridge/smoke.sh"        || true
 printf -- '- '; bash "$SKILLS/codex-bridge/smoke.sh"  || true
-printf -- '- '; bash "$SKILLS/openrouter/smoke.sh"   || true
+printf -- '- '; bash "$SKILLS/openrouter-bridge/smoke.sh"   || true
 echo
 echo "(agy - the optional agentic Gemini seat - is not pinged here; it uses OAuth quota."
 echo " To check it: agy -p 'Reply with exactly: AGY_OK' </dev/null )"
