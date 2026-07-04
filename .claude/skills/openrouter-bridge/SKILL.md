@@ -9,8 +9,9 @@ description: >-
   reach a model you hold no direct key for, for cost arbitrage, or as a self-
   contained "mini board in one call" via Fusion. Triggers: "openrouter", "open
   router", "fusion", "model fusion", "openrouter/fusion", "GLM", "DeepSeek",
-  "Qwen", "Kimi", "ask openrouter", "route via openrouter", "panel in one call",
-  "cheap model", "fallback model". The /board skill uses this as its 4th seat.
+  "Qwen", "Kimi", "Grok", "xAI", "ask grok", "ask openrouter", "route via
+  openrouter", "panel in one call", "cheap model", "fallback model". The /board
+  skill uses this for its Grok and Fusion seats.
 argument-hint: '<prompt> | --fusion <prompt> | smoke (check key+endpoint)'
 ---
 
@@ -25,6 +26,7 @@ One OpenAI-compatible endpoint proxying many providers behind a single prepaid k
 | Mode | Command | What it does |
 |------|---------|--------------|
 | plain | `bash openrouter-bridge/ask.sh <file-or-stdin>` | one model, default `z-ai/glm-5.2`. Override `OPENROUTER_MODEL=provider/model`. |
+| grok | `bash openrouter-bridge/ask.sh --grok <file-or-stdin>` | latest xAI flagship, default `x-ai/grok-4.3`. Override `OPENROUTER_GROK_MODEL`. The /board Grok seat. |
 | fusion | `bash openrouter-bridge/ask.sh --fusion <file-or-stdin>` | `openrouter/fusion`: panel answers in parallel (web search on) -> judge synthesizes one answer. |
 | smoke | `bash openrouter-bridge/smoke.sh` | cheap single-model ping; verifies key + endpoint (NOT fusion - that fans out paid calls). |
 
@@ -48,5 +50,5 @@ Add a 3rd panel model (e.g. `moonshotai/kimi-k2.6`) for more robustness at more 
 
 ## See also
 - `_model-cache/openrouter.md` - call shape, Fusion config, live model/pricing lookup
-- `/board` - uses this as the 4th (Fusion) seat
+- `/board` - uses this for the Grok seat (`--grok`) and the Fusion seat (`--fusion`)
 - `/gemini-bridge`, `/codex-bridge` - the other board seats

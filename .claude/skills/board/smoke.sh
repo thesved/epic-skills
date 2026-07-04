@@ -9,6 +9,7 @@ echo "- Fable  - ok (in-session, Agent tool)"
 printf -- '- '; bash "$SKILLS/gemini-bridge/smoke.sh"        || true
 printf -- '- '; bash "$SKILLS/codex-bridge/smoke.sh"  || true
 printf -- '- '; bash "$SKILLS/openrouter-bridge/smoke.sh"   || true
+echo "- Grok   - shares the OpenRouter key/endpoint (covered by the ping above; model x-ai/grok-4.3 via ask.sh --grok)"
 echo
 echo "(agy - the optional agentic Gemini seat - is not pinged here; it uses OAuth quota."
 echo " To check it: agy -p 'Reply with exactly: AGY_OK' </dev/null )"

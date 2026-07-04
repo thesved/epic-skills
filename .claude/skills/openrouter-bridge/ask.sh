@@ -3,8 +3,10 @@
 # Resolves the key via lib.sh (env -> ~/.zshrc -> keychain openrouter-api-key), so it
 # works in the keychain-only setup where the session env has no OPENROUTER_API_KEY.
 #
-# Two modes:
+# Three modes:
 #   plain    bash openrouter-bridge/ask.sh /tmp/brief        (model = $OPENROUTER_MODEL, default z-ai/glm-5.2)
+#   grok     bash openrouter-bridge/ask.sh --grok /tmp/brief (model = $OPENROUTER_GROK_MODEL, default x-ai/grok-4.3)
+#            -> the /board Grok seat: latest xAI flagship via OpenRouter.
 #   fusion   bash openrouter-bridge/ask.sh --fusion /tmp/brief
 #            -> openrouter/fusion panel+judge deliberation. Panel + judge are env-overridable:
 #               OPENROUTER_FUSION_PANEL  (csv of provider/model, default GLM-5.2 + DeepSeek-V4-Pro)
@@ -15,8 +17,9 @@ SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; . "$SELF/../_model-cache/l
 key="$(resolve_key OPENROUTER_API_KEY)"
 [ -z "$key" ] && { echo "OpenRouter seat ERR: no key (keychain openrouter-api-key / env OPENROUTER_API_KEY)"; exit 1; }
 
-fusion=0
+fusion=0; grok=0
 if [ "${1:-}" = "--fusion" ]; then fusion=1; shift; fi
+if [ "${1:-}" = "--grok" ]; then grok=1; shift; fi
 if [ -n "${1:-}" ] && [ -f "$1" ]; then brief="$(cat "$1")"; else brief="$(cat)"; fi
 
 if [ "$fusion" = 1 ]; then
@@ -28,6 +31,9 @@ if [ "$fusion" = 1 ]; then
      plugins:[{id:"fusion",
                analysis_models:($panel|split(",")|map(gsub("^\\s+|\\s+$";""))),
                model:$judge}]}')"
+elif [ "$grok" = 1 ]; then
+  model="${OPENROUTER_GROK_MODEL:-x-ai/grok-4.3}"
+  body="$(jq -n --arg p "$brief" --arg m "$model" '{model:$m,messages:[{role:"user",content:$p}]}')"
 else
   model="${OPENROUTER_MODEL:-z-ai/glm-5.2}"
   body="$(jq -n --arg p "$brief" --arg m "$model" '{model:$m,messages:[{role:"user",content:$p}]}')"
