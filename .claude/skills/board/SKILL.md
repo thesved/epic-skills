@@ -1,7 +1,7 @@
 ---
 name: board
 description: >-
-  Convene a "board of directors" - query Opus, Gemini, Codex, and an OpenRouter
+  Convene a "board of directors" - query Fable 5, Gemini, Codex, and an OpenRouter
   Fusion seat (GLM-5.2 + DeepSeek panel) in parallel on
   the same question, then synthesize the cross-model perspective. Use for
   irreversible decisions, open-problem exploration from multiple angles, or when
@@ -19,7 +19,7 @@ argument-hint: '<question for the board> | smoke (check all seats)'
 
 # Board - multi-model panel
 
-Run one question through **Opus + Gemini + Codex + an OpenRouter Fusion seat in parallel**, then synthesize. Agreement = higher confidence; disagreement = the signal worth investigating. This skill is the *orchestrator* - it does **not** re-document how to drive each model. For seat-specific call shapes, gotchas, and auth, the seats own their docs: **`/gemini-bridge`** (Gemini seat), **`/codex-bridge`** (Codex seat), and **`/openrouter-bridge`** (Fusion seat); model ids/pricing live in `~/.claude/skills/_model-cache/`.
+Run one question through **Fable 5 + Gemini + Codex + an OpenRouter Fusion seat in parallel**, then synthesize. Agreement = higher confidence; disagreement = the signal worth investigating. This skill is the *orchestrator* - it does **not** re-document how to drive each model. For seat-specific call shapes, gotchas, and auth, the seats own their docs: **`/gemini-bridge`** (Gemini seat), **`/codex-bridge`** (Codex seat), and **`/openrouter-bridge`** (Fusion seat); model ids/pricing live in `~/.claude/skills/_model-cache/`.
 
 The **4th seat is OpenRouter Fusion** (`openrouter/fusion`): a panel of `z-ai/glm-5.2` + `deepseek/deepseek-v4-pro` (judge GLM-5.2) deliberates and returns one synthesized answer. It deliberately uses **non-OpenAI/Anthropic/Google families** - architecture diversity the other three seats don't cover - so its agreement/dissent is independent signal. Swap models with `OPENROUTER_FUSION_PANEL` / `OPENROUTER_FUSION_JUDGE` (see `/openrouter-bridge`). Costs ≈4-5× a single call; drop it when budget matters more than breadth.
 
@@ -27,7 +27,7 @@ The **4th seat is OpenRouter Fusion** (`openrouter/fusion`): a panel of `z-ai/gl
 **Don't** when: there's a single checkable answer; you haven't tried it yourself; budget matters more than confidence (≈3× one call).
 
 ## Smoke test
-`/board smoke` (or first board of a session - CLIs drift): `bash ~/.claude/skills/board/smoke.sh`. It delegates to each seat's own `smoke.sh` (Gemini = cheapest lite via paid key, throttle-proof; Codex = `gpt-5.5` via stdin; OpenRouter = cheap single-model ping, NOT fusion) and notes Opus as always-in-session. Report the seat table it prints. If a seat is DOWN, run the board with the rest and note it.
+`/board smoke` (or first board of a session - CLIs drift): `bash ~/.claude/skills/board/smoke.sh`. It delegates to each seat's own `smoke.sh` (Gemini = cheapest lite via paid key, throttle-proof; Codex = `gpt-5.5` via stdin; OpenRouter = cheap single-model ping, NOT fusion) and notes Fable as always-in-session. Report the seat table it prints. If a seat is DOWN, run the board with the rest and note it.
 
 ## Step 1 - Draft ONE briefing
 Same self-contained prompt to every seat (assume no shared context):
@@ -44,7 +44,7 @@ Be concrete. No filler. Under 300 words.
 ## Step 2 - Fire all three in ONE message (parallel)
 Write the briefing to a file ONCE (e.g. `/tmp/board_brief.md`), then point all three seats at it. Issuing the Agent call + two Bash calls in a single assistant message runs them concurrently (the host executes independent tool calls in parallel). Run smoke first if you haven't this session, so you don't block on a dead seat.
 ```
-Agent(subagent_type:"general-purpose", model:"opus", description:"Opus seat: <topic>", prompt:"<briefing - or: read /tmp/board_brief.md>")
+Agent(subagent_type:"general-purpose", model:"fable", description:"Fable seat: <topic>", prompt:"<briefing - or: read /tmp/board_brief.md>")
 Bash: bash ~/.claude/skills/gemini-bridge/ask.sh /tmp/board_brief.md
 Bash: bash ~/.claude/skills/codex-bridge/ask.sh /tmp/board_brief.md
 Bash: bash ~/.claude/skills/openrouter-bridge/ask.sh --fusion /tmp/board_brief.md
@@ -61,7 +61,7 @@ Map each seat → recommendation / strongest reason / strongest objection / woul
 
 ## Step 4 - Present crisply (don't dump raw responses)
 ```
-PANEL: Opus: <rec> - <why> | Gemini: <rec> - <why> | Codex: <rec> - <why> | Fusion: <rec> - <why>
+PANEL: Fable: <rec> - <why> | Gemini: <rec> - <why> | Codex: <rec> - <why> | Fusion: <rec> - <why>
 AGREE: <consensus>   DISAGREE: <key tension>
 MY REC: <one option>, because <synthesis>.   KEY RISK: <dissent in one line>.
 YOUR CALL.
@@ -69,7 +69,7 @@ YOUR CALL.
 The board informs; the user decides.
 
 ## Resilience - always return something
-Each seat is independent; a seat erroring is normal. Drop a failed Bash seat and continue. Codex 400 → it's the model id (see `/codex-bridge`), retry once then drop. Gemini key errors (credits) → fall back to agy or drop. Fusion seat slow/erroring (it fans out N+1 calls) → drop it or fall back to a plain OpenRouter model (`bash ~/.claude/skills/openrouter-bridge/ask.sh /tmp/board_brief.md`). **Opus (Agent tool) is always available**, so the board never returns empty. Always note dropped seats in the output.
+Each seat is independent; a seat erroring is normal. Drop a failed Bash seat and continue. Codex 400 → it's the model id (see `/codex-bridge`), retry once then drop. Gemini key errors (credits) → fall back to agy or drop. Fusion seat slow/erroring (it fans out N+1 calls) → drop it or fall back to a plain OpenRouter model (`bash ~/.claude/skills/openrouter-bridge/ask.sh /tmp/board_brief.md`). **Fable (Agent tool) is always available**, so the board never returns empty. If `model:"fable"` is rejected (Fable pulled again), fall back to `model:"opus"`. Always note dropped seats in the output.
 
 ## Guardrails
 One board per major decision per session unless asked. ~30-90s wall-clock. If the panel unanimously contradicts what the user wanted, **surface that gap explicitly** and let the user resolve it - don't quietly side with either.

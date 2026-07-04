@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Board smoke = verify every seat is reachable. Delegates to each seat's own
-# smoke.sh (no duplication). Opus needs no check - it runs via the Agent tool,
+# smoke.sh (no duplication). Fable needs no check - it runs via the Agent tool,
 # always available in-session.
 set -uo pipefail
 SKILLS="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 echo "SEAT CHECK:"
-echo "- Opus   - ok (in-session, Agent tool)"
+echo "- Fable  - ok (in-session, Agent tool)"
 printf -- '- '; bash "$SKILLS/gemini-bridge/smoke.sh"        || true
 printf -- '- '; bash "$SKILLS/codex-bridge/smoke.sh"  || true
 printf -- '- '; bash "$SKILLS/openrouter-bridge/smoke.sh"   || true
