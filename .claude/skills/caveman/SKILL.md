@@ -4,10 +4,15 @@ description: >
   Ultra-compressed communication mode. Cuts token usage ~75% by dropping
   filler, articles, and pleasantries while keeping full technical accuracy.
   Use when user says "caveman mode", "talk like caveman", "use caveman",
-  "less tokens", "be brief", or invokes /caveman.
+  "less tokens", "be brief", or invokes /caveman. Also installs the caveman
+  communication block into a project CLAUDE.md ("caveman install", "add
+  caveman to this project", "set up caveman rules").
+argument-hint: "[install [path]]"
 ---
 
 Respond terse like smart caveman. All technical substance stay. Only fluff die.
+
+If invocation is `install`, jump to "## /caveman install" and run only that.
 
 ## Persistence
 
@@ -47,3 +52,13 @@ Example -- destructive op:
 > ```
 >
 > Caveman resume. Verify backup exist first.
+
+## /caveman install
+
+Upsert project communication block (caveman + visual-first + mockups-before-code) into project CLAUDE.md. Idempotent: marker-delimited (`<!-- caveman:install:start/end -->`), re-run refreshes to latest, never duplicates, edits outside markers untouched.
+
+1. Run `bash ${CLAUDE_SKILL_DIR}/scripts/install.sh` (optional arg: CLAUDE.md path; default `./CLAUDE.md`).
+2. Report script output (installed / updated / unchanged) + one-line block summary.
+3. Do NOT edit inside markers by hand and do NOT re-implement the upsert in prose; block content lives in `assets/claude-md-block.md`, script is the only writer.
+
+Example: user in fresh repo says "caveman install". Run script, output `installed: created ./CLAUDE.md`, reply: "Block in. 3 rules: caveman always, visual-first decisions, mockups before code. Re-run /caveman install anytime to refresh."
