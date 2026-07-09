@@ -2,7 +2,7 @@
 
 Verified 2026-06-13 - every capability below **passed `_model-cache/verify.sh --full` (real artifacts)**: text, lite, image, tts, **live realtime audio**, veo video-gen, lyria music, deep-research, YouTube video-analysis. Also cross-checked vs official `ai.google.dev` docs/changelog + community. Prices = USD per 1M tokens unless noted. **Google hot-swaps `-latest`/`-preview` alias targets with ~2wk notice** - pin a dated id for anything reproducible; this file is the pin. Refresh: `_model-cache/update.sh gemini` then the `update-models` mode of `/gemini-bridge`.
 
-Default auth = **paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`), REST `generateContent`. Pay-as-you-go, no free-tier wall. `agy` (OAuth) is the opt-in agentic seat only.
+Default auth = **paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`), REST `generateContent`. Pay-as-you-go, no free-tier wall. **The `gemini` CLI is DEAD (2026-07-09: OAuth `IneligibleTierError`, migrate-to-Antigravity) - everything is REST now.** `agy` (Antigravity, OAuth) is the opt-in agentic seat only.
 
 ## TEXT / REASONING
 | id | in | out | status | notes |
@@ -68,8 +68,8 @@ Flow (3 sends): `{setup:{model:"models/…",generationConfig:{responseModalities
 ## VIDEO ANALYSIS
 | source | how | cap |
 |---|---|---|
-| YouTube URL | pass `fileData.fileUri=<url>` (CLI: just the URL) - public only | paid: no length limit |
-| local <100MB | inline base64 - but **CLI hardcodes a 20MB cap → fails**; use the helper | <100MB inline |
+| YouTube URL | pass `fileData.fileUri=<url>` - public only | paid: no length limit |
+| local <100MB | inline base64 - use the helper (`video.sh`) | <100MB inline |
 | local big/long | **Files API** (upload→poll ACTIVE→generate→delete) | 2GB free / 20GB paid |
 
 **Local files: use `gemini-bridge/video.sh`** (Files API; requires the key tier - OAuth can't reach Files API). Default 1 FPS sampling (raise `GEMINI_FPS` for rapid motion/dense text). `media_resolution` low=66 tok/frame vs default 258; ~1hr @ default / ~3hr @ low within 1M ctx. Up to 10 videos/request. Clip with `start_offset`/`end_offset` to save tokens. Flash 3.5 to collect, Pro 3.1 to reason.

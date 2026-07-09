@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OpenAI Realtime API (GA gpt-realtime) realtime-audio client: text -> WAV.
+"""OpenAI Realtime API (GA, default gpt-realtime-2.1) realtime-audio client: text -> WAV.
 Usage: realtime_openai.py <model> <out.wav> [prompt]   (key from $OPENAI_API_KEY)
 Prints "OK <bytes>" + exit 0, "ERR <reason>" + exit 1.
 GA gotchas baked in: Authorization Bearer header, NO OpenAI-Beta header, `format`
@@ -8,7 +8,7 @@ response.output_audio.delta (base64 PCM16 24kHz) until response.done."""
 import asyncio, json, base64, wave, os, sys
 import websockets
 
-MODEL  = sys.argv[1] if len(sys.argv) > 1 else "gpt-realtime"
+MODEL  = sys.argv[1] if len(sys.argv) > 1 else "gpt-realtime-2.1"
 OUT    = sys.argv[2] if len(sys.argv) > 2 else "/tmp/openai_live.wav"
 PROMPT = sys.argv[3] if len(sys.argv) > 3 else "Say this exactly, nothing else: realtime audio is working."
 KEY    = os.environ.get("OPENAI_API_KEY", "")

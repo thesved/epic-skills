@@ -8,14 +8,19 @@ description: >-
   De-prescribes Opus-era prompts and CLAUDE.md files that degrade Fable
   (step recipes, show-your-reasoning refusal triggers, token countdowns).
   Routes work between Fable, Opus, Sonnet, and Haiku to cut token spend
-  without losing quality. Also builds Fable system prompts for API, Agent
-  SDK, and custom subagent harnesses (surfaces without Claude Code's
-  built-in Fable instructions). Use when the user says fable-max, max out
-  fable, get the most out of fable, fable settings, prompt for fable,
-  fable system prompt, api prompt for fable, write my goal, goal
-  statement, /goal settings, overnight run setup, should I use fable,
-  de-prescribe, save tokens, or reduce token usage.
-argument-hint: goal <objective> | session | prompt <file|text> | api <use case> | route <task>
+  without losing quality, and runs the delegation pattern: Fable
+  orchestrates while execution runs on other models (GPT-5.5 via codex
+  CLI shell-out, Gemini, OpenRouter seats) via wrapper agents. Also
+  builds Fable system prompts for API, Agent SDK, and custom subagent
+  harnesses (surfaces without Claude Code's built-in Fable
+  instructions). Use when the user says fable-max, max out fable, get
+  the most out of fable, fable settings, prompt for fable, fable system
+  prompt, api prompt for fable, write my goal, goal statement, /goal
+  settings, overnight run setup, should I use fable, de-prescribe, save
+  tokens, reduce token usage, delegate to codex, delegate execution,
+  fable orchestrator, orchestrate other models, or multi-model
+  execution.
+argument-hint: goal <objective> | session | prompt <file|text> | api <use case> | route <task> | delegate <task>
 ---
 
 Research-backed (official docs + community evidence + Claude Code system-prompt dump, 2026-07-04). Detail lives in four references; load ONLY what the active mode names:
@@ -24,6 +29,7 @@ Research-backed (official docs + community evidence + Claude Code system-prompt 
 - `references/prompting.md`: Claude Code-first Fable prompting (default guide)
 - `references/api.md`: API / Agent SDK / subagent system prompts (the 1% case)
 - `references/tokens.md`: effort economics, cache breakers, model routing, context hygiene
+- `references/delegation.md`: Fable orchestrates, other models execute (codex shell-out, wrapper agents, rubric, failure modes)
 
 Pick the mode from the request. No mode named: infer from intent; a bare `/fable-max` means `session`. Default surface is Claude Code; go to `api.md` only when the user names API, SDK, or subagent authoring.
 
@@ -69,7 +75,17 @@ Read `references/api.md`. Assemble a Fable system prompt for a raw API call, Age
 
 ## Mode: route <task>
 
-Read the routing sections of `references/tokens.md` and `references/prompting.md`. Answer: which model, which effort, single session or sandwich (cheap explores, Fable plans, Opus/Sonnet executes, Fable reviews). Always state the cost logic in one line.
+Read the routing sections of `references/tokens.md` and `references/prompting.md`. Answer: which model, which effort, single session or sandwich (cheap explores, Fable plans, Opus/Sonnet executes, Fable reviews). If the answer involves a non-Claude executor, continue into `delegate`. Always state the cost logic in one line.
+
+## Mode: delegate <task>
+
+Read `references/delegation.md`. Run the orchestrator pattern: Fable plans, authors the delegated prompts, and reviews; execution goes to the cheapest model that clears the bar via the existing bridges (codex-bridge implement/review/computer-use for GPT-5.5, gemini-bridge, openrouter-bridge, Sonnet/Haiku subagents).
+
+1. Run the three gates (size ~15 min, self-contained spec, taste >= 7 for user-facing). Any gate fails: do not delegate, say why.
+2. Pick the executor from the rubric (intelligence > taste > cost for anything that ships).
+3. Fable writes the complete self-contained prompt; the bridge (or a thin wrapper agent in fan-outs) only runs it. Call shapes live in the bridge skills, not here.
+4. Verification is Fable's job: `git status` pin before, `git diff` + cheapest real check after. The executor's report is a claim, not evidence.
+5. State the arbitrage in one line (whose meter burns, roughly what it saves).
 
 ## Examples
 

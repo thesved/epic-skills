@@ -25,7 +25,7 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 | Image generate / edit | **Gemini** Nano Banana | gemini-3.1-flash-image (key) | cheap, fast edits; Codex gpt-image-2 fallback |
 | TTS / narration | **Gemini** | gemini-3.1-flash-tts-preview (key) | 30 voices, multi-speaker |
 | Analyze a video / YouTube | **Gemini** (only option) | gemini-3.5-flash / 3.1-pro | Claude can't; Gemini's moat |
-| Realtime/live voice audio | either | gemini-2.5-flash-native-audio-… / gpt-realtime | WebSocket; Gemini audio-out ~5× cheaper, OpenAI GA + simpler |
+| Realtime/live voice audio | either | gemini-2.5-flash-native-audio-… / gpt-realtime-2.1(-mini) | WebSocket; Gemini audio-out ~5× cheaper than full 2.1, but 2.1-mini narrows it to ~1.5×; OpenAI GA + simpler |
 | Agentic coding via OpenAI key | OpenAI codex | gpt-5.3-codex (Responses API) | heavy coding; CLI `gpt-5.5` for interactive |
 | Text fallback when a route throttles | **OpenRouter** | provider/model | one key → many providers |
 | Long-context doc dump | **Gemini** | gemini-3.5-flash | 1M ctx |

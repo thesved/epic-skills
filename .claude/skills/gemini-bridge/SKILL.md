@@ -22,30 +22,28 @@ Use Gemini for what Claude can't or does worse: **video analysis** (YouTube + lo
 
 **Model ids, pricing, and exact call shapes live in the cache - read it before generating:** `~/.claude/skills/_model-cache/gemini.md` (and `index.md` for routing). For **how to prompt each model well**, read the ONE matching file in `~/.claude/skills/_model-cache/examples/` (each mode below names its file). This skill never hardcodes ids; they drift. The cache is the pin.
 
-## Auth - default to the paid key
-Default = **paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`) via REST. Pay-as-you-go, no free-tier throttle wall - this is the default precisely because OAuth limits keep biting. Image/TTS/local-video **require** the key tier regardless. The `gemini` CLI obeys `~/.gemini/settings.json` → `security.auth.selectedType` (currently `oauth-personal`, so it ignores `GEMINI_API_KEY`); use REST `curl` for anything key-gated. `agy` (OAuth agentic seat) is opt-in only - see `/board`.
-
-CLI use (text/`@file` ingestion): add `--skip-trust` to every headless call or it refuses ("not running in a trusted directory").
+## Auth - REST + paid key, always
+Everything runs **REST with the paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`). Pay-as-you-go, no free-tier throttle wall. **The old `gemini` CLI is DEAD** (OAuth path returns `IneligibleTierError` + migrate-to-Antigravity notice, confirmed 2026-07-09); its successor is `agy` (Antigravity), which stays an opt-in OAuth agentic seat only - see `/board`. Do not route work through `gemini`; every mode below is REST (`ask.sh`, `video.sh`, or the curl shapes in the cache).
 
 ## Modes
 
 ### `write` / `review` / `translate` - non-English copy
 Build a real brief (audience, voice, what to avoid, constraints, output format), not "translate this." Flash is enough for copy.
 ```bash
-gemini --skip-trust -m gemini-3.5-flash -p "$(cat <<'EOF'
+cat <<'EOF' | bash ~/.claude/skills/gemini-bridge/ask.sh
 You are writing native-quality <lang> <copy type>. Audience: <…>. Voice: <…>.
 Avoid: <literal-from-English, clichés>. Task: <…>. Constraints: <length/tone>. Output: just the copy.
 EOF
-)"
 ```
+(`ask.sh` = keychain-resolving REST one-shot; model via `BOARD_GEMINI_MODEL`, default tracks newest flash.)
 Review mode: ask for surgical defects ("quote each phrase that sounds translated, suggest a natural alternative"), not generic praise.
 
 ### `image` - generate / edit
 REST + key only (CLI 404s on image models). **Read the IMAGE section of the cache** for the current id (`gemini-3.1-flash-image` cheap / `gemini-3-pro-image` studio), the `imageConfig` call shape, edit-via-inlineData, and per-image pricing. Output is base64 in `inlineData` - read its `mimeType`. Codex `gpt-image-2` is the fallback (`/codex-bridge image`) when you'd rather use OpenAI. **Prompt examples → `_model-cache/examples/gemini-image.md`.**
 
 ### `video` - YouTube or local file (the moat)
-- **YouTube URL** → just pass it to the CLI; Gemini fetches it. For metadata + top comments folded in, prefer `/youtube`.
-- **Local file** → `~/.claude/skills/gemini-bridge/video.sh "<path>" "<question>"` (Files API; the CLI can't upload local video). `GEMINI_MODEL=pro` for reasoning, `GEMINI_FPS=n` for rapid motion/dense text. Flash to collect (transcribe/OCR/list), Pro to reason (intent/cause). See the VIDEO section of the cache for sampling/limits. **Prompt examples (transcript, tutorial-extract, Veo gen) → `_model-cache/examples/gemini-video.md`.**
+- **YouTube URL** → REST `generateContent` with `fileData.fileUri=<url>` in the parts (call shape in the cache VIDEO section); Gemini fetches it. For metadata + top comments folded in, prefer `/youtube`.
+- **Local file** → `~/.claude/skills/gemini-bridge/video.sh "<path>" "<question>"` (Files API). `GEMINI_MODEL=pro` for reasoning, `GEMINI_FPS=n` for rapid motion/dense text. Flash to collect (transcribe/OCR/list), Pro to reason (intent/cause). See the VIDEO section of the cache for sampling/limits. **Prompt examples (transcript, tutorial-extract, Veo gen) → `_model-cache/examples/gemini-video.md`.**
 
 ### `tts` - spoken audio
 REST + key only. Quick path + the call shape are in the cache TTS section; **full reference (30 voices, multi-speaker, tags, WAV wrap): `~/.claude/skills/gemini-bridge/tts.md`. Meditation/hypnosis pacing: `~/.claude/skills/gemini-bridge/tts-meditation-pacing.md`** (read it or output is unusable audiobook narration). For one-line dev audio, macOS `say` is faster. **Prompt examples (style tags, multi-speaker, director) → `_model-cache/examples/gemini-audio.md`.**
@@ -55,9 +53,9 @@ For bidirectional voice agents or low-latency streaming TTS. `python3 ~/.claude/
 
 ### `ask` / long-context
 ```bash
-gemini --skip-trust -m gemini-3.5-flash -p "<self-contained question>"   # or: @filepath inside the prompt to ingest files
+echo "<self-contained question>" | bash ~/.claude/skills/gemini-bridge/ask.sh   # or: ask.sh /path/to/brief
 ```
-Flash to collect, Pro to think (cache TEXT section). Throttle-proof key-backed one-shot (resolves key from keychain): `bash ~/.claude/skills/gemini-bridge/ask.sh <file|stdin>`. **Prompt examples (thinking control, JSON, long-context) → `_model-cache/examples/gemini-text.md`.** For Lyria music / deep-research → `_model-cache/examples/gemini-gen.md`.
+Flash to collect, Pro to think (`BOARD_GEMINI_MODEL=gemini-3.1-pro-preview`; cache TEXT section). To ingest files, cat them into the brief. **Prompt examples (thinking control, JSON, long-context) → `_model-cache/examples/gemini-text.md`.** For Lyria music / deep-research → `_model-cache/examples/gemini-gen.md`.
 
 ### `smoke` / `verify` - is it actually working?
 - `bash ~/.claude/skills/gemini-bridge/smoke.sh` → cheap liveness ping (lite model, paid key; `tier=standard` confirms paid).
@@ -72,10 +70,8 @@ Flash to collect, Pro to think (cache TEXT section). Throttle-proof key-backed o
 Don't dump raw output. Summarize, quote the key bits. For copy/translations, offer alternatives. For images, report the saved path (`open <path>`). For non-English, show the user and ask if it reads naturally - don't assume Gemini nailed it.
 
 ## Failure modes
-- **"not running in a trusted directory"** → add `--skip-trust`.
-- **`ModelNotFoundError: 404` on image/TTS** → you're using the CLI; those are REST+key only (cache has the curl).
-- **Local video via `@file` stalls** → CLI never uses the Files API (20MB inline cap); use `video.sh`.
-- **`TerminalQuotaError` / quota** → OAuth tier burned; you should be on the key already (REST). 
+- **`IneligibleTierError` / migrate-to-Antigravity** → you called the dead `gemini` CLI; use REST (`ask.sh` / curl from the cache).
+- **`TerminalQuotaError` / quota** → an OAuth path burned its tier; you should be on the key via REST.
 - **Smoke ERR: no key** → add the key to keychain (`gemini-api-key`) or export `GEMINI_API_KEY`; `lib.sh` resolves env→`~/.zshrc`→keychain.
 - **Key throttled / credits depleted (text)** → route the request through OpenRouter (`google/gemini-3.5-flash`) - see `_model-cache/openrouter.md`. (Media endpoints stay direct.)
 

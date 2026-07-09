@@ -37,7 +37,7 @@ Output schema/Stop conditions; imperative MUST/NEVER, no hedging. Return ONLY th
 
 ---
 
-## gpt-realtime - voice agent. Instructions+tools ≤16k tok; window 32k. Voices incl. `marin`,`cedar`.
+## gpt-realtime-2.1 - voice agent (2.1: window 128k / out 32k; old `gpt-realtime` 32k/4k; `-2.1-mini` = cheap pick, $10/$20 audio). Instructions+tools ≤16k tok. Voices incl. `marin`,`cedar`.
 
 **Structured role block** - short labeled sections + CAPS rules are what it was tuned on [off]:
 ```

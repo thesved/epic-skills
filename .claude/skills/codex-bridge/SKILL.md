@@ -3,13 +3,17 @@ name: codex-bridge
 description: >-
   Use OpenAI Codex CLI for what it does better than Claude: writing prompts FOR
   Claude (especially Opus - Codex produces more rigorous, spec-like, less
-  conversational prompts), generating images via gpt-image, and a structurally
-  different "200 IQ autistic developer" second opinion. Triggers: "write a
-  prompt", "improve this prompt", "prompt for opus", "prompt engineering", "ask
-  codex", "codex image", "generate image via openai", "different model take",
-  "what would codex say". Proactively suggest when the user is about to spawn an
-  Agent/subagent with a hand-written prompt - Codex can sharpen it first.
-argument-hint: prompt <goal> | improve <existing-prompt> | image <description> | ask <question> | smoke | update-models
+  conversational prompts), generating images via gpt-image, a structurally
+  different "200 IQ autistic developer" second opinion, and delegating
+  execution to GPT-5.5: bounded implementation, independent code review, and
+  computer-use verification via codex exec/review shell-outs. Triggers: "write
+  a prompt", "improve this prompt", "prompt for opus", "prompt engineering",
+  "ask codex", "codex image", "generate image via openai", "different model
+  take", "what would codex say", "delegate to codex", "codex implement",
+  "codex review", "codex computer use", "have gpt-5.5 do it". Proactively
+  suggest when the user is about to spawn an Agent/subagent with a
+  hand-written prompt - Codex can sharpen it first.
+argument-hint: prompt <goal> | improve <existing-prompt> | image <description> | ask <question> | implement <task> | review [target] | computer-use <check> | smoke | update-models
 ---
 
 # Codex Prompt - let Codex write prompts for Opus
@@ -51,10 +55,32 @@ EOF
 ```
 Reasoning effort: add `-c model_reasoning_effort=high`. Don't dump verbatim - quote the 1-3 sharpest points and say what you'll do with them. Scripted/board one-shot (stdin + banner-strip handled): `bash ~/.claude/skills/codex-bridge/ask.sh <file|stdin>`.
 
+### `implement` / `review` / `computer-use` - delegate execution to GPT-5.5
+GPT-5.5 as executor while Claude orchestrates (see `/fable-max` delegate mode for WHEN and the routing rubric; this section is HOW). Shell-out via Bash - same pattern as every bridge here; bills the OpenAI sub, zero Claude tokens. Flags verified 2026-07-09:
+
+```bash
+R="$(mktemp -d)/report.md"
+# implement (bounded change, repo-write):
+cat prompt.md | codex exec - -s workspace-write -C "$PWD" -o "$R"
+# review (independent second pass; target = --uncommitted | --base main | --commit <sha>):
+codex review --uncommitted "Review for bugs, regressions, missing tests, requirement mismatches. Findings over summary: severity, file:line, concrete failure mode, fix direction. Do not edit files. If nothing substantive, say so and name residual test gaps."
+# computer-use / runtime verification (GUI, simulators, browsers):
+cat prompt.md | codex exec - -s danger-full-access -C "$PWD" -o "$R"
+# investigation (no edit risk): -s read-only
+```
+
+Rules (each prevents a real failure):
+1. **Codex sees nothing of your session** - the prompt must be self-contained: goal + acceptance criteria + reference files/patterns + must-NOT-touch + verification commands + "do not commit/push/deploy".
+2. **Contract "nothing found" as an explicit outcome** or the orchestrator loops re-asking.
+3. **Verify, never relay.** Pin `git status --short` before, read `git diff` after, run the cheapest real check. The report is a claim, not evidence.
+4. Long runs exceed Bash's 10-min default: raise `timeout` or `run_in_background` + poll `$R`.
+5. Structured verdicts: `--output-schema <schema.json>`. Cap Claude↔Codex review ping-pong at 2 rounds.
+6. Codex churns (renames, import reshuffles): put "execute exactly what was asked, don't redesign" in the prompt.
+
 ### API-key extras (beyond the OAuth CLI)
 With `OPENAI_API_KEY` set (in `~/.zshrc`), the full API opens up - details + verified call shapes in `~/.claude/skills/_model-cache/openai.md`:
 - **Codex agentic models** (`gpt-5.3-codex` latest, `gpt-5.2-codex`, …) → **Responses API** (`/v1/responses`), NOT chat/completions. There is **no** `gpt-5.5-codex`.
-- **Realtime audio** (`gpt-realtime`, GA) → `python3 ~/.claude/skills/_model-cache/realtime_openai.py gpt-realtime <out.wav> "<text>"` (verified).
+- **Realtime audio** (`gpt-realtime-2.1`, GA; `-2.1-mini` = cheap pick) → `python3 ~/.claude/skills/_model-cache/realtime_openai.py gpt-realtime-2.1-mini <out.wav> "<text>"` (verified 2026-07-09).
 - **OpenRouter** (`~/.claude/skills/_model-cache/openrouter.md`) = generic text fallback across providers when a route throttles.
 
 ### `smoke` / `verify` - is it actually working?

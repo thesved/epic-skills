@@ -25,15 +25,16 @@ curl -s https://api.openai.com/v1/responses -H "Authorization: Bearer $OPENAI_AP
 ```
 ~$1.75 in / $14 out (5.3-codex). Use for heavy agentic coding when you want OpenAI's coder via the key; the `codex` CLI (OAuth) covers the interactive path.
 
-## REALTIME AUDIO - `gpt-realtime` (GA, WebSocket)
-Speech-to-speech / text→audio. **Client: `_model-cache/realtime_openai.py`** (raw `websockets`, verified). URL `wss://api.openai.com/v1/realtime?model=gpt-realtime`, header `Authorization: Bearer $OPENAI_API_KEY`, **NO `OpenAI-Beta` header on GA**.
+## REALTIME AUDIO - `gpt-realtime-2.1` (GA, WebSocket; refreshed 2026-07-09)
+Speech-to-speech / text→audio. **Client: `_model-cache/realtime_openai.py`** (raw `websockets`; **E2E-verified with `gpt-realtime-2.1-mini` 2026-07-09**, protocol unchanged). URL `wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1`, header `Authorization: Bearer $OPENAI_API_KEY`, **NO `OpenAI-Beta` header on GA**.
 | id | status | notes |
 |---|---|---|
-| `gpt-realtime` (snap `-2025-08-28`) | **GA, default** | 32k ctx |
-| `gpt-realtime-mini` | GA | cheaper, ~$0.06-0.15/min |
-| `gpt-realtime-2`, `gpt-realtime-1.5` | GA | newer snapshots |
-| `gpt-realtime-translate` / `-whisper` | GA | streaming translate / transcribe (billed by audio duration) |
-Flow: `session.update` (**`format` is an OBJECT** `{"type":"audio/pcm","rate":24000}`, `output_modalities:["audio"]`, `voice`) → `conversation.item.create` (input_text) → **`response.create`** (mandatory) → collect `response.output_audio.delta` (base64 PCM16 24kHz) until `response.done`. Pricing: **audio $32 in / $64 out**, text $4/$16, cached $0.40 per 1M. Latency ~4.5s round-trip for a short turn (streams in real time). Browser → ephemeral `ek_` token via `POST /v1/realtime/client_secrets`. `websockets`<13 uses `extra_headers`, ≥13 `additional_headers`.
+| `gpt-realtime-2.1` | **GA, default** (shipped 2026-07-06) | **128k ctx / 32k out** (old GA was 32k/4k); configurable reasoning effort; better alphanumerics, interruption, noise handling; text+audio+image in |
+| `gpt-realtime-2.1-mini` | GA, **price-performance pick** | audio **$10 in / $20 out**, text $0.60/$2.40; ~1.3-1.7x Gemini Live output cost with GPT-class tool use |
+| `gpt-realtime` (snap `-2025-08-28`), `-2`, `-1.5`, `-mini` | GA, superseded | all still live in `/v1/models` (verified); playground reportedly still defaults to `-2`, so pass explicit ids |
+| `gpt-realtime-translate` / `-whisper` | GA | streaming translate / transcribe, billed per minute: **$0.034/min / $0.017/min** |
+| `GPT-Live-1` / `-1-mini` | **ChatGPT only, API waitlist** (announced 2026-07-08) | full-duplex (listens while speaking), replaces Advanced Voice Mode; delegates reasoning to GPT-5.5 in background; expect a NEW duplex API shape, form: openai.com/form/gpt-live-1-in-the-api/ |
+Flow (unchanged in 2.1): `session.update` (**`format` is an OBJECT** `{"type":"audio/pcm","rate":24000}`, `output_modalities:["audio"]`, `voice`) → `conversation.item.create` (input_text) → **`response.create`** (mandatory) → collect `response.output_audio.delta` (base64 PCM16 24kHz) until `response.done`. Pricing (`gpt-realtime-2.1`): **audio $32 in / $64 out**, text $4 in / **$24 out** (was $16 on old GA), cached $0.40 per 1M. Latency: p95 cut ≥25% vs `-2` (official claim). Browser → ephemeral `ek_` token via `POST /v1/realtime/client_secrets`. `websockets`<13 uses `extra_headers`, ≥13 `additional_headers`. Reasoning-effort session field name unverified - check the realtime guide before relying on it.
 
 ## IMAGE
 | id | notes |
