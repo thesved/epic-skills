@@ -26,7 +26,7 @@ One OpenAI-compatible endpoint proxying many providers behind a single prepaid k
 | Mode | Command | What it does |
 |------|---------|--------------|
 | plain | `bash openrouter-bridge/ask.sh <file-or-stdin>` | one model, default `z-ai/glm-5.2`. Override `OPENROUTER_MODEL=provider/model`. |
-| grok | `bash openrouter-bridge/ask.sh --grok <file-or-stdin>` | xAI seat, self-healing chain: `x-ai/grok-4.5` direct → on EU region-block retry via US SOCKS5 (keychain `nordvpn-socks5` = NordVPN service `user:pass`, host `$NORD_SOCKS_HOST` default `us.socks.nordhold.net:1080`) → fall back `x-ai/grok-4.3` (notes the substitution). Overrides: `OPENROUTER_GROK_MODEL` / `_FALLBACK` / `OPENROUTER_PROXY`. The /board Grok seat. |
+| grok | `bash openrouter-bridge/ask.sh --grok <file-or-stdin>` | xAI seat, self-healing chain: latest flagship direct → US-proxy retry on region-block → prior flagship fallback (notes the substitution). Mechanics + envs documented in the `ask.sh` header; model facts in the cache. The /board Grok seat. |
 | fusion | `bash openrouter-bridge/ask.sh --fusion <file-or-stdin>` | `openrouter/fusion`: panel answers in parallel (web search on) -> judge synthesizes one answer. |
 | smoke | `bash openrouter-bridge/smoke.sh` | cheap single-model ping; verifies key + endpoint (NOT fusion - that fans out paid calls). |
 

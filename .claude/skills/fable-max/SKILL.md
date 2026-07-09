@@ -79,10 +79,10 @@ Read the routing sections of `references/tokens.md` and `references/prompting.md
 
 ## Mode: delegate <task>
 
-Read `references/delegation.md`. Run the orchestrator pattern: Fable plans, authors the delegated prompts, and reviews; execution goes to the cheapest model that clears the bar via the existing bridges (codex-bridge implement/review/computer-use for GPT-5.5, gemini-bridge, openrouter-bridge, Sonnet/Haiku subagents).
+Read `references/delegation.md` AND the "Delegation roles" table in `~/.claude/skills/_model-cache/index.md` (current model picks live there, refreshed with model updates - never from memory). Run the orchestrator pattern: Fable plans, authors the delegated prompts, and reviews; execution goes to the role's current pick via its bridge (codex-bridge implement/review/computer-use, gemini-bridge, openrouter-bridge, Claude subagents).
 
-1. Run the three gates (size ~15 min, self-contained spec, taste >= 7 for user-facing). Any gate fails: do not delegate, say why.
-2. Pick the executor from the rubric (intelligence > taste > cost for anything that ships).
+1. Run the three gates (size ~15 min, self-contained spec, taste gate for user-facing). Any gate fails: do not delegate, say why.
+2. Pick the executor from the cache roles table (intelligence > taste > cost for anything that ships).
 3. Fable writes the complete self-contained prompt; the bridge (or a thin wrapper agent in fan-outs) only runs it. Call shapes live in the bridge skills, not here.
 4. Verification is Fable's job: `git status` pin before, `git diff` + cheapest real check after. The executor's report is a claim, not evidence.
 5. State the arbitrage in one line (whose meter burns, roughly what it saves).

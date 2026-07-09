@@ -15,6 +15,7 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 | Gemini video analysis or Veo video-gen | [`examples/gemini-video.md`](examples/gemini-video.md) |
 | Lyria music or deep-research | [`examples/gemini-gen.md`](examples/gemini-gen.md) |
 | Any OpenAI: gpt-5.5 / codex / realtime / gpt-image-2 | [`examples/openai.md`](examples/openai.md) |
+| Grok / xAI via OpenRouter (route-to/away, effort dial, agentic patterns) | [`examples/grok.md`](examples/grok.md) |
 
 ## Capability routing - who to reach for
 | need | first choice | id (verify in provider file) | why |
@@ -35,6 +36,19 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 
 Smoke = cheapest lite (`gemini-flash-lite-latest`) / `gpt-5.5`. Default Gemini auth = **paid `GEMINI_API_KEY`** (REST), not OAuth.
 
+## Delegation roles - current picks (refresh with every model update; skills point HERE, never hardcode)
+Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-09.
+| role | current pick | why now |
+|---|---|---|
+| Orchestrator / plans / final review | fable-5 (high effort, never above) | best planning layer; 2x Opus price so it writes no bulk code |
+| Bulk executor (clear-spec impl, migrations, tests, analysis) | gpt-5.5 via codex CLI | execution ~parity with frontier at OpenAI-sub marginal cost; taste ~5, nothing user-facing unreviewed |
+| Taste work + independent review seat | opus-4.8 | taste ~9 at half Fable price; also the security-review seat (Fable refusal risk) |
+| Wrapper plumbing / mid-taste | sonnet-5 | cheap, reliable executor of ready-made prompts |
+| Read-only scout | haiku | cheapest useful |
+| Cross-family opinion (board Grok seat) | x-ai grok chain (`openrouter-bridge/ask.sh --grok`) | latest xAI flagship, self-healing fallback; also a strong agentic-tool-loop executor (see `examples/grok.md`) |
+| Cheap diverse panel | openrouter fusion (GLM+DeepSeek) | non-OAI/Anthropic/Google/xAI architecture diversity |
+| Video / multimodal / 1M-ctx dumps / non-English | gemini (REST) | the moat; Claude can't do video |
+
 ## Typical response time
 Measured once 2026-06-13 (a few runs, median - reference only; not re-run every verify). `verify.sh` prints a live `SECS` column (single run by default). **Scales with output length, image resolution, video/audio duration, and context size.**
 | capability | model | latency | per unit |
@@ -52,6 +66,7 @@ Measured once 2026-06-13 (a few runs, median - reference only; not re-run every 
 ## Refresh (the `update-models` flow)
 1. `_model-cache/update.sh [gemini|openai|all]` - deterministic: pulls the live model list, diffs vs the snapshot, prints **NEW / REMOVED / CHANGED**.
 2. Web-research **only** the flagged models (capability + pricing + one best-practice sample) and edit the provider file. If nothing changed → just refresh pricing.
+2b. Any flagged model that could change a **Delegation roles** row (above): re-verify that row and its date. Skills depend on this table instead of hardcoding names.
 3. `update-models all` → re-research every model; `update-models <ids>` → only those.
 
 `.snap-gemini.tsv` / `.snap-openai.txt` = machine snapshots (diff basis). `.updated` = last refresh timestamp - **if it's older than ~30-60 days, run `update.sh` before trusting ids/pricing** (the lineups drift).
