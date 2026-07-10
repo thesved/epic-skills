@@ -28,7 +28,7 @@ The **4th seat is Grok** (`ask.sh --grok`, latest xAI flagship via OpenRouter; s
 **Don't** when: there's a single checkable answer; you haven't tried it yourself; budget matters more than confidence (≈8× one call with Fusion, ≈4× without).
 
 ## Smoke test
-`/board smoke` (or first board of a session - CLIs drift): `bash ~/.claude/skills/board/smoke.sh`. It delegates to each seat's own `smoke.sh` (Gemini = cheapest lite via paid key, throttle-proof; Codex = `gpt-5.5` via stdin; OpenRouter = cheap single-model ping, NOT fusion) and notes Fable as always-in-session. Report the seat table it prints. If a seat is DOWN, run the board with the rest and note it.
+`/board smoke` (or first board of a session - CLIs drift): `bash ~/.claude/skills/board/smoke.sh`. It delegates to each seat's own `smoke.sh` (Gemini = cheapest lite via paid key, throttle-proof; Codex = its `smoke.sh` default via stdin; OpenRouter = cheap single-model ping, NOT fusion) and notes Fable as always-in-session. Report the seat table it prints. If a seat is DOWN, run the board with the rest and note it.
 
 ## Step 1 - Draft ONE briefing
 Same self-contained prompt to every seat (assume no shared context):

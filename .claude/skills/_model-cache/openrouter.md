@@ -12,6 +12,7 @@ curl -s https://openrouter.ai/api/v1/chat/completions \
   | jq -r '.choices[0].message.content'
 ```
 - **Model id = `provider/model`**, e.g. `openai/gpt-5.5`, `google/gemini-3.5-flash`, `anthropic/claude-opus-4.8`, `openai/gpt-5.4-mini`, `google/gemini-2.5-flash-lite` (cheap). List: `GET https://openrouter.ai/api/v1/models` (no key needed) → `.data[].id`.
+- **Early-access arbitrage: OpenRouter can serve models the direct API still gates** - when a headline model 403s direct, check here first. `openai/gpt-5.6-sol`/`-terra`/`-luna` (each ±`-pro`, 1.05M ctx; sol $5/$30, terra $2.50/$15, luna $1/$6) live here; **for 5.6 prefer codex CLI OAuth (sub-billed), use this route for `-pro`/API-key needs**. Facts + cautions → `openai.md`.
 - Response includes `provider` (which upstream actually served it). Optional headers `HTTP-Referer` / `X-Title` for app attribution.
 - Streaming, tools, and most OpenAI params pass through. Some providers drop unsupported fields silently.
 

@@ -34,14 +34,14 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 | Music generation | Gemini lyria | lyria-3-pro-preview | |
 | Multi-step cited research | Gemini deep-research | deep-research-pro-preview-12-2025 | or use `/deep-research` skill |
 
-Smoke = cheapest lite (`gemini-flash-lite-latest`) / `gpt-5.5`. Default Gemini auth = **paid `GEMINI_API_KEY`** (REST), not OAuth.
+Smoke = cheapest lite (`gemini-flash-lite-latest`) / `gpt-5.6-sol`. Default Gemini auth = **paid `GEMINI_API_KEY`** (REST), not OAuth.
 
 ## Delegation roles - current picks (refresh with every model update; skills point HERE, never hardcode)
 Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-09.
 | role | current pick | why now |
 |---|---|---|
 | Orchestrator / plans / final review | fable-5 (high effort, never above) | best planning layer; 2x Opus price so it writes no bulk code |
-| Bulk executor (clear-spec impl, migrations, tests, analysis) | gpt-5.5 via codex CLI | execution ~parity with frontier at OpenAI-sub marginal cost; taste ~5, nothing user-facing unreviewed |
+| Bulk executor (clear-spec impl, migrations, tests, analysis) | gpt-5.6-terra via codex CLI (`gpt-5.6-sol` for hard bulk) | ~5.5-class execution at half price, sub-billed. **If Sol executes, external verification is mandatory - never accept its own test results** (METR record reward-hacking, see `examples/openai.md`) |
 | Taste work + independent review seat | opus-4.8 | taste ~9 at half Fable price; also the security-review seat (Fable refusal risk) |
 | Wrapper plumbing / mid-taste | sonnet-5 | cheap, reliable executor of ready-made prompts |
 | Read-only scout | haiku | cheapest useful |

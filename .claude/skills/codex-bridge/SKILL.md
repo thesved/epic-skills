@@ -5,12 +5,13 @@ description: >-
   Claude (especially Opus - Codex produces more rigorous, spec-like, less
   conversational prompts), generating images via gpt-image, a structurally
   different "200 IQ autistic developer" second opinion, and delegating
-  execution to GPT-5.5: bounded implementation, independent code review, and
-  computer-use verification via codex exec/review shell-outs. Triggers: "write
-  a prompt", "improve this prompt", "prompt for opus", "prompt engineering",
-  "ask codex", "codex image", "generate image via openai", "different model
-  take", "what would codex say", "delegate to codex", "codex implement",
-  "codex review", "codex computer use", "have gpt-5.5 do it". Proactively
+  execution to GPT (5.6 sol/terra/luna): bounded implementation, independent
+  code review, and computer-use verification via codex exec/review shell-outs.
+  Triggers: "write a prompt", "improve this prompt", "prompt for opus",
+  "prompt engineering", "ask codex", "codex image", "generate image via
+  openai", "different model take", "what would codex say", "delegate to
+  codex", "codex implement", "codex review", "codex computer use", "have
+  gpt-5.6 do it", "have gpt-5.5 do it". Proactively
   suggest when the user is about to spawn an Agent/subagent with a
   hand-written prompt - Codex can sharpen it first.
 argument-hint: prompt <goal> | improve <existing-prompt> | image <description> | ask <question> | implement <task> | review [target] | computer-use <check> | smoke | update-models
@@ -18,18 +19,18 @@ argument-hint: prompt <goal> | improve <existing-prompt> | image <description> |
 
 # Codex Prompt - let Codex write prompts for Opus
 
-Core insight: **Opus is not the best model for writing prompts Opus will execute.** Codex/GPT-5.5 writes more rigorous, spec-like, less conversational prompts. When about to spawn an Agent with a non-trivial briefing, run it through Codex first. Also the entry point for OpenAI-side capabilities Claude lacks: **image gen** (`gpt-image-2`) and a different-architecture **second opinion**.
+Core insight: **Opus is not the best model for writing prompts Opus will execute.** Codex/GPT writes more rigorous, spec-like, less conversational prompts. When about to spawn an Agent with a non-trivial briefing, run it through Codex first. Also the entry point for OpenAI-side capabilities Claude lacks: **image gen** (`gpt-image-2`) and a different-architecture **second opinion**.
 
 **Model ids, pricing, call shapes, gotchas live in the cache - read before use:** `~/.claude/skills/_model-cache/openai.md`. For **how to prompt gpt-5.5/codex/realtime/gpt-image well** (spec/contract prompts, eagerness + reasoning_effort, AGENTS.md, voice-agent instructions, metaprompting for Opus) → `~/.claude/skills/_model-cache/examples/openai.md`. Don't hardcode ids; they drift and most `-codex`/`-pro` ids 400 on ChatGPT login.
 
 ## The one rule that breaks everything
-Pass the prompt via **stdin**, never a positional arg (positional hangs on "Reading additional input from stdin…"). On ChatGPT-account login use **`-m gpt-5.5`** (the only reliable id; cache explains why). `--skip-git-repo-check` outside a repo.
+Pass the prompt via **stdin**, never a positional arg (positional hangs on "Reading additional input from stdin…"). On ChatGPT-account login use **`-m gpt-5.6-sol` / `-terra` / `-luna`** (bare `gpt-5.6` 400s; fallback `gpt-5.5`). `--skip-git-repo-check` outside a repo.
 
 ## Modes
 
 ### `prompt` - write a prompt from scratch (esp. for an Agent/Opus call)
 ```bash
-cat <<'EOF' | codex exec -m gpt-5.5 --skip-git-repo-check
+cat <<'EOF' | codex exec -m gpt-5.6-sol --skip-git-repo-check
 Write a prompt for <target model> to do: <one-paragraph goal>.
 CONTEXT IT WILL HAVE: <repo state, files, tools>.
 CONSTRAINTS (numbered, hard): 1) … 2) …
@@ -48,15 +49,15 @@ Built-in `image_gen` tool, works on ChatGPT-login OAuth. **Read the IMAGE sectio
 
 ### `ask` - second opinion / argue against my plan
 ```bash
-cat <<'EOF' | codex exec -m gpt-5.5 --skip-git-repo-check
+cat <<'EOF' | codex exec -m gpt-5.6-sol --skip-git-repo-check
 I am about to <action>. Reasoning: <reasoning>.
 Argue against this. Find what I'm missing. Be specific and technical. Do not validate, do not soften.
 EOF
 ```
 Reasoning effort: add `-c model_reasoning_effort=high`. Don't dump verbatim - quote the 1-3 sharpest points and say what you'll do with them. Scripted/board one-shot (stdin + banner-strip handled): `bash ~/.claude/skills/codex-bridge/ask.sh <file|stdin>`.
 
-### `implement` / `review` / `computer-use` - delegate execution to GPT-5.5
-GPT-5.5 as executor while Claude orchestrates (see `/fable-max` delegate mode for WHEN and the routing rubric; this section is HOW). Shell-out via Bash - same pattern as every bridge here; bills the OpenAI sub, zero Claude tokens. Flags verified 2026-07-09:
+### `implement` / `review` / `computer-use` - delegate execution to GPT
+GPT as executor while Claude orchestrates (see `/fable-max` delegate mode for WHEN and the routing rubric; this section is HOW; current executor pick = delegation-roles table in `_model-cache/index.md`). Shell-out via Bash - same pattern as every bridge here; bills the OpenAI sub, zero Claude tokens. Flags verified 2026-07-09:
 
 ```bash
 R="$(mktemp -d)/report.md"
@@ -72,7 +73,7 @@ cat prompt.md | codex exec - -s danger-full-access -C "$PWD" -o "$R"
 Rules (each prevents a real failure):
 1. **Codex sees nothing of your session** - the prompt must be self-contained: goal + acceptance criteria + reference files/patterns + must-NOT-touch + verification commands + "do not commit/push/deploy".
 2. **Contract "nothing found" as an explicit outcome** or the orchestrator loops re-asking.
-3. **Verify, never relay.** Pin `git status --short` before, read `git diff` after, run the cheapest real check. The report is a claim, not evidence.
+3. **Verify, never relay.** Pin `git status --short` before, read `git diff` after, run the cheapest real check. The report is a claim, not evidence. **With `gpt-5.6-sol` this rule is mandatory, not hygiene** (METR record reward-hacking; trust rule in `_model-cache/examples/openai.md`).
 4. Long runs exceed Bash's 10-min default: raise `timeout` or `run_in_background` + poll `$R`.
 5. Structured verdicts: `--output-schema <schema.json>`. Cap Claude↔Codex review ping-pong at 2 rounds.
 6. Codex churns (renames, import reshuffles): put "execute exactly what was asked, don't redesign" in the prompt.
@@ -84,7 +85,7 @@ With `OPENAI_API_KEY` set (in `~/.zshrc`), the full API opens up - details + ver
 - **OpenRouter** (`~/.claude/skills/_model-cache/openrouter.md`) = generic text fallback across providers when a route throttles.
 
 ### `smoke` / `verify` - is it actually working?
-- `bash ~/.claude/skills/codex-bridge/smoke.sh` → pings `gpt-5.5` via stdin (`CODEX_MODEL=<id>` to override).
+- `bash ~/.claude/skills/codex-bridge/smoke.sh` → pings `gpt-5.6-sol` via stdin (`CODEX_MODEL=<id>` to override).
 - `bash ~/.claude/skills/_model-cache/verify.sh` → E2E PASS/FAIL across all providers (incl. openai text/codex/realtime).
 
 ### `update-models` - refresh the cache
@@ -94,7 +95,7 @@ With `OPENAI_API_KEY` set (in `~/.zshrc`), the full API opens up - details + ver
 Use for: consequential Agent calls (planning, risky-code review, decisions), a vague hand-written prompt, batches of parallel agents needing consistent briefings, image-gen, adversarial second opinions. Skip for: trivial Agent calls, prompts already short and good.
 
 ## Failure modes
-- **400 "not supported"** → wrong model id (an `-codex`/`-pro`/older id on ChatGPT login). Use `gpt-5.5`; if that 400s, run `update-models`.
+- **400 "not supported"** → wrong model id (bare `gpt-5.6`, `-codex`/`-pro` ids on ChatGPT login) or stale codex CLI. Use `gpt-5.6-sol`; if it still 400s, `volta install @openai/codex@latest` + `update-models`.
 - **Hang on "Reading additional input from stdin…"** → you used a positional arg. Pipe via stdin.
 - **Output has fences/preamble despite instructions** → strip before using.
 - **Image not where you asked** → it's in `~/.codex/generated_images/…`; `cp` it.

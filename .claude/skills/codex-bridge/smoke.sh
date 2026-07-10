@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Codex seat smoke test. Prompt via STDIN (positional arg hangs on "Reading
-# additional input from stdin…"). Model via CODEX_MODEL (default gpt-5.5; older
-# /-codex-suffixed ids 400). If it errors on the model id, run update-models.
+# additional input from stdin…"). Model via CODEX_MODEL (default gpt-5.6-sol).
+# On model-id error: update the codex CLI, then update-models.
 set -uo pipefail
 command -v codex >/dev/null 2>&1 || { echo "Codex - DOWN: codex CLI not installed (npm i -g @openai/codex)"; exit 1; }
-model="${CODEX_MODEL:-gpt-5.5}"
+model="${CODEX_MODEL:-gpt-5.6-sol}"
 out="$(printf 'Reply with exactly: CODEX_OK\n' | codex exec -m "$model" --skip-git-repo-check 2>&1)"
 if printf '%s' "$out" | grep -q CODEX_OK; then
   echo "Codex - ok ($model)"

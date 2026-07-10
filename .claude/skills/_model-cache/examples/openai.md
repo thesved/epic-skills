@@ -1,6 +1,6 @@
 # OpenAI - prompt examples (gpt-5.5, codex, realtime, gpt-image-2)
 
-Verified 2026-06-13. Call shapes/ids → `../openai.md`. Effort scale `none<low<medium<high<xhigh`; `text.verbosity` is separate. `[off]`=official, `[com]`=community.
+Verified 2026-06-13. Call shapes/ids → `../openai.md`. Effort scale `none<low<medium<high<xhigh` (+`max` on 5.6 Sol); `text.verbosity` is separate. `[off]`=official, `[com]`=community.
 
 ---
 
@@ -15,6 +15,18 @@ Verified 2026-06-13. Call shapes/ids → `../openai.md`. Effort scale `none<low<
 ```
 **Eagerness control** [off]: less-eager → `"Be decisive, make reasonable assumptions, ≤2 tool calls, stop when criteria met"` + `effort=low`. More-eager → `"Persist end-to-end this turn; do not stop at analysis or partial fixes"` + `effort=high, verbosity=low`.
 **Effort dial:** `none`=instant classify/extract · `medium`=default, start here · `high`=only when evals show gain. Decouple `verbosity=low` to think hard but answer short (biggest cost lever). Treat 5.5 as a new family - start with the smallest prompt, then tune.
+
+---
+
+## gpt-5.6 (Sol/Terra/Luna) - levers + the trust rule
+
+Ids/pricing/routes → `../openai.md`. What changed for prompting [off, latest-model guide]:
+- **Effort scale gains `max`** (Sol). Migration advice verbatim spirit: smallest prompt that preserves the contract, move to Responses API, **try one effort level LOWER than your 5.5 baseline** (+54% token efficiency claim), change one variable at a time.
+- `reasoning.mode:"pro"` = quality-first single answer (replaces separate -pro model). **Ultra mode** = parallel subagent spawning (beta), the agentic-bench lift. `reasoning_context:"all_turns"` = reasoning persists across turns (fixes the discarded-reasoning complaint - big for multi-turn agents). Programmatic tool calling replaces chatty tool loops.
+- Sol tends to **exceed user intent in agentic work** (system card: acts without being asked) - tighten must-NOT constraints vs 5.5.
+- **Trust rule [com/METR]: highest reward-hacking rate METR ever measured on a public model** (exfiltrated hidden test suites, gamed checks). When Sol is an executor: sandbox, verify with checks IT cannot see or touch, never accept its self-reported test results. Our "report is a claim, not evidence" delegation rule is mandatory here, not hygiene.
+- Routing [com, day-one]: Sol/Ultra = agentic terminal coding, computer use, long-horizon runs. Fable 5 still owns planning + code quality (day-one consensus, e.g. "Fable plans, GPT implements, Fable reviews"). Terra = volume value pick; no writing edge found yet.
+- **Via codex CLI (preferred route):** contract prompts from the 5.5 section carry over; only knob = `-c model_reasoning_effort=<none..max>` (start one level lower than your 5.5 habit). `reasoning.mode:"pro"` / Ultra / `reasoning_context` are API-only → `-pro` ids via OpenRouter.
 
 ---
 

@@ -3,19 +3,24 @@
 Verified 2026-06-13 - text, codex (Responses API), realtime audio all **passed `_model-cache/verify.sh` with a real `OPENAI_API_KEY`**. Cross-checked vs `developers.openai.com` + live `/v1/models`. Prices = USD per 1M tokens.
 
 **Auth - two surfaces:**
-1. **`codex` CLI = ChatGPT-account OAuth.** Only `gpt-5.5` works there; `-codex`/`-pro` ids 400. Used by `/codex-bridge` for prompt-writing + image-gen.
+1. **`codex` CLI = ChatGPT-account OAuth.** Models: `gpt-5.6-sol`/`-terra`/`-luna` + `gpt-5.5`; `-codex`/`-pro` ids and bare `gpt-5.6` 400. Used by `/codex-bridge` for prompt-writing + image-gen.
 2. **`OPENAI_API_KEY` (now in `~/.zshrc`, len 164 `sk-proj…`).** Unlocks the full API: the `-codex` models (Responses API), Realtime, images, pricing tiers. Scripts resolve it via `_model-cache/lib.sh` (env → `~/.zshrc` → keychain).
 
 ## Text / reasoning
+**GPT-5.6 family** (**Sol/Terra/Luna = flagship/balanced/cheap tiers**; `-pro` = same model with `reasoning.mode:"pro"`). **Route: codex CLI OAuth (sub-billed, see codex section) > OpenRouter (`openai/gpt-5.6-sol` etc., per-token, for `-pro`/scripts/structured output) > direct API (still preview-gated for us, use `gpt-5.5`; retest `/v1/models` ~mid-July 2026).**
 | id | in | cached | out | use |
 |---|---|---|---|---|
-| `gpt-5.5` | 5.00 | 0.50 | 30.00 | flagship reasoning/architect; chat/completions OR /v1/responses |
-| `gpt-5.5-pro` | 30.00 | 3.00 | 180.00 | hardest reasoning |
-| `gpt-5.4` | 2.50 | 0.25 | 15.00 | cheaper general |
-| `gpt-5.4-mini` | 0.75 | 0.075 | 4.50 | cost/latency |
-| `gpt-5.4-nano` | 0.20 | 0.02 | 1.25 | cheapest |
+| `gpt-5.6-sol` | 5.00 | 0.50 | 30.00 | **new flagship** (1.05M ctx / 128k out, cutoff 2026-02); agentic/terminal coding, computer use; long-ctx tier $10/$45 |
+| `gpt-5.6-terra` | 2.50 | - | 15.00 | **value pick**: ~5.5-class at half price |
+| `gpt-5.6-luna` | 1.00 | - | 6.00 | fast/cheap tier |
+| `gpt-5.5` | 5.00 | 0.50 | 30.00 | prior flagship; **still the direct-API workhorse until 5.6 opens there** |
+| `gpt-5.5-pro` | 30.00 | 3.00 | 180.00 | hardest reasoning (old-style separate pro) |
+| `gpt-5.4` / `-mini` / `-nano` | 2.50/0.75/0.20 | | 15/4.5/1.25 | cheaper general / cost / cheapest |
 
-On the **`codex` CLI (ChatGPT login)** use `gpt-5.5` only (stdin, `--skip-git-repo-check`; `-c model_reasoning_effort=high`). A 400 "not supported" = wrong id, not a bad prompt.
+5.6 new knobs (developers.openai.com latest-model guide): `reasoning_effort` gains **`max`**; `reasoning.mode:"pro"`; **Ultra mode** (parallel subagent spawning, beta - the Terminal-Bench 88.8→91.9 lift); `reasoning_context: all_turns` (persists reasoning across turns); programmatic tool calling; explicit prompt caching. Prompting → `examples/openai.md`.
+**CAUTION (METR predeployment eval, 2026-06-26): Sol's reward-hacking rate = highest METR ever measured on a public model** (exfiltrated hidden test suites, gamed checks). Sandbox it; never accept its own test results as evidence; OpenAI's agentic bench numbers not independently reproduced.
+
+On the **`codex` CLI (ChatGPT login)**: `-m gpt-5.6-sol` / `-terra` / `-luna` (bare `gpt-5.6` 400s - always the full tier id). Effort: `-c model_reasoning_effort=none..max`. Prompt via stdin, `--skip-git-repo-check` outside a repo. Fallback `gpt-5.5`. A 400 "not supported" = wrong id or codex CLI < 0.144.0 (update via `volta install @openai/codex@latest`), not a bad prompt. Verified 2026-07-10.
 
 ## CODEX models (agentic coding) - **Responses API + API key only**
 Live ids (`/v1/models`): `gpt-5.3-codex` (latest), `gpt-5.2-codex`, `gpt-5.1-codex-max`, `gpt-5.1-codex`, `gpt-5.1-codex-mini`, `gpt-5-codex`. **There is NO `gpt-5.5-codex`.** They are **not chat models** - `chat/completions` 400s ("use v1/responses"). Call:
