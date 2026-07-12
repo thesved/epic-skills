@@ -108,6 +108,7 @@ Community-hardened (Eva Khmelinskaya, medium.com, 2026-05-18):
 - Checkpoint to a STATUS.md so a fresh session can pick up cold.
 - For multi-hour work, phase-split into 30-60 min fresh `claude -p` sessions with `--max-budget-usd`, chained by STATUS.md.
 - Watch the first hour before walking away.
+- Sentinel for anything unattended: a separate cheap watchdog (cron / `/loop`, haiku/sonnet) reads STATUS.md + `git log` every 15-30 min and checks progress against expected milestones; two checks with no new artifact → alert or restart. It verifies artifacts, not the run's own claims. (Details: delegation.md → Sentinel.)
 - Always a turn cap. Always.
 
 ## Failure gallery

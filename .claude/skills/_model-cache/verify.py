@@ -83,7 +83,7 @@ def t_openai_text():
     except Exception: rec("openai-text", m, "FAIL", str(d.get("error",d))[:120])
 
 def t_openrouter():
-    m = "google/gemini-2.5-flash-lite"
+    m = "google/gemini-3.1-flash-lite"  # liveness ping only (key+endpoint); keep on a current-gen cheap id so dashboards don't show retired models
     if not need(RKEY, "openrouter", m): return
     s, d = http("https://openrouter.ai/api/v1/chat/completions",
                 {"model":m,"messages":[{"role":"user","content":"Reply with exactly: OR_OK"}]},

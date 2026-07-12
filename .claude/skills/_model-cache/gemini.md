@@ -28,6 +28,7 @@ Pick: **Flash to collect** (transcribe/summarize/extract/OCR/translate - mechani
 |---|---|---|
 | `gemini-3.1-flash-image` ("Nano Banana 2") | ~0.045 (≤1K) → ~0.15 (4K) | **GA, cheap-iterate default** |
 | `gemini-3-pro-image` ("Nano Banana Pro") | 0.039 (≤1K) → 0.134 (2K) → 0.24 (4K) | **GA, studio/4K, legible text, ≤14 ref imgs** |
+| `gemini-3.1-flash-lite-image` ("Nano Banana 2 Lite") | cheaper than 3.1-flash-image | preview 2026-06-30, budget tier |
 | `gemini-2.5-flash-image` ("Nano Banana") | ~0.039 | GA, gen-1 |
 | ~~`*-image-preview`, `nano-banana-pro-preview`~~ | - | **shutdown 2026-06-25** → GA ids |
 | ~~`imagen-4.0-*`~~ | - | **shutdown 2026-06-24** → Nano Banana |
@@ -75,7 +76,9 @@ Flow (3 sends): `{setup:{model:"models/…",generationConfig:{responseModalities
 **Local files: use `gemini-bridge/video.sh`** (Files API; requires the key tier - OAuth can't reach Files API). Default 1 FPS sampling (raise `GEMINI_FPS` for rapid motion/dense text). `media_resolution` low=66 tok/frame vs default 258; ~1hr @ default / ~3hr @ low within 1M ctx. Up to 10 videos/request. Clip with `start_offset`/`end_offset` to save tokens. Flash 3.5 to collect, Pro 3.1 to reason.
 
 ## VIDEO-GEN - `veo-3.1-lite-generate-preview`
-Async: `POST .../models/veo-3.1-lite-generate-preview:predictLongRunning` body `{instances:[{prompt,image?}],parameters:{aspectRatio,durationSeconds,resolution}}` → returns Operation → poll `operations.get` until `done` → read video URI. ~$0.03/s (720p) → ~0.05-0.08/s (audio). Preview, no free tier. Latency ~45s per short clip (~6-10s per sec of output video). (Also: `veo-3.1-generate-preview`, `veo-3.1-fast-generate-preview`, legacy `veo-3.0-*`/`veo-2.0-*`.)
+Async: `POST .../models/veo-3.1-lite-generate-preview:predictLongRunning` body `{instances:[{prompt,image?}],parameters:{aspectRatio,durationSeconds,resolution}}` → returns Operation → poll `operations.get` until `done` → read video URI. ~$0.03/s (720p) → ~0.05-0.08/s (audio). Preview, no free tier. Latency ~45s per short clip (~6-10s per sec of output video). (Also: `veo-3.1-generate-preview`, `veo-3.1-fast-generate-preview`; `veo-3.0-*`/`veo-2.0-*` removed from the API 2026-07.)
+
+**`gemini-omni-flash-preview`** (API since 2026-06-30): multimodal model with native VIDEO OUTPUT + audio via `generateContent` - text/image/video in, video out. Differentiator vs veo: **conversational video EDITING** (swap characters, relight, change angle by natural language, keeps original audio/video tracks). $0.10/s video out (= veo-3.1-fast). Use veo for pure text→video gen, omni-flash for edit/iterate loops.
 
 ## MUSIC-GEN - `lyria-3-pro-preview`
 `:generateContent` w/ `responseModalities:["AUDIO"]`, prompt in `contents` → **44.1kHz 192kbps stereo MP3** (`audio/mpeg`, verified). Name instruments/BPM/key/mood, use `[Verse]/[Chorus]/[Bridge]` tags. ~$0.04-0.08/song, ~20s/song. (Clip: `lyria-3-clip-preview`.) No tools/grounding/thinking.

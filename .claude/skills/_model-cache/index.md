@@ -37,12 +37,14 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 Smoke = cheapest lite (`gemini-flash-lite-latest`) / `gpt-5.6-sol`. Default Gemini auth = **paid `GEMINI_API_KEY`** (REST), not OAuth.
 
 ## Delegation roles - current picks (refresh with every model update; skills point HERE, never hardcode)
-Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-09.
+Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-12.
 | role | current pick | why now |
 |---|---|---|
-| Orchestrator / plans / final review | fable-5 (high effort, never above) | best planning layer; 2x Opus price so it writes no bulk code |
-| Bulk executor (clear-spec impl, migrations, tests, analysis) | gpt-5.6-terra via codex CLI (`gpt-5.6-sol` for hard bulk) | ~5.5-class execution at half price, sub-billed. **If Sol executes, external verification is mandatory - never accept its own test results** (METR record reward-hacking, see `examples/openai.md`) |
-| Taste work + independent review seat | opus-4.8 | taste ~9 at half Fable price; also the security-review seat (Fable refusal risk) |
+| Orchestrator / plans / taste judging / final review | fable-5 (high effort, never above) | best planning layer AND highest taste available: taste review is orchestrator work, never delegated. 2x Opus price so it writes no bulk code |
+| Implementation that ships (features, anything with judgment) | gpt-5.6-sol via codex CLI | best executor; cost is a tie-breaker only. **External verification mandatory - never accept Sol's own test results** (METR record reward-hacking, see `examples/openai.md`) |
+| Mechanical bulk (migrations, boilerplate, rote tests, log analysis) | gpt-5.6-terra via codex CLI | ~5.5-class at half price, sub-billed; ONLY when the task is rote AND low-stakes. When in doubt → sol |
+| Mission-critical review gate | best available, plural: fable-5 + opus-4.8 + gpt-5.6-sol as independent seats | a defect that slips a gate stalls all downstream work; gate cost is small vs stall cost and usually pays back in speed |
+| Independent review seat + security review | opus-4.8 | second pair of eyes at half Fable price; security reports must not return through Fable (refusal-downgrade risk) |
 | Wrapper plumbing / mid-taste | sonnet-5 | cheap, reliable executor of ready-made prompts |
 | Read-only scout | haiku | cheapest useful |
 | Cross-family opinion (board Grok seat) | x-ai grok chain (`openrouter-bridge/ask.sh --grok`) | latest xAI flagship, self-healing fallback; also a strong agentic-tool-loop executor (see `examples/grok.md`) |

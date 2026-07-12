@@ -11,9 +11,10 @@ The top model plans, judges, reviews, and authors every delegated prompt; everyt
 
 Planning quality is the top model's moat; execution is near-parity across frontier coders. Pay top-model rates only where errors compound: decomposition, architecture, non-obvious debugging, conflict arbitration, plan + final review, /goal ownership, authoring delegated prompts.
 
-- Tie-break for anything that ships: **intelligence > taste > cost**. Cost is a tie-breaker only.
+- Tie-break for anything that ships: **intelligence > taste > cost**. Cost is a tie-breaker only. The value-tier executor is for rote AND low-stakes work; implementation that ships defaults to the top executor tier. When in doubt, the better model.
 - Cheaper output below the bar → redo with a smarter model without asking; escalating costs less than shipping mediocre work.
-- User-facing work (UI, copy, API design) needs a high-taste model or a mandatory taste review of the executor's draft.
+- **Mission-critical review gates get the best available models, plural** (independent seats, cross-family). A defect that slips a gate stalls everything downstream; gate cost is trivial vs stall cost and usually pays back in shipping speed.
+- User-facing work (UI, copy, API design): the executor drafts, but the taste JUDGING is the orchestrator's own job - the top model has the best taste; delegate the drafting, never the verdict.
 - Security-flavored review never returns through Fable (refusal-downgrade risk, see prompting.md); route it to the cache table's review seat.
 - Computer use: delegating it is a COST move (screenshot loops are token furnaces), not a quality move; quality-critical GUI verification stays on the best GUI driver (check the cache).
 
@@ -52,6 +53,10 @@ API design, copy.
 - Reviews: orchestrator or taste/review model, optionally the bulk executor
   as an extra independent seat.
 ```
+
+## Sentinel (progress watchdog for long multi-executor runs)
+
+Executors stall silently: a wrapper hangs, a codex run dies mid-diff, a phase finishes without starting the next. On any run longer than ~1 hour or with 3+ delegated tasks, add a sentinel: a separate cheap checker (cron / `/loop` / scheduled `claude -p` on haiku or sonnet) that every 15-30 min reads STATUS.md + `git log --oneline -5` + the run's expected-milestone list and answers one question: did measurable progress happen since last check? No progress twice in a row → alert or restart the stalled phase. The sentinel verifies artifacts (commits, files, test output), never the executors' own status claims.
 
 ## Failure rules (each one cost someone a session or real money)
 
