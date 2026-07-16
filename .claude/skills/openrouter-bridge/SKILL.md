@@ -42,7 +42,7 @@ OPENROUTER_FUSION_PANEL="z-ai/glm-5.2,deepseek/deepseek-v4-pro"   # csv, 1-8 mod
 OPENROUTER_FUSION_JUDGE="z-ai/glm-5.2"                            # synthesizer that writes the answer
 bash openrouter-bridge/ask.sh --fusion /tmp/brief
 ```
-Add a 3rd panel model (e.g. `moonshotai/kimi-k2.6`) for more robustness at more cost. Use Fusion for research / high-stakes / compare-and-contrast prompts; skip it for simple lookups, code-gen (style drift), and creative writing (voice dilution).
+For high-stakes boards, append a 3rd panel model: current pick `moonshotai/kimi-k3` (frontier-tier open-weight, extra Moonshot family; pricier, slower, day-one caveats + when-to-make-default conditions in `_model-cache/examples/kimi.md`). Use Fusion for research / high-stakes / compare-and-contrast prompts; skip it for simple lookups, code-gen (style drift), and creative writing (voice dilution).
 
 ## When to use vs a direct provider
 - **Use** when a primary route fails (429/credits/regional), you want a model you hold no direct key for, for cost arbitrage, or you want Fusion's one-call panel.

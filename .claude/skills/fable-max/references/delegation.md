@@ -58,6 +58,8 @@ API design, copy.
 
 Executors stall silently: a wrapper hangs, a codex run dies mid-diff, a phase finishes without starting the next. On any run longer than ~1 hour or with 3+ delegated tasks, add a sentinel: a separate cheap checker (cron / `/loop` / scheduled `claude -p` on haiku or sonnet) that every 15-30 min reads STATUS.md + `git log --oneline -5` + the run's expected-milestone list and answers one question: did measurable progress happen since last check? No progress twice in a row → alert or restart the stalled phase. The sentinel verifies artifacts (commits, files, test output), never the executors' own status claims.
 
+For a single long-running process (training, big build), use the in-session variant: Monitor tailing its log with a filter that fires on EVERY failure signature (`nan|Traceback|Killed|OOM`), not just success markers, plus a log-growth stall alarm and a process-gone check that EXITS the sentinel. Ordering matters: process check before stall check, or the sentinel outlives the run and false-alarms on a legitimately quiet log. Full mechanics + the 5h-dead-run postmortem: autoresearch skill, failure-modes.md "Live-log sentinel".
+
 ## Failure rules (each one cost someone a session or real money)
 
 1. Orchestrator effort caps at HIGH; xhigh/max degrades orchestration (overthinking, loops).
@@ -65,3 +67,5 @@ Executors stall silently: a wrapper hangs, a codex run dies mid-diff, a phase fi
 3. Wrapper reporting success is not evidence: check `git status`/`git diff` yourself.
 4. Wrappers cannot spawn wrappers (one-level depth); recursive delegation designs silently never execute.
 5. When planning is trivial (bulk fan-out of identical mechanical tasks), skip the orchestrator entirely - a mid-tier fleet beats top-model-plus-fleet there. The premium buys nothing without hard decisions.
+6. Never read a delegated command's success off `cmd | tail -N` - the pipeline exit is tail's, so a hard failure prints as exit 0 (masked a dead 2h image build). `set -o pipefail`, or log to a file and echo `exit=$?` explicitly.
+7. Executor-written research-critical code (losses, metrics, harnesses) gets a multi-model adversarial review BEFORE the first expensive run, not after. Evidence 2026-07-12: two different-architecture reviewers on one diff returned DISJOINT critical bugs (sol: unguarded GAN discriminator = permanent zombie run; grok: penalty at a granularity the head cannot act on). Either alone would have shipped the other's bug into a 5-hour run. Scope the executor tightly too: told "zero warnings", one executor ran cargo fmt over the whole workspace; another added a build-time file check at a stage where the files cannot exist yet. Verify the DIFF SCOPE, not just the diff.

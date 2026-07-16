@@ -12,9 +12,10 @@ description: >-
   does everyone think", "explore from multiple angles", "I'm stuck on this
   decision", "open-ended exploration", "ask grok", "what would grok say".
   Proactively suggest for: architectural decisions you'll live with for years,
-  hiring/strategy questions, pre-launch sanity checks, "I want to be really
-  sure about this". Also smoke-tests the panel CLIs on "board smoke", "board
-  test", "is the board working".
+  hiring/strategy questions, pre-launch sanity checks, adversarial review of
+  research-critical code (losses, metrics, harnesses) BEFORE an expensive or
+  long run, "I want to be really sure about this". Also smoke-tests the panel
+  CLIs on "board smoke", "board test", "is the board working".
 argument-hint: '<question for the board> | smoke (check all seats)'
 ---
 
@@ -22,9 +23,9 @@ argument-hint: '<question for the board> | smoke (check all seats)'
 
 Run one question through **Fable 5 + Gemini + Codex + Grok + an OpenRouter Fusion seat in parallel**, then synthesize. Agreement = higher confidence; disagreement = the signal worth investigating. This skill is the *orchestrator* - it does **not** re-document how to drive each model. For seat-specific call shapes, gotchas, and auth, the seats own their docs: **`/gemini-bridge`** (Gemini seat), **`/codex-bridge`** (Codex seat), and **`/openrouter-bridge`** (Grok + Fusion seats); model ids/pricing live in `~/.claude/skills/_model-cache/`.
 
-The **4th seat is Grok** (`ask.sh --grok`, latest xAI flagship via OpenRouter; self-healing chain handles region-blocks and falls back to the prior flagship, see `/openrouter-bridge`): a fourth independent frontier family (xAI) with a training distribution none of the other seats share. The **5th seat is OpenRouter Fusion** (`openrouter/fusion`): a panel of `z-ai/glm-5.2` + `deepseek/deepseek-v4-pro` (judge GLM-5.2) deliberates and returns one synthesized answer. It deliberately uses **non-OpenAI/Anthropic/Google/xAI families** - architecture diversity the other four seats don't cover - so its agreement/dissent is independent signal. Swap models with `OPENROUTER_FUSION_PANEL` / `OPENROUTER_FUSION_JUDGE` (see `/openrouter-bridge`). Fusion costs ≈4-5× a single call; drop it when budget matters more than breadth.
+The **4th seat is Grok** (`ask.sh --grok`, latest xAI flagship via OpenRouter; self-healing chain handles region-blocks and falls back to the prior flagship, see `/openrouter-bridge`): a fourth independent frontier family (xAI) with a training distribution none of the other seats share. The **5th seat is OpenRouter Fusion** (`openrouter/fusion`): a panel of `z-ai/glm-5.2` + `deepseek/deepseek-v4-pro` (judge GLM-5.2) deliberates and returns one synthesized answer. It deliberately uses **non-OpenAI/Anthropic/Google/xAI families** - architecture diversity the other four seats don't cover - so its agreement/dissent is independent signal. Swap models with `OPENROUTER_FUSION_PANEL` / `OPENROUTER_FUSION_JUDGE` (see `/openrouter-bridge`); for high-stakes boards append the current frontier open-weight pick from the `_model-cache/index.md` delegation table to the panel. Fusion costs ≈4-5× a single call; drop it when budget matters more than breadth.
 
-**Use when**: irreversible decision (architecture, vendor, schema, hiring); genuine exploration wanting angles one model misses; you've already escalated to Opus via `/think` and want a different family's sanity check; the user asks for the panel.
+**Use when**: irreversible decision (architecture, vendor, schema, hiring); genuine exploration wanting angles one model misses; you've already escalated to Opus via `/think` and want a different family's sanity check; the user asks for the panel; research-critical code about to gate an expensive run (evidence 2026-07-12: two seats reviewing one training diff returned DISJOINT critical bugs - one found an unguarded GAN discriminator that would zombie the run, the other a penalty the model architecture could not act on; either alone would have shipped the other's bug into a 5-hour training).
 **Don't** when: there's a single checkable answer; you haven't tried it yourself; budget matters more than confidence (≈8× one call with Fusion, ≈4× without).
 
 ## Smoke test

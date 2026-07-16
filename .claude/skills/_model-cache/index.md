@@ -16,6 +16,7 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 | Lyria music or deep-research | [`examples/gemini-gen.md`](examples/gemini-gen.md) |
 | Any OpenAI: gpt-5.5 / codex / realtime / gpt-image-2 | [`examples/openai.md`](examples/openai.md) |
 | Grok / xAI via OpenRouter (route-to/away, effort dial, agentic patterns) | [`examples/grok.md`](examples/grok.md) |
+| Kimi K3 / Moonshot via OpenRouter (route-to/away, param traps, board-seat verdict) | [`examples/kimi.md`](examples/kimi.md) |
 
 ## Capability routing - who to reach for
 | need | first choice | id (verify in provider file) | why |
@@ -49,6 +50,7 @@ Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, co
 | Read-only scout | haiku | cheapest useful |
 | Cross-family opinion (board Grok seat) | x-ai grok chain (`openrouter-bridge/ask.sh --grok`) | latest xAI flagship, self-healing fallback; also a strong agentic-tool-loop executor (see `examples/grok.md`) |
 | Cheap diverse panel | openrouter fusion (GLM+DeepSeek) | non-OAI/Anthropic/Google/xAI architecture diversity |
+| High-stakes fusion upgrade (opt-in) | append moonshotai kimi-k3 to the fusion panel | strongest open-weight (above Opus 4.8 on GDPval-AA v2), adds Moonshot family; day-one caveats + flip-to-default conditions in `examples/kimi.md` (verified 2026-07-16) |
 | Video / multimodal / 1M-ctx dumps / non-English | gemini (REST) | the moat; Claude can't do video |
 
 ## Typical response time
