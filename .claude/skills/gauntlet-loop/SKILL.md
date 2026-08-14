@@ -76,7 +76,7 @@ Plus regression gates: pieces that passed get locked scenarios every later round
 ## GATE 5: economics (fable-max layer)
 
 - Top model orchestrates ONLY (decomposition, bar and gate design, arbitration, final taste verdict) at high effort, never above.
-- Builders and inner critics run on cheap or delegated meters: route per the Delegation roles table in `~/.claude/skills/_model-cache/index.md` via the bridges (codex-bridge, gemini-bridge, openrouter-bridge). Vision A/B needs a vision-capable seat.
+- Builders and inner critics run on cheap or delegated meters, per the Delegation roles table in `~/.claude/skills/_model-cache/index.md` via the bridges (codex-bridge, gemini-bridge, openrouter-bridge). Binding default: pieces that SHIP go to the table's implementation seat via codex-bridge (fable-max delegate rules: orchestrator verifies every diff itself; executor reports are claims). Claude subagents (sonnet/haiku) are for wrapper plumbing, scouts, and below-ship-bar pieces only. Sub-billed executors spend their own meter, not the run's dollar budget (track their quota separately); never downgrade the executor to "save" budget their sub absorbs, cost is a tie-breaker only. Vision A/B needs a vision-capable seat.
 - Fan-out ceiling stated in the prompt; no recursive spawning (8 subagents became 30+ and ate a 5-hour window in 15 minutes). Parallelize only independent pieces; coupled systems get ONE owner, sequential (parallel owners on coupled systems: +0.46 with defects rising vs +1.00 sequential, Shumer's own data).
 - One fan-out level. Keep model+effort fixed for the run (cache).
 - STATE.md per run, orchestrator is its ONLY writer: frozen piece list (orchestrator-approved, capped), per-piece verdicts, failed approaches, spend ledger, budget remaining. Restarts read state, never "continue".
@@ -149,7 +149,7 @@ Fan out subagents and ultracode. (Claude Code terms; on other harnesses:
 looping".)
 ```
 
-2. **Run config**: orchestrator model+effort, executor routing (from the cache table), fan-out ceiling, sentinel yes/no, and the one-line Goodhart risk (what could satisfy the letter and fail the want).
+2. **Run config**: orchestrator model+effort, executor routing (each seat named from the cache table WITH its bridge; shipping pieces on the implementation seat per GATE 5), fan-out ceiling, sentinel yes/no, and the one-line Goodhart risk (what could satisfy the letter and fail the want).
 3. One flat line: "I can run this here." If asked to run it, you are the lead agent: follow the prompt, fable-max delegate rules apply (verify diffs yourself; executor reports are claims).
 
 ## Examples

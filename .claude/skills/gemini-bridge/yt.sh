@@ -26,7 +26,7 @@ KEY="$(resolve_key GEMINI_API_KEY)"
 [ -n "$KEY" ] || { echo "ERROR: no API key (keychain gemini-api-key / env GEMINI_API_KEY)" >&2; exit 1; }
 
 case "${GEMINI_MODEL:-flash}" in
-  flash) MODEL="gemini-3.5-flash" ;;
+  flash) MODEL="gemini-3.7-flash" ;;
   pro)   MODEL="gemini-3.1-pro-preview" ;;
   *)     MODEL="${GEMINI_MODEL}" ;;
 esac

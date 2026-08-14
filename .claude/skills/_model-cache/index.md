@@ -23,14 +23,14 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 |---|---|---|---|
 | Different-model second opinion | either | gemini-3.1-pro-preview / gpt-5.5 | architecture diversity |
 | Write a prompt for Claude/Opus | **Codex** | gpt-5.5 | spec-like, less conversational |
-| Non-English copy / translate | **Gemini** | gemini-3.5-flash | stronger multilingual |
+| Non-English copy / translate | **Gemini** | gemini-3.7-flash | stronger multilingual |
 | Image generate / edit | **Gemini** Nano Banana | gemini-3.1-flash-image (key) | cheap, fast edits; Codex gpt-image-2 fallback |
 | TTS / narration | **Gemini** | gemini-3.1-flash-tts-preview (key) | 30 voices, multi-speaker |
-| Analyze a video / YouTube | **Gemini** (only option) | gemini-3.5-flash / 3.1-pro | Claude can't; Gemini's moat |
+| Analyze a video / YouTube | **Gemini** (only option) | gemini-3.7-flash / 3.1-pro | Claude can't; Gemini's moat |
 | Realtime/live voice audio | either | gemini-2.5-flash-native-audio-… / gpt-realtime-2.1(-mini) | WebSocket; Gemini audio-out ~5× cheaper than full 2.1, but 2.1-mini narrows it to ~1.5×; OpenAI GA + simpler |
 | Agentic coding via OpenAI key | OpenAI codex | gpt-5.3-codex (Responses API) | heavy coding; CLI `gpt-5.5` for interactive |
 | Text fallback when a route throttles | **OpenRouter** | provider/model | one key → many providers |
-| Long-context doc dump | **Gemini** | gemini-3.5-flash | 1M ctx |
+| Long-context doc dump | **Gemini** | gemini-3.7-flash | 1M ctx |
 | Video generation | Gemini veo | veo-3.1-lite-generate-preview | |
 | Music generation | Gemini lyria | lyria-3-pro-preview | |
 | Multi-step cited research | Gemini deep-research | deep-research-pro-preview-12-2025 | or use `/deep-research` skill |
@@ -52,18 +52,18 @@ Deep-research writeups behind each claim: [`research/2026-08-12/`](research/2026
 - **No Hungarian (or CEE) benchmark exists for ANY 2026 model**, from any vendor or leaderboard. OpenHuEval covers GPT-4-era models only; MMMLU's 14 languages exclude Hungarian. Multilingual quality for these languages can only be measured, never looked up.
 
 ## Delegation roles, current picks (refresh with every model update; skills point HERE, never hardcode)
-Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-12.
+Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-12; review/gemini/grok/open-family rows refreshed 2026-08-14 (see `research/2026-08-14/model-sweep.md`).
 | role | current pick | why now |
 |---|---|---|
 | Orchestrator / plans / taste judging / final review | fable-5 (high effort, never above) | best planning layer AND highest taste available: taste review is orchestrator work, never delegated. 2x Opus price so it writes no bulk code |
 | Implementation that ships (features, anything with judgment) | gpt-5.6-sol via codex CLI | best executor; cost is a tie-breaker only. **External verification mandatory, never accept Sol's own test results** (METR record reward-hacking, see `examples/openai.md`) |
 | Mechanical bulk (migrations, boilerplate, rote tests, log analysis) | gpt-5.6-terra via codex CLI | ~5.5-class at half price, sub-billed; ONLY when the task is rote AND low-stakes. When in doubt → sol |
-| Mission-critical review gate | best available, plural: fable-5 + opus-4.8 + gpt-5.6-sol as independent seats | a defect that slips a gate stalls all downstream work; gate cost is small vs stall cost and usually pays back in speed |
-| Independent review seat + security review | opus-4.8 | second pair of eyes at half Fable price; security reports must not return through Fable (refusal-downgrade risk) |
+| Mission-critical review gate | best available, plural: fable-5 + opus-5 + gpt-5.6-sol as independent seats | a defect that slips a gate stalls all downstream work; gate cost is small vs stall cost and usually pays back in speed |
+| Independent review seat + security review | opus-5 (`claude-opus-5`, released 2026-07-24) | near-Fable at half price ($5/$25, same as 4.8), 1M ctx; security reports must not return through Fable (refusal-downgrade risk) |
 | Wrapper plumbing / mid-taste | sonnet-5 | cheap, reliable executor of ready-made prompts |
 | Read-only scout | haiku | cheapest useful |
-| Cross-family opinion (board Grok seat) | x-ai grok chain (`openrouter-bridge/ask.sh --grok`) | latest xAI flagship, self-healing fallback; also a strong agentic-tool-loop executor (see `examples/grok.md`) |
-| Cheap diverse opinion (board open-family seat) | `openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro` (2nd seat: `-m z-ai/glm-5.2`) | non-OAI/Anthropic/Google/xAI architecture diversity; one plain call per model, never a router |
+| Cross-family opinion (board Grok seat) | x-ai grok chain (`openrouter-bridge/ask.sh --grok`) | latest = grok-4.6 (2026-08-12): cost/task ~2x 4.5 via token inflation, no longer a fast lane; route-to/away in `examples/grok.md` |
+| Cheap diverse opinion (board open-family seat) | `openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro` (2nd seat: `-m z-ai/glm-5.2`) | non-OAI/Anthropic/Google/xAI architecture diversity; one plain call per model, never a router. DeepSeek direct API goes time-variable 2026-08-16 16:00 UTC (peak $1.32/$3.96, off-peak $0.66/$1.98 vs $0.435/$0.87 now); OR route verified 2026-08-14, re-check after |
 | High-stakes extra seat (opt-in) | `-m moonshotai/kimi-k3` | strongest open-weight (above Opus 4.8 on GDPval-AA v2), adds Moonshot family; day-one caveats + flip-to-default conditions in `examples/kimi.md` (verified 2026-07-16) |
 | Video / multimodal / 1M-ctx dumps / non-English | gemini (REST) | the moat; Claude can't do video |
 | **Bulk structured extraction** (thousands of schema-constrained calls over a fixed rulebook) | cheapest model that PASSES a schema probe on your real schema, then batch it | the price spread across rungs is 10-100x, and the deciding factor is never the headline benchmark: it is strict-schema support, max output, and cache-read price. Probe, do not read it off a spec sheet, see the trap list below |

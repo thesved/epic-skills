@@ -15,7 +15,7 @@ Verified 2026-06-13, text, codex (Responses API), realtime audio all **passed `_
 | `gpt-5.6-luna` | 1.00 |, | 6.00 | fast/cheap tier |
 | `gpt-5.5` | 5.00 | 0.50 | 30.00 | prior flagship; **still the direct-API workhorse until 5.6 opens there** |
 | `gpt-5.5-pro` | 30.00 | 3.00 | 180.00 | hardest reasoning (old-style separate pro) |
-| `gpt-5.4` / `-mini` / `-nano` | 2.50/0.75/0.20 | | 15/4.5/1.25 | cheaper general / cost / cheapest |
+| `gpt-5.4` / `-mini` / `-nano` | 2.50/0.75/0.20 | | 15/4.5/1.25 | cheaper general / cost / cheapest; **pulled from Codex CLI (ChatGPT login) 2026-08-31** → use gpt-5.6-terra / -luna |
 
 5.6 new knobs (developers.openai.com latest-model guide): `reasoning_effort` gains **`max`**; `reasoning.mode:"pro"`; **Ultra mode** (parallel subagent spawning, beta, the Terminal-Bench 88.8→91.9 lift); `reasoning_context: all_turns` (persists reasoning across turns); programmatic tool calling; explicit prompt caching. Prompting → `examples/openai.md`.
 **CAUTION (METR predeployment eval, 2026-06-26): Sol's reward-hacking rate = highest METR ever measured on a public model** (exfiltrated hidden test suites, gamed checks). Sandbox it; never accept its own test results as evidence; OpenAI's agentic bench numbers not independently reproduced.

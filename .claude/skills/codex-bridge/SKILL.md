@@ -24,7 +24,7 @@ Core insight: **Opus is not the best model for writing prompts Opus will execute
 **Model ids, pricing, call shapes, gotchas live in the cache - read before use:** `~/.claude/skills/_model-cache/openai.md`. For **how to prompt gpt-5.5/codex/realtime/gpt-image well** (spec/contract prompts, eagerness + reasoning_effort, AGENTS.md, voice-agent instructions, metaprompting for Opus) → `~/.claude/skills/_model-cache/examples/openai.md`. Don't hardcode ids; they drift and most `-codex`/`-pro` ids 400 on ChatGPT login.
 
 ## The one rule that breaks everything
-Pass the prompt via **stdin**, never a positional arg (positional hangs on "Reading additional input from stdin…"). On ChatGPT-account login use **`-m gpt-5.6-sol` / `-terra` / `-luna`** (bare `gpt-5.6` 400s; fallback `gpt-5.5`). `--skip-git-repo-check` outside a repo.
+Pass the prompt via **stdin**, never a positional arg (positional hangs on "Reading additional input from stdin…"). On ChatGPT-account login use **`-m gpt-5.6-sol` / `-terra` / `-luna`** (bare `gpt-5.6` 400s; fallback `gpt-5.5`). `--skip-git-repo-check` outside a repo. Web search: `-c tools.web_search=true` (there is NO `--search` flag; it errors, verified 2026-08-14).
 
 ## Modes
 

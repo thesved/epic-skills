@@ -7,9 +7,10 @@ Default auth = **paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`), 
 ## TEXT / REASONING
 | id | in | out | status | notes |
 |---|---|---|---|---|
-| `gemini-3.5-flash` | 1.50 | 9.00 | **GA, default workhorse** | cache-in 0.15; 1M ctx / 65k out |
+| `gemini-3.7-flash` | 0.75 | 3.75 | **GA, default workhorse** | intro price to end-2026 (then expect ~1.50/7.50); coding/agent focus; text+video verified live 2026-08-14 |
+| `gemini-3.5-flash` | 1.50 | 9.00 | GA, prior workhorse | cache-in 0.15; 1M ctx / 65k out |
 | `gemini-3.1-pro-preview` | 2.00→4.00 | 12.00→18.00 | preview, **best reasoning** | >200k ctx doubles in / +50% out; out incl thinking tokens |
-| `gemini-3-flash-preview` | 0.50 | 3.00 | preview | cheap mid-tier; prefer 3.5-flash for prod |
+| `gemini-3-flash-preview` | 0.50 | 3.00 | preview | cheap mid-tier; prefer 3.7-flash for prod |
 | `gemini-2.5-pro` | 1.25→2.50 | 10.00→15.00 | GA, **shutdown 2026-10-16** | |
 | `gemini-2.5-flash` | 0.30 | 2.50 | GA, **shutdown 2026-10-16** | |
 | `gemini-2.5-flash-lite` | 0.10 | 0.40 | GA | cheapest GA lite |
