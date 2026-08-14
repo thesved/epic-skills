@@ -5,15 +5,12 @@ description: >-
   statements. Defaults to Claude Code context: model and effort choice,
   task-prompt framing, /goal conditions rewritten through a 4-part gate
   (measurable end state, check command, constraints, stop bound).
-  De-prescribes Opus-era prompts and CLAUDE.md files that degrade Fable
-  (step recipes, show-your-reasoning refusal triggers, token countdowns).
-  Routes work between Fable, Opus, Sonnet, and Haiku to cut token spend
-  without losing quality, and runs the delegation pattern: Fable
-  orchestrates while execution runs on other models (GPT-5.5 via codex
-  CLI shell-out, Gemini, OpenRouter seats) via wrapper agents. Also
-  builds Fable system prompts for API, Agent SDK, and custom subagent
-  harnesses (surfaces without Claude Code's built-in Fable
-  instructions). Use when the user says fable-max, max out fable, get
+  De-prescribes Opus-era prompts and CLAUDE.md files that degrade Fable.
+  Routes work between Fable, Opus, Sonnet, Haiku to cut token spend.
+  Delegation pattern: Fable orchestrates, execution on other models
+  (GPT-5.5 via codex shell-out, Gemini, OpenRouter) via wrapper agents.
+  Also builds Fable system prompts for API, Agent SDK, and subagent
+  harnesses. Use when the user says fable-max, max out fable, get
   the most out of fable, fable settings, prompt for fable, fable system
   prompt, api prompt for fable, write my goal, goal statement, /goal
   settings, overnight run setup, should I use fable, de-prescribe, save
@@ -43,6 +40,8 @@ Read `references/goal.md`. Turn the user's objective into a /goal statement.
 4. Evaluator-blindness check: the condition must force evidence into the transcript ("run X and show the output"). The evaluator reads the transcript only; it runs nothing.
 5. Goodhart check: name what the agent could ship that satisfies the letter but not the want; add a checkable proxy for the qualitative want.
 6. Emit: the `/goal` line, plus a settings block (model per routing test, `/effort`, auto mode for unattended, budget/turn caps), plus one sentence on the riskiest way this goal could technically pass while failing.
+7. Multi-clause or evolving goal (>~1,500 chars, or the user will tune it mid-run): use the goal-file pattern from goal.md, clauses live in a user-owned repo file, the `/goal` line forces printing the file + per-clause evidence every checkpoint and bans agent edits to it. Default to this for program-scale goals.
+8. Delegation-backed goal (execution runs on other models): the `/goal` line MUST begin with invoking the pattern, `invoke /fable-max delegate and run per <orientation doc>`, and the goal file gets a delegation clause (executors per the delegation map, orchestrator verifies every result itself, checkpoints print who did what). Skill context compacts away; the condition is re-sent every turn, so the /goal line is the only durable carrier of the orchestration pattern.
 
 ## Mode: session
 

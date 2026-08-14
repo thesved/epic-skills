@@ -18,7 +18,7 @@ TTS requires `GEMINI_API_KEY` (the OAuth/personal-login tier does NOT include TT
 security add-generic-password -a "$USER" -s "gemini-api-key" -w "PASTE-KEY-HERE"
 ```
 
-The Gemini CLI also does NOT drive TTS endpoints - hit the REST API with `curl`, same pattern as image gen.
+TTS is REST with `curl`, same pattern as image gen.
 
 ---
 

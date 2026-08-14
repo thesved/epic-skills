@@ -45,6 +45,26 @@ Negative example (published burn): `/goal a world where 'substrate, not model' i
 
 The evaluator judges only what Claude surfaced in the conversation. Consequence: the condition must FORCE evidence into the transcript. Write "run X and show the output" into the condition. If proof lives in unlogged state (a file the agent never prints, a browser it never screenshots), the goal never resolves, or worse, the evaluator hallucinates success.
 
+## Goal file pattern (long or evolving goals)
+
+Conditions near the 4,000-char cap are unwieldy and frozen at `/goal` time. For multi-clause programs, put the clauses in a repo file and keep the `/goal` line short:
+
+```
+/goal every clause in <repo>/GOAL.md is satisfied; at every checkpoint print the
+FULL current content of <repo>/GOAL.md followed by per-clause evidence (command
+output, not claims); never edit <repo>/GOAL.md yourself and prove it by printing
+`git log --oneline -- <repo>/GOAL.md`; or stop after N turns
+```
+
+Why it works despite evaluator blindness (evaluator reads no files): the condition FORCES the agent to print the file every checkpoint, so the evaluator sees the current clauses in the transcript. Bonus: re-printing each checkpoint survives compaction better than a one-shot long condition.
+
+Rules:
+- The file is USER-owned. User edits it mid-run to update the goal (no `/goal clear` needed; next checkpoint prints the new version). The agent treats it read-only; the never-edit clause + git evidence guard against self-weakening.
+- The 4-element gate applies INSIDE the file: every clause = measurable end state + check command + constraints. Same adjective BAN.
+- The stop bound stays in the `/goal` LINE, never only in the file.
+- Each clause must still force evidence into the transcript ("print X").
+- Delegation-backed programs: the `/goal` line begins `invoke /fable-max delegate and run per <orientation doc>`, and the file carries a delegation clause (named delegation map, orchestrator verifies every delegated result itself via git diff + tests, checkpoints print which executor did what). The condition is the only thing that survives compaction and fresh sessions; if the delegate invocation lives only in skill context or a doc, resumed sessions silently stop delegating.
+
 ## Goodhart warning
 
 The agent optimizes exactly what the condition measures, nothing else. Field case (Jason Croucher, medium.com, 2026-05-18): space-shooter game passed every check, "a provably correct, useless result", bare unplayable canvas, because visual quality was unmeasured. Fix: "write the condition as what you want, not only how you will check it", then add a checkable proxy for the qualitative want (headless playtest prints `COMPLETABLE` per level, screenshots taken and reviewed against the brief).

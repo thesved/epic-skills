@@ -12,6 +12,10 @@ Multi-agent friendly + non-disruptive. Each SESSION owns one tab:
 Session key = CDP_SESSION, else CLAUDE_CODE_SESSION_ID, else "default".
 The focus-stealers Page.bringToFront / Target.activateTarget are refused (they
 yank Chrome to the macOS foreground); set CDP_ALLOW_FOCUS=1 to override.
+The window-killers Browser.close / Browser.crash / Target.closeTarget are
+refused outright: this Chrome is SHARED with the human and other sessions.
+Clean up with `cdp.py --close-tab`, which closes only your own tab and never
+the last one.
 
 Env: CHROME_CDP_PORT (9222) · CDP_SESSION (tab owner id) ·
 CDP_TARGET (substring: attach this session to an existing tab by URL) ·
@@ -27,6 +31,10 @@ STATE_DIR = os.path.join(tempfile.gettempdir(), f"cdp-tabs-{PORT}")
 PIN = os.path.join(STATE_DIR, SESSION)
 # commands that drag the OS window to the foreground and steal focus on macOS
 FOCUS_STEALERS = {"Page.bringToFront", "Target.activateTarget"}
+# commands that can take down a Chrome shared with the human and other sessions.
+# No override flag on purpose: use --close-tab, which can only close your own tab.
+WINDOW_KILLERS = {"Browser.close", "Browser.crash", "Target.closeTarget",
+                  "Target.disposeBrowserContext", "Page.close"}
 
 
 def _get(path):
@@ -95,6 +103,33 @@ async def resolve_ws():
     print("ERR: created tab but could not find its websocket", file=sys.stderr); sys.exit(1)
 
 
+def close_own_tab():
+    """Clean up THIS session's tab only. Never closes someone else's tab, and
+    never the last page target (Chrome quits with its last tab, which would
+    kill a window the human and other sessions are sharing)."""
+    pin = _read_pin()
+    if not pin:
+        print("no tab owned by this session - nothing to close"); return 0
+    pages = _pages()
+    mine = [t for t in pages if t.get("id") == pin]
+    if not mine:
+        try: os.remove(PIN)
+        except OSError: pass
+        print("my tab is already gone - pin cleared"); return 0
+    if len(pages) <= 1:
+        print("refusing: my tab is the only one left; closing it would quit the "
+              "shared Chrome window. Leaving it open.", file=sys.stderr)
+        return 3
+    try:
+        urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json/close/{pin}").read()
+    except (URLError, OSError) as e:
+        print(f"ERR: could not close tab {pin} ({e})", file=sys.stderr); return 1
+    try: os.remove(PIN)
+    except OSError: pass
+    print(f"closed my tab ({pin}); {len(pages)-1} tab(s) left untouched")
+    return 0
+
+
 async def run(method, params):
     async with websockets.connect(await resolve_ws(), max_size=None) as ws:
         await ws.send(json.dumps({"id": 1, "method": method, "params": params}))
@@ -110,6 +145,14 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(__doc__); sys.exit(1)
     m = sys.argv[1]
+    if m in ("--close-tab", "close-tab"):
+        sys.exit(close_own_tab())
+    if m in WINDOW_KILLERS:
+        print(f"refusing {m}: this Chrome is SHARED with the human and other\n"
+              f"sessions - closing the browser or a target you don't own destroys\n"
+              f"their tabs. Clean up with: python3 cdp.py --close-tab (closes only\n"
+              f"your own tab, never the last one).", file=sys.stderr)
+        sys.exit(2)
     if m in FOCUS_STEALERS and not os.environ.get("CDP_ALLOW_FOCUS"):
         print(f"refusing {m}: it yanks Chrome to the macOS foreground and steals focus.\n"
               f"each session reuses one background tab on purpose - screenshots etc. do NOT\n"

@@ -10,7 +10,7 @@ Researched 2026-07-16 (launch day, model dropped ~24h earlier). Ids/pricing: `..
 
 ## Route to / away
 
-**TO it:** high-stakes board/fusion panel upgrade (only open-weight model scoring above Opus 4.8 on GDPval-AA v2, plus Moonshot-family diversity no other seat has); long-horizon agentic browse/search (vendor claims BrowseComp 91.2 single-agent SOTA [off, unreplicated]); 1M-ctx codebase/corpus reads; visible reasoning traces ("debugging ideas far more thoroughly" than Fable, which hides them [com]); strongest open-weight second opinion.
+**TO it:** high-stakes board seat upgrade (only open-weight model scoring above Opus 4.8 on GDPval-AA v2, plus Moonshot-family diversity no other seat has); long-horizon agentic browse/search (vendor claims BrowseComp 91.2 single-agent SOTA [off, unreplicated]); 1M-ctx codebase/corpus reads; visible reasoning traces ("debugging ideas far more thoroughly" than Fable, which hides them [com]); strongest open-weight second opinion.
 **AWAY:** cost-sensitive bulk (GLM-5.2 claimed "roughly the same quality at a much cheaper price" [com, disputed]; DeepSeek-V4 for basic tasks); latency-sensitive calls (reasoning is MANDATORY with no dial, ~23s measured for a 4-sentence answer); any decision needing verified benchmarks (no AA Intelligence Index yet, contamination skepticism high [com]); media beyond image-in.
 
 ## Drive it
@@ -18,7 +18,7 @@ Researched 2026-07-16 (launch day, model dropped ~24h earlier). Ids/pricing: `..
 - **Reasoning cannot be turned off or down**: mandatory, default-enabled, the ONLY supported effort is `max` [off, OpenRouter model entry]. Unlike Grok there is no cheap-call mode. Budget latency + output tokens accordingly.
 - **Param trap:** `temperature` / `top_p` / `seed` are NOT in `supported_parameters` (K2.7-code has them, K3 does not). Send tools / tool_choice / structured_outputs / response_format / stop / penalties / max_tokens; skip sampling knobs.
 - **Raw reasoning traces contain unescaped control chars**: `jq` dies parsing the response (`Invalid string: control characters ... must be escaped`, hit live 2026-07-16). Parse with python, or use `openrouter-bridge/ask.sh` which extracts content safely.
-- **Single upstream provider** (Moonshot AI itself, no mirrors yet). Launch window = waves of 429 "temporarily rate-limited upstream" lasting minutes; 2 of 8 calls succeeded on launch day. Retry with backoff; BYOK Moonshot key lifts the shared limit.
+- **Single upstream provider** (Moonshot AI itself, no mirrors yet). Launch window = waves of 429 "temporarily rate-limited upstream" lasting minutes; 2 of 8 calls succeeded on launch day. Retry with backoff; BYOK Moonshot key lifts the shared limit. `provider.allow_fallbacks`/`order` do NOT help (single upstream, nothing to fall back to) - BYOK is the only real bypass. `openrouter-bridge/ask.sh` now retries 429/5xx with backoff + Retry-After automatically (all seats); waves lasting minutes still exceed the retry budget, so Kimi stays opt-in and a dead seat just drops.
 - **Cost control:** cache-read is 0.1x ($0.30), front-load static context. Watch `usage.completion_tokens`: K2 lineage has documented reasoning-token bloat ("uses a lot of tokens for quite simple tasks" re K2.7 [com]); effective cost can exceed a pricier-per-token model that reasons shorter ("If Sol spends 10K reasoning tokens vs Kimi spends 50K, Sol wins on cost effectiveness" [com, HN]). Unmeasured on K3 yet.
 - **Anthropic-compatible API on Moonshot direct** (K2 lineage pattern, api.moonshot.ai; touted for K3 as Claude Code backend) [com/?, unverified for K3].
 
@@ -30,14 +30,13 @@ Researched 2026-07-16 (launch day, model dropped ~24h earlier). Ids/pricing: `..
 - No Artificial Analysis Intelligence Index yet (insufficient coverage as of 2026-07-16). Community contamination skepticism: "all open-weight models come with amazing results now... hard to believe anything other than benchmarks leaked into training data" [com].
 - Live seat test 2026-07-16 via `ask.sh` (panel-design question + arithmetic): sharp, correct, zero fluff. Qualitative PASS.
 
-## Board / fusion integration (decision 2026-07-16)
+## Board integration (decision 2026-07-16)
 
-**Opt-in high-stakes upgrade, NOT a default panel member.**
+**Opt-in high-stakes extra seat, NOT a default board member.**
 ```bash
-OPENROUTER_FUSION_PANEL="z-ai/glm-5.2,deepseek/deepseek-v4-pro,moonshotai/kimi-k3" \
-bash ~/.claude/skills/openrouter-bridge/ask.sh --fusion /tmp/board_brief.md
+bash ~/.claude/skills/openrouter-bridge/ask.sh -m moonshotai/kimi-k3 /tmp/board_brief.md
 ```
-Why not default: launch-day 429 waves on a single provider (a dead seat mid-board), unverified benchmarks, ~5x panel-mate price with unmeasured reasoning bloat, mandatory-max latency.
+Why not default: launch-day 429 waves on a single provider (a dead seat mid-board), unverified benchmarks, ~5x the price of the other open-family seats with unmeasured reasoning bloat, mandatory-max latency.
 **Flip to default when ALL hold:** (1) AA Intelligence Index published and frontier-tier, (2) a second OpenRouter provider or a clean week without upstream 429s, (3) measured completion-token usage on a real board brief is sane (< ~3x GLM's for the same brief).
 
 ## Sources

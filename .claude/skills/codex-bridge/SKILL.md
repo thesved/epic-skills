@@ -78,6 +78,27 @@ Rules (each prevents a real failure):
 5. Structured verdicts: `--output-schema <schema.json>`. Cap Claude↔Codex review ping-pong at 2 rounds.
 6. Codex churns (renames, import reshuffles): put "execute exactly what was asked, don't redesign" in the prompt.
 
+### `steer` - steerable delegated runs (SendMessage semantics for GPT executors)
+`codex exec` is fire-and-forget: stdin is consumed once, NO channel exists to reach a running exec. For any delegated run where mid-run coordination is plausible (>5 min, user-interactive dependency like CAPTCHA/OAuth, scope may grow), launch via `steer/steer.sh` instead - it wraps `codex app-server` (JSON-RPC; `codex proto` is dead) with a per-agent driver + FIFO. All verified 2026-08-13 on ChatGPT OAuth.
+
+```bash
+S=~/.claude/skills/codex-bridge/steer/steer.sh
+cat prompt.md | bash $S start <name> -C <workdir> [-m gpt-5.6-sol] [-s workspace-write]
+bash $S msg <name> "<new instruction>"   # injects into the RUNNING turn (turn/steer);
+                                          # idle -> new turn on same thread, context kept
+bash $S img <name> shot.png "<text>"     # inject an image mid-turn (post-CAPTCHA screenshot)
+bash $S interrupt <name>                  # abort live turn; thread + context survive
+bash $S wait <name> [secs] | status | tail | ls
+bash $S stop <name>                       # ALWAYS pair with start (procguard)
+```
+- State: `~/.codex-steer/<name>/` - `out.md` (human transcript), `events.jsonl` (filtered protocol), `state.json` (status: starting/running/idle/stopped/dead).
+- Steering an ended turn auto-falls-back to a new turn (expectedTurnId precondition handled).
+- Agents survive the launching session (own process group). `steer.sh ls` audits; a `dead(stale)` row means the driver died - `stop` it to clean up.
+- Protocol is experimental; on breakage after a codex update: `codex app-server generate-json-schema --out <dir>` and diff against `driver.py`'s calls.
+- Verify rule 3 applies unchanged: steer reports are claims; check the diff yourself.
+- Follow-up on a FINISHED plain exec run (no steer daemon): `codex exec resume <thread_id> -` (capture thread_id from `--json`'s `thread.started`). Traps: no `-s`/`-C` on resume, cwd re-roots to caller's - cd to the original workdir first.
+- OpenRouter/REST executors have NO mid-run channel; use `openrouter-bridge/conv.sh` chunked turns instead.
+
 ### API-key extras (beyond the OAuth CLI)
 With `OPENAI_API_KEY` set (in `~/.zshrc`), the full API opens up - details + verified call shapes in `~/.claude/skills/_model-cache/openai.md`:
 - **Codex agentic models** (`gpt-5.3-codex` latest, `gpt-5.2-codex`, …) → **Responses API** (`/v1/responses`), NOT chat/completions. There is **no** `gpt-5.5-codex`.
@@ -101,6 +122,6 @@ Use for: consequential Agent calls (planning, risky-code review, decisions), a v
 - **Image not where you asked** → it's in `~/.codex/generated_images/…`; `cp` it.
 
 ## See also
-- `/gemini-bridge` - Gemini CLI; image gen, non-English copy, video, TTS
+- `/gemini-bridge` - Gemini REST bridge; image gen, non-English copy, video, TTS
 - `/board` - multi-model panel (Opus + Gemini + Codex)
 - `/think` - escalate to Opus when the need is harder thinking, not a different model

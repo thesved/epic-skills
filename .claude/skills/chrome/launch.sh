@@ -30,9 +30,38 @@ fi
 BIN="$(find_chrome)"
 [ -n "$BIN" ] || { echo "ERROR: Chrome/Chromium not found - set CHROME_BIN" >&2; exit 1; }
 mkdir -p "$PROFILE"
-"$BIN" --remote-debugging-port="$PORT" --user-data-dir="$PROFILE" \
-       --no-first-run --no-default-browser-check "$@" >/dev/null 2>&1 &
-echo "launching: $BIN  ·  CDP :$PORT  ·  profile $PROFILE  ·  pid $!"
+# Chrome 136+ rejects CDP websocket upgrades carrying an Origin header (403) unless
+# that origin is allowlisted. Clients on a browser/HTTP stack that auto-sends Origin
+# (python websockets, node ws, fetch) hit this; allowlist the loopback CDP origins.
+# Chrome MUST outlive whoever launched it. A plain `&` leaves it in the caller's
+# process group, and launchd KILLS a job's whole process group when the job exits
+# (unless AbandonProcessGroup=true). That is how a 10-minute launchd watcher was
+# killing a Chrome shared with the human every single run: not a tab close, a
+# process-group reap. start_new_session=True (setsid) puts Chrome in its own
+# session and process group, so no parent's death can take it down.
+spawn_detached() {
+  python3 - "$@" <<'PY'
+import subprocess, sys
+proc = subprocess.Popen(sys.argv[1:], stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                        start_new_session=True)
+print(proc.pid)
+PY
+}
+CHROME_ARGS=("$BIN" --remote-debugging-port="$PORT" --user-data-dir="$PROFILE"
+             --remote-allow-origins="http://localhost:$PORT,http://127.0.0.1:$PORT"
+             --no-first-run --no-default-browser-check "$@")
+if command -v python3 >/dev/null 2>&1; then
+  PID="$(spawn_detached "${CHROME_ARGS[@]}")"
+else
+  # fallback: still detach as far as bash can (new pgroup via job control)
+  set -m
+  "${CHROME_ARGS[@]}" >/dev/null 2>&1 &
+  PID=$!
+  disown "$PID" 2>/dev/null || true
+  set +m
+fi
+echo "launching: $BIN  ·  CDP :$PORT  ·  profile $PROFILE  ·  pid $PID (detached)"
 for _ in $(seq 1 25); do
   curl -fsS "http://127.0.0.1:$PORT/json/version" >/dev/null 2>&1 && { echo "ready:"; curl -s "http://127.0.0.1:$PORT/json/version"; exit 0; }
   sleep 0.3

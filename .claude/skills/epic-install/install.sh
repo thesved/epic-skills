@@ -71,7 +71,7 @@ cmd_store_key() {
 
 cmd_min_header() {
   local md="${1:-$HOME/.claude/CLAUDE.md}"
-  local line='**KEEP THIS FILE MINIMAL - caveman-terse, prune the unnecessary, NEVER bloat/trash it. Top-rules + cheat-sheet ONLY; war-stories/rationale/derivations → `learnings/INDEX.md`. Every edit: shorten, don'\''t pad.**'
+  local line='**KEEP THIS FILE MINIMAL: caveman-terse, prune the unnecessary, NEVER bloat/trash it. Top-rules + cheat-sheet ONLY; war-stories/rationale/derivations → `learnings/INDEX.md`. Every edit: shorten, don'\''t pad.**'
   mkdir -p "$(dirname "$md")"; touch "$md"
   grep -qF "KEEP THIS FILE MINIMAL" "$md" && { echo "  · minimal-header already in $md"; return; }
   { printf '%s\n\n' "$line"; cat "$md"; } > "$md.tmp" && mv "$md.tmp" "$md"
@@ -90,7 +90,6 @@ cmd_check() {
   local target="$HOME_TARGET"
   while [ $# -gt 0 ]; do case "$1" in --target) target="$2"; shift 2;; *) shift;; esac; done
   echo "CLI:"
-  command -v gemini >/dev/null 2>&1 && echo "  ✓ gemini CLI" || echo "  ✗ gemini CLI missing → npm i -g @google/gemini-cli"
   command -v codex  >/dev/null 2>&1 && echo "  ✓ codex CLI"  || echo "  ✗ codex CLI missing → npm i -g @openai/codex"
   command -v jq     >/dev/null 2>&1 && echo "  ✓ jq" || echo "  ✗ jq missing (needed by the Gemini seat)"
   echo "Keys / seats:"

@@ -14,7 +14,7 @@ Planning quality is the top model's moat; execution is near-parity across fronti
 - Tie-break for anything that ships: **intelligence > taste > cost**. Cost is a tie-breaker only. The value-tier executor is for rote AND low-stakes work; implementation that ships defaults to the top executor tier. When in doubt, the better model.
 - Cheaper output below the bar → redo with a smarter model without asking; escalating costs less than shipping mediocre work.
 - **Mission-critical review gates get the best available models, plural** (independent seats, cross-family). A defect that slips a gate stalls everything downstream; gate cost is trivial vs stall cost and usually pays back in shipping speed.
-- User-facing work (UI, copy, API design): the executor drafts, but the taste JUDGING is the orchestrator's own job - the top model has the best taste; delegate the drafting, never the verdict.
+- User-facing work (UI, copy, API design): the executor drafts, but the taste JUDGING is the orchestrator's own job, the top model has the best taste; delegate the drafting, never the verdict.
 - Security-flavored review never returns through Fable (refusal-downgrade risk, see prompting.md); route it to the cache table's review seat.
 - Computer use: delegating it is a COST move (screenshot loops are token furnaces), not a quality move; quality-critical GUI verification stays on the best GUI driver (check the cache).
 
@@ -53,6 +53,12 @@ API design, copy.
 - Reviews: orchestrator or taste/review model, optionally the bulk executor
   as an extra independent seat.
 ```
+
+## Steering delegated runs (never fire-and-forget the steerable cases)
+
+`codex exec` has no mid-run channel (stdin consumed once). When mid-run coordination is plausible - run projected >5 min, user-interactive dependency (CAPTCHA, OAuth click, 2FA), scope likely to grow (hunts, scrapes, "find X"), or the user actively watching - launch the executor via **codex-bridge `steer` mode** (`steer/steer.sh`, wraps `codex app-server`): `msg` injects into the RUNNING turn, `img` injects a screenshot mid-turn, `interrupt` aborts without losing the thread, follow-up turns keep full context. Verified live 2026-08-13. Always pair `start` with `stop` (long-lived process; `steer.sh ls` audits orphans). NO polling instruction goes into the executor prompt - steering is push-based, costs zero executor tokens until used (mailbox-file polling was tried and rejected: constant re-reads burn tokens every checkpoint).
+- Plain `codex exec` stays right for one-shot bounded tasks; if a follow-up NEED emerges after it finishes, `codex exec resume <thread_id> -` keeps context (capture thread_id from `--json` at launch - free insurance).
+- OpenRouter/REST executors: no mid-flight channel exists, period. Chunk the work into turns with openrouter-bridge `conv.sh` (persisted history) so every chunk boundary is a steering point.
 
 ## Sentinel (progress watchdog for long multi-executor runs)
 

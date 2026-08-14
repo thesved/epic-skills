@@ -23,7 +23,7 @@ Use Gemini for what Claude can't or does worse: **video analysis** (YouTube + lo
 **Model ids, pricing, and exact call shapes live in the cache - read it before generating:** `~/.claude/skills/_model-cache/gemini.md` (and `index.md` for routing). For **how to prompt each model well**, read the ONE matching file in `~/.claude/skills/_model-cache/examples/` (each mode below names its file). This skill never hardcodes ids; they drift. The cache is the pin.
 
 ## Auth - REST + paid key, always
-Everything runs **REST with the paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`). Pay-as-you-go, no free-tier throttle wall. **The old `gemini` CLI is DEAD** (OAuth path returns `IneligibleTierError` + migrate-to-Antigravity notice, confirmed 2026-07-09); its successor is `agy` (Antigravity), which stays an opt-in OAuth agentic seat only - see `/board`. Do not route work through `gemini`; every mode below is REST (`ask.sh`, `video.sh`, or the curl shapes in the cache).
+Everything runs **REST with the paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`). Pay-as-you-go, no free-tier throttle wall. Never invoke a `gemini` binary; every mode below is REST (`ask.sh`, `yt.sh`, `video.sh`, or the curl shapes in the cache). `agy` (Antigravity) is a separate opt-in OAuth agentic seat only - see `/board`.
 
 ## Modes
 
@@ -39,10 +39,10 @@ EOF
 Review mode: ask for surgical defects ("quote each phrase that sounds translated, suggest a natural alternative"), not generic praise.
 
 ### `image` - generate / edit
-REST + key only (CLI 404s on image models). **Read the IMAGE section of the cache** for the current id (`gemini-3.1-flash-image` cheap / `gemini-3-pro-image` studio), the `imageConfig` call shape, edit-via-inlineData, and per-image pricing. Output is base64 in `inlineData` - read its `mimeType`. Codex `gpt-image-2` is the fallback (`/codex-bridge image`) when you'd rather use OpenAI. **Prompt examples → `_model-cache/examples/gemini-image.md`.**
+REST + key only. **Read the IMAGE section of the cache** for the current id (`gemini-3.1-flash-image` cheap / `gemini-3-pro-image` studio), the `imageConfig` call shape, edit-via-inlineData, and per-image pricing. Output is base64 in `inlineData` - read its `mimeType`. Codex `gpt-image-2` is the fallback (`/codex-bridge image`) when you'd rather use OpenAI. **Prompt examples → `_model-cache/examples/gemini-image.md`.**
 
 ### `video` - YouTube or local file (the moat)
-- **YouTube URL** → REST `generateContent` with `fileData.fileUri=<url>` in the parts (call shape in the cache VIDEO section); Gemini fetches it. For metadata + top comments folded in, prefer `/youtube`.
+- **YouTube URL** → `~/.claude/skills/gemini-bridge/yt.sh "<url>" "<question>"` (or `yt.sh "<url>" - <<EOF` for long prompts); REST `generateContent` with `fileData.fileUri`, Gemini fetches the video server-side. For metadata + top comments folded in, prefer `/youtube`.
 - **Local file** → `~/.claude/skills/gemini-bridge/video.sh "<path>" "<question>"` (Files API). `GEMINI_MODEL=pro` for reasoning, `GEMINI_FPS=n` for rapid motion/dense text. Flash to collect (transcribe/OCR/list), Pro to reason (intent/cause). See the VIDEO section of the cache for sampling/limits. **Prompt examples (transcript, tutorial-extract, Veo gen) → `_model-cache/examples/gemini-video.md`.**
 
 ### `tts` - spoken audio
@@ -70,7 +70,7 @@ Flash to collect, Pro to think (`BOARD_GEMINI_MODEL=gemini-3.1-pro-preview`; cac
 Don't dump raw output. Summarize, quote the key bits. For copy/translations, offer alternatives. For images, report the saved path (`open <path>`). For non-English, show the user and ask if it reads naturally - don't assume Gemini nailed it.
 
 ## Failure modes
-- **`IneligibleTierError` / migrate-to-Antigravity** → you called the dead `gemini` CLI; use REST (`ask.sh` / curl from the cache).
+- **`IneligibleTierError` / migrate-to-Antigravity** → something invoked a retired `gemini` binary; route through REST instead (`ask.sh` / `yt.sh` / curl from the cache).
 - **`TerminalQuotaError` / quota** → an OAuth path burned its tier; you should be on the key via REST.
 - **Smoke ERR: no key** → add the key to keychain (`gemini-api-key`) or export `GEMINI_API_KEY`; `lib.sh` resolves env→`~/.zshrc`→keychain.
 - **Key throttled / credits depleted (text)** → route the request through OpenRouter (`google/gemini-3.5-flash`) - see `_model-cache/openrouter.md`. (Media endpoints stay direct.)

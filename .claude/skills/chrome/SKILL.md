@@ -18,6 +18,17 @@ Starts Chrome with `--remote-debugging-port=9222` on a **dedicated profile** (`~
 
 Overrides: `CHROME_CDP_PORT`, `CHROME_CDP_PROFILE`, `CHROME_BIN`.
 
+**Chrome is spawned detached (setsid), on purpose. Never "simplify" that back to `cmd &`.**
+A backgrounded child stays in the launcher's process group, and **launchd kills a job's entire
+process group when the job exits** unless the plist sets `AbandonProcessGroup=true`. A
+10-minute launchd watcher that called `launch.sh` therefore killed the shared Chrome on every
+single run, taking every window with it, which reads as "something keeps closing my browser"
+and looks nothing like a CDP bug. Same trap applies to cron and to any dying agent session.
+Two layers, keep both: `launch.sh` setsids Chrome into its own session, and any launchd plist
+that touches Chrome sets `AbandonProcessGroup=true`.
+Regression test: launch Chrome from a subshell, then `kill -KILL -<that subshell's pgid>`.
+Chrome must still answer on `/json/version`.
+
 ## 2. Discover targets
 ```
 curl -s http://127.0.0.1:9222/json/version    # browser + ws endpoint
@@ -41,6 +52,16 @@ Picks the first page target (or set `CDP_TARGET=<url-substring>` to choose a tab
 
 Decode base64 output with `... | jq -r .data | base64 -d > out.png`.
 
+## Save an authenticated page as ONE self-contained HTML
+
+Goal: grab a login-gated, JS-rendered page (e.g. a pages.dev deck behind Cloudflare Access) as a single offline HTML.
+
+**Pull the pristine *served* HTML, not the live DOM.** Serializing `document.documentElement.outerHTML` captures the post-JS DOM; any script that *appends* on load (chart drawers, `container.appendChild(...)`, `innerHTML +=`) then **double-renders** every element when the saved file is reopened (JS runs again on top of the already-baked output). General bug, hits all such widgets.
+
+Fix: fetch the original response body via `Page.getResourceContent` through the logged-in session (empty containers + the draw script → renders exactly once on open). `curl` gets 401 (no auth); page CSP often blocks in-page `fetch`. Needs Page domain enabled in the **same** websocket session, so `cdp.py`'s one-command-per-connection won't do it: write a one-shot websocket script: `Page.enable` → `Page.navigate` → wait `Page.loadEventFired` → `Page.getResourceTree` (frame id + url) → `Page.getResourceContent` (base64-decode if flagged).
+
+Self-contained only if the source already inlines assets (images as `data:` URIs, inline `<script>`/`<style>`, 0 external `src`/`href`). Verify: reopen the saved `file://` and assert no chart/container holds >1 rendered child.
+
 ## 4. Stay out of the way (one tab per session, shared Chrome)
 
 `cdp.py` is built to share **one** Chrome with you and other agents without stepping on anyone:
@@ -60,6 +81,13 @@ bash ~/.claude/skills/chrome/badge.sh off
 Paints its own favicon (never taints/depends on the page's real one) and re-applies via `MutationObserver` if an SPA overwrites it. A page navigation wipes it (new document), so re-run `on` after navigating if you want it to persist.
 
 **macOS caveat (10-yr Chromium bug):** on *stable headed* Chrome, CDP traffic can still trigger app activation on the create-tab flash even with the above. Kill the jarring Space-jump with `defaults write NSGlobalDomain AppleSpacesSwitchOnActivate -bool false && killall Dock`.
+
+## 5. Driving Google apps (Sheets/Docs) - measured 2026-08-14
+
+- **Rapid-fire cdp.py calls fail SILENTLY.** Each call opens its own websocket; several back-to-back in one shell line return empty output with exit 0 and the command never ran. One cdp.py call per shell invocation, ≥0.3s gaps, and treat empty stdout as failure, never as success.
+- **Synthetic JS events are ignored** (`element.dispatchEvent(...)` is untrusted; Google apps drop it). Use trusted `Input.dispatchMouseEvent` / `Input.dispatchKeyEvent` at coordinates from `getBoundingClientRect()`; re-read coordinates after any UI change (tabs shift on rename).
+- **Paste into Sheets:** `pbcopy < file.tsv` then `Input.dispatchKeyEvent '{"type":"keyDown","key":"v","code":"KeyV","modifiers":4,"commands":["paste"]}'`. Works into the grid from A1.
+- **Sheets grid is canvas - DOM readback impossible.** Verify via `Page.captureScreenshot` (read the image) + selection range from `.waffle-name-box`; tab names live in `.docs-sheet-tab-name` spans (DOM, readable). Dblclick a tab name (two trusted click pairs, clickCount 1 then 2) → selectAll+insertText+Enter renames it. `sheets.new` creates a spreadsheet if the profile is logged in.
 
 <!-- skill-lint: ignore placeholder-example -->
 

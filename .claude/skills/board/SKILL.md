@@ -1,12 +1,11 @@
 ---
 name: board
 description: >-
-  Convene a "board of directors" - query Fable 5, Gemini, Codex, Grok (latest
-  xAI via OpenRouter), and an OpenRouter Fusion seat (GLM-5.2 + DeepSeek panel)
+  Convene a "board of directors" - query Fable 5, Gemini, Codex, Grok (xAI via
+  OpenRouter), and an open-family seat (DeepSeek / GLM via OpenRouter)
   in parallel on the same question, then synthesize the cross-model perspective.
-  Use for irreversible decisions, open-problem exploration from multiple angles,
-  or when one model's answer feels insufficient. Each model brings a different
-  architecture and training distribution, so the disagreements are signal.
+  Use for irreversible decisions, open-problem exploration,
+  or when one model's answer feels insufficient.
   Triggers: "board", "board of directors", "panel", "consult the panel",
   "multiple models", "cross-model", "second third and fourth opinion", "what
   does everyone think", "explore from multiple angles", "I'm stuck on this
@@ -21,15 +20,15 @@ argument-hint: '<question for the board> | smoke (check all seats)'
 
 # Board - multi-model panel
 
-Run one question through **Fable 5 + Gemini + Codex + Grok + an OpenRouter Fusion seat in parallel**, then synthesize. Agreement = higher confidence; disagreement = the signal worth investigating. This skill is the *orchestrator* - it does **not** re-document how to drive each model. For seat-specific call shapes, gotchas, and auth, the seats own their docs: **`/gemini-bridge`** (Gemini seat), **`/codex-bridge`** (Codex seat), and **`/openrouter-bridge`** (Grok + Fusion seats); model ids/pricing live in `~/.claude/skills/_model-cache/`.
+Run one question through **Fable 5 + Gemini + Codex + Grok + an open-family seat in parallel**, then synthesize. Agreement = higher confidence; disagreement = the signal worth investigating. This skill is the *orchestrator* - it does **not** re-document how to drive each model. For seat-specific call shapes, gotchas, and auth, the seats own their docs: **`/gemini-bridge`** (Gemini seat), **`/codex-bridge`** (Codex seat), and **`/openrouter-bridge`** (Grok + open-family seats); model ids/pricing live in `~/.claude/skills/_model-cache/`.
 
-The **4th seat is Grok** (`ask.sh --grok`, latest xAI flagship via OpenRouter; self-healing chain handles region-blocks and falls back to the prior flagship, see `/openrouter-bridge`): a fourth independent frontier family (xAI) with a training distribution none of the other seats share. The **5th seat is OpenRouter Fusion** (`openrouter/fusion`): a panel of `z-ai/glm-5.2` + `deepseek/deepseek-v4-pro` (judge GLM-5.2) deliberates and returns one synthesized answer. It deliberately uses **non-OpenAI/Anthropic/Google/xAI families** - architecture diversity the other four seats don't cover - so its agreement/dissent is independent signal. Swap models with `OPENROUTER_FUSION_PANEL` / `OPENROUTER_FUSION_JUDGE` (see `/openrouter-bridge`); for high-stakes boards append the current frontier open-weight pick from the `_model-cache/index.md` delegation table to the panel. Fusion costs ≈4-5× a single call; drop it when budget matters more than breadth.
+The **4th seat is Grok** (`ask.sh --grok`, latest xAI flagship via OpenRouter; self-healing chain handles region-blocks and falls back to the prior flagship, see `/openrouter-bridge`): a fourth independent frontier family (xAI) with a training distribution none of the other seats share. The **5th seat is open-family**: `ask.sh -m deepseek/deepseek-v4-pro`, deliberately **non-OpenAI/Anthropic/Google/xAI** - architecture diversity the other four seats don't cover, so its agreement/dissent is independent signal. For a high-stakes board add a 6th seat with a second open family (`-m z-ai/glm-5.2`, or the current frontier open-weight pick from the `_model-cache/index.md` delegation table). Each extra seat is one more plain call: same price shape as the others, and a dead seat costs you that seat only.
 
 **Use when**: irreversible decision (architecture, vendor, schema, hiring); genuine exploration wanting angles one model misses; you've already escalated to Opus via `/think` and want a different family's sanity check; the user asks for the panel; research-critical code about to gate an expensive run (evidence 2026-07-12: two seats reviewing one training diff returned DISJOINT critical bugs - one found an unguarded GAN discriminator that would zombie the run, the other a penalty the model architecture could not act on; either alone would have shipped the other's bug into a 5-hour training).
-**Don't** when: there's a single checkable answer; you haven't tried it yourself; budget matters more than confidence (≈8× one call with Fusion, ≈4× without).
+**Don't** when: there's a single checkable answer; you haven't tried it yourself; budget matters more than confidence (≈5× one call).
 
 ## Smoke test
-`/board smoke` (or first board of a session - CLIs drift): `bash ~/.claude/skills/board/smoke.sh`. It delegates to each seat's own `smoke.sh` (Gemini = cheapest lite via paid key, throttle-proof; Codex = its `smoke.sh` default via stdin; OpenRouter = cheap single-model ping, NOT fusion) and notes Fable as always-in-session. Report the seat table it prints. If a seat is DOWN, run the board with the rest and note it.
+`/board smoke` (or first board of a session - CLIs drift): `bash ~/.claude/skills/board/smoke.sh`. It delegates to each seat's own `smoke.sh` (Gemini = cheapest lite via paid key, throttle-proof; Codex = its `smoke.sh` default via stdin; OpenRouter = cheap single-model ping) and notes Fable as always-in-session. Report the seat table it prints. If a seat is DOWN, run the board with the rest and note it.
 
 ## Step 1 - Draft ONE briefing
 Same self-contained prompt to every seat (assume no shared context):
@@ -50,8 +49,9 @@ Agent(subagent_type:"general-purpose", model:"fable", description:"Fable seat: <
 Bash: bash ~/.claude/skills/gemini-bridge/ask.sh /tmp/board_brief.md
 Bash: bash ~/.claude/skills/codex-bridge/ask.sh /tmp/board_brief.md
 Bash: bash ~/.claude/skills/openrouter-bridge/ask.sh --grok /tmp/board_brief.md
-Bash: bash ~/.claude/skills/openrouter-bridge/ask.sh --fusion /tmp/board_brief.md
+Bash: bash ~/.claude/skills/openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro /tmp/board_brief.md
 ```
+- **A seat that reasons hard on a heavy brief can outrun the Bash tool's 120s default**, which kills it silently and makes the seat look empty. On a long brief, fire the slow seats with `run_in_background` into a file and poll, or pass an explicit longer `timeout`; the fast seats answer in seconds meanwhile.
 - The seat helpers (`gemini-bridge/ask.sh`, `codex-bridge/ask.sh`) source `_model-cache/lib.sh` for the key (keychain-safe) and use a self-updating model alias - **no key or model id is hardcoded in this skill**, and they handle the Codex stdin/banner quirks. Because they resolve the key the same way `smoke` does, **smoke passing now predicts the board working** (an inline `?key=$GEMINI_API_KEY` would silently fail in the keychain-only setup). They take the briefing as a file arg or on stdin.
 - **Richer agentic Gemini seat** (opt-in): `agy --model "Gemini 3.5 Flash (High)" -p "$(cat /tmp/board_brief.md)" </dev/null`. OAuth (can throttle/hang). The `</dev/null` is **mandatory** - agy blocks forever on an open stdin pipe - and the model string must match `agy models` exactly. Use only when you want agy's agentic seat and can tolerate OAuth limits; the key seat above answers in seconds otherwise.
 
@@ -64,7 +64,7 @@ Map each seat → recommendation / strongest reason / strongest objection / woul
 
 ## Step 4 - Present crisply (don't dump raw responses)
 ```
-PANEL: Fable: <rec> - <why> | Gemini: <rec> - <why> | Codex: <rec> - <why> | Grok: <rec> - <why> | Fusion: <rec> - <why>
+PANEL: Fable: <rec> - <why> | Gemini: <rec> - <why> | Codex: <rec> - <why> | Grok: <rec> - <why> | DeepSeek: <rec> - <why>
 AGREE: <consensus>   DISAGREE: <key tension>
 MY REC: <one option>, because <synthesis>.   KEY RISK: <dissent in one line>.
 YOUR CALL.
@@ -72,7 +72,7 @@ YOUR CALL.
 The board informs; the user decides.
 
 ## Resilience - always return something
-Each seat is independent; a seat erroring is normal. Drop a failed Bash seat and continue. Codex 400 → it's the model id (see `/codex-bridge`), retry once then drop. Gemini key errors (credits) → fall back to agy or drop. Grok seat erroring → likely the model id rotated (check `x-ai/*` in the live `/models` list, override `OPENROUTER_GROK_MODEL`), retry once then drop. Fusion seat slow/erroring (it fans out N+1 calls) → drop it or fall back to a plain OpenRouter model (`bash ~/.claude/skills/openrouter-bridge/ask.sh /tmp/board_brief.md`). **Fable (Agent tool) is always available**, so the board never returns empty. If `model:"fable"` is rejected (Fable pulled again), fall back to `model:"opus"`. Always note dropped seats in the output.
+Each seat is independent; a seat erroring is normal. Drop a failed Bash seat and continue. Codex 400 → it's the model id (see `/codex-bridge`), retry once then drop. Gemini key errors (credits) → fall back to agy or drop. Grok seat erroring → likely the model id rotated (check `x-ai/*` in the live `/models` list, override `OPENROUTER_GROK_MODEL`), retry once then drop. An OpenRouter seat coming back **empty** is usually the Bash timeout clipping a slow reasoning call, **not** an API failure: re-fire it in the background before concluding anything (diagnosis order in `/openrouter-bridge`), or swap the model with `-m`. The seat helper now retries 429/5xx with backoff itself (Kimi's single-upstream waves), so a transient seat error self-heals within the call. **Fable (Agent tool) is always available**, so the board never returns empty. If `model:"fable"` is rejected (Fable pulled again), fall back to `model:"opus"`. Always note dropped seats in the output.
 
 ## Guardrails
 One board per major decision per session unless asked. ~30-90s wall-clock. If the panel unanimously contradicts what the user wanted, **surface that gap explicitly** and let the user resolve it - don't quietly side with either.

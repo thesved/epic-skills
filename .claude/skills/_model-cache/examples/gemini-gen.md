@@ -1,22 +1,22 @@
-# Gemini generative - Lyria music + Deep-research prompt examples
+# Gemini generative, Lyria music + Deep-research prompt examples
 
 Verified 2026-06-13. Music `lyria-3-pro-preview` (≤3min; clip `lyria-3-clip-preview`). Research `deep-research-pro-preview-12-2025` (Interactions API). Call shapes → `../gemini.md`. `[off]`=official, `[com]`=community.
 
 ---
 
-## LYRIA music - NO `negative_prompt` (bake exclusions into prose). Section tags `[Intro][Verse][Chorus][Bridge][Outro]`.
+## LYRIA music, NO `negative_prompt` (bake exclusions into prose). Section tags `[Intro][Verse][Chorus][Bridge][Outro]`.
 
-**Timestamped arrangement** (Pro superpower - direct the timeline) [off]:
+**Timestamped arrangement** (Pro superpower, direct the timeline) [off]:
 ```
 [00:00] Massive gospel choir, uplifting. [00:15] Heavy hip-hop beat + 808 drop. [00:30] Male lead
 raps a confident verse; choir punctuates. [01:10] Triumphant chorus, brass horns. [01:50] Strip to
 gentle Hammond B3, quiet bridge. [02:10] Full choir + beat return; end on a sustained chord at [03:00].
 ```
-**Spec-dense instrumental** - BPM + named instruments + "Instrumental only" [off]:
+**Spec-dense instrumental**: BPM + named instruments + "Instrumental only" [off]:
 ```
 A 30s lofi hip hop beat, dusty vinyl crackle, mellow Rhodes chords, slow boom-bap at 85 BPM, jazzy upright bass. Instrumental only.
 ```
-**Directed vocal** - range + dynamic arc + lyric *theme* (not verbatim lyrics; copyright filter) [off]:
+**Directed vocal**: range + dynamic arc + lyric *theme* (not verbatim lyrics; copyright filter) [off]:
 ```
 A moody jazz ballad, piano + upright bass. Female breathy soulful soprano, starts confident then
 calmer/quieter as it progresses. Lyrics about meeting the love of her life in New York.
@@ -25,7 +25,7 @@ Reproducibility: `seed:42` (omit sample_count) to iterate identically; `sample_c
 
 ---
 
-## DEEP-RESEARCH - async (`background=True`), poll until `completed`. Default tools: google_search + url_context + code_execution.
+## DEEP-RESEARCH, async (`background=True`), poll until `completed`. Default tools: google_search + url_context + code_execution.
 
 **Impose the report skeleton in-prompt** (parseable deliverable, not an essay) [com]:
 ```

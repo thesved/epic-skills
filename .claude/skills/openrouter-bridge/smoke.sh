@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# OpenRouter seat smoke test - cheap single-model ping (NOT fusion; fusion would
-# fan out N+1 paid calls). Verifies key + endpoint reachability only.
+# OpenRouter seat smoke test - cheap single-model ping. Verifies key + endpoint
+# reachability only.
 # Key: env OPENROUTER_API_KEY else keychain openrouter-api-key. Override model with
 # OPENROUTER_SMOKE_MODEL. Default = a cheap, always-on non-routing model.
 set -uo pipefail

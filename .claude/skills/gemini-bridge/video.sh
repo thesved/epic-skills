@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # video.sh - analyze a LOCAL video file with Gemini via the File API (robust path).
+# For YouTube URLs use yt.sh instead (no upload needed; fileData.fileUri).
 #
-# Why this exists: the `gemini` CLI's `@file.mp4` ingestion hangs/stalls on large
-# videos (verified: a 76 MB screen recording never returned after 9+ min). The
-# File API is the reliable mechanism Google documents for any video, and is the
-# ONLY option for files >20 MB (inline base64 exceeds the request-size limit).
+# Why the File API: it is the mechanism Google documents as reliable for any
+# video size, and the ONLY option for files >20 MB (inline base64 exceeds the
+# request-size limit).
 #
 # Usage:
 #   ./video.sh <video-file> [question...]            # default model = Flash
@@ -24,9 +24,7 @@
 #   fast motion / dense on-screen text so frames aren't skipped).
 #
 # Auth: uses $GEMINI_API_KEY if set, else the macOS keychain entry
-# `gemini-api-key`. The File API requires the API-key tier - the free
-# personal-Google-login (gemini CLI OAuth) hits a different endpoint and
-# CANNOT upload files (gemini-cli issue #25167).
+# `gemini-api-key` (the File API requires the API-key tier).
 set -euo pipefail
 
 FILE="${1:?usage: video.sh <video-file> [question...]}"; shift || true

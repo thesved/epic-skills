@@ -41,8 +41,7 @@ read -rs GEMINI_API_KEY && printf '%s' "$GEMINI_API_KEY" | \
 (Repeat per key. The user can run these with a leading `!` in this session.)
 
 ## 3. CLIs + auth
-The seats call two CLIs:
-- **Gemini**: `npm i -g @google/gemini-cli` (the bridge's REST features use `GEMINI_API_KEY`).
+- **Gemini**: no CLI; the bridge is pure REST via `GEMINI_API_KEY` (set up in step 2).
 - **Codex**: `npm i -g @openai/codex`, then **`codex login`** (ChatGPT account OAuth - the Codex seat needs this, not an API key).
 
 ## 4. CLAUDE.md setup

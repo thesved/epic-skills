@@ -1,0 +1,85 @@
+<!-- caveman HTML gallery asset: PhotoSwipe 5.4.4 tuned to iPhone Photos feel.
+     Copy the pieces below into the page. Verified against photoswipe.com v5 docs
+     + GitHub defaultOptions (2026-07-18). Do not tweak option values from memory.
+
+     iPhone deltas vs stock PhotoSwipe:
+       bgOpacity 1 (full black backdrop), loop false (Photos does not wrap),
+       wheelToZoom true (bare trackpad/wheel zooms on desktop),
+       durations 350 + iOS-ish bezier (PhotoSwipe has no spring physics; this is
+       the closest static approximation, same curve Vaul drawer uses),
+       secondaryZoomLevel 2 (modest double-tap zoom).
+     Everything else is PhotoSwipe default, kept explicit to document intent.
+
+     Per-image requirements (HARD):
+       <a href="FULL-SIZE url" data-pswp-width="W" data-pswp-height="H"> around thumb <img>.
+       W/H = real pixel dims of the FULL image, else layout + zoom break (no auto-measure).
+       Square-cropped thumbs: add data-cropped="true" + object-fit:cover, else open
+       transition distorts.
+
+     Gotchas:
+       loop silently forced off under 3 slides.
+       doubleTapAction:'zoom' keeps ~300ms single-tap delay; iOS Photos has same, accept it.
+       Native Fullscreen API unsupported on iPhone Safari; black backdrop is the substitute.
+       iOS ignores user-scalable=no since iOS 10; grid double-tap-zoom is killed by
+       touch-action:manipulation instead.
+       Captions: core has none; optional photoswipe-dynamic-caption-plugin if needed. -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://unpkg.com/photoswipe@5.4.4/dist/photoswipe.css">
+<style>
+  #gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 2px; }
+  #gallery a { display: block; aspect-ratio: 1; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  #gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* keep close button / counter out of notch + Dynamic Island */
+  .pswp__top-bar { padding-top: env(safe-area-inset-top); }
+</style>
+
+<div id="gallery">
+  <a href="photos/p1-full.jpg" data-pswp-width="2400" data-pswp-height="1600" data-cropped="true">
+    <img src="photos/p1-thumb.jpg" alt="">
+  </a>
+  <a href="photos/p2-full.jpg" data-pswp-width="1600" data-pswp-height="2400" data-cropped="true">
+    <img src="photos/p2-thumb.jpg" alt="">
+  </a>
+</div>
+
+<script type="module">
+import PhotoSwipeLightbox from 'https://unpkg.com/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.js';
+
+const lightbox = new PhotoSwipeLightbox({
+  gallery: '#gallery',
+  children: 'a',
+  pswpModule: () => import('https://unpkg.com/photoswipe@5.4.4/dist/photoswipe.esm.js'),
+
+  // open/close: zoom from thumbnail, like tapping a photo in iOS Photos
+  showHideAnimationType: 'zoom',
+  showAnimationDuration: 350,   // UIKit transitions run ~300-350ms
+  hideAnimationDuration: 350,
+  zoomAnimationDuration: 350,   // also drives double-tap zoom
+
+  easing: 'cubic-bezier(0.32, 0.72, 0, 1)', // iOS spring approximation
+
+  bgOpacity: 1,                 // full black behind photo, like Photos
+
+  initialZoomLevel: 'fit',
+  secondaryZoomLevel: 2,        // double-tap target
+  maxZoomLevel: 4,              // pinch ceiling
+
+  tapAction: 'toggle-controls', // single tap shows/hides chrome
+  doubleTapAction: 'zoom',
+  imageClickAction: 'zoom-or-close', // desktop mouse click
+  bgClickAction: 'close',
+
+  pinchToClose: true,           // pinch past min zoom shrinks + closes
+  closeOnVerticalDrag: true,    // flick up/down dismisses
+  clickToCloseNonZoomable: true,
+
+  wheelToZoom: true,            // bare wheel/trackpad zoom on desktop
+  allowPanToNext: true,         // pan past edge swipes to next (touch)
+  spacing: 0.1,                 // 10% viewport gap between slides
+  loop: false,                  // Photos does not wrap last -> first
+  preload: [1, 2],
+  preloadFirstSlide: true,
+});
+lightbox.init();
+</script>
