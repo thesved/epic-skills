@@ -11,7 +11,7 @@
 #   GEMINI_MODEL=pro ./video.sh <video-file> [q...]  # force Pro (deep reasoning)
 #
 # Model selection (GEMINI_MODEL): flash (default) | pro | <exact-model-id>
-#   flash → gemini-3.5-flash      (latest GA Flash; cheap/fast: transcribe,
+#   flash → gemini-3.7-flash      (latest GA Flash; cheap/fast: transcribe,
 #                                  summarize, OCR, list, "what happens")
 #   pro   → gemini-3.1-pro-preview (latest Pro, preview; deep reasoning:
 #                                  intent, critique, cross-modal synthesis)
@@ -36,7 +36,7 @@ KEY="$(resolve_key GEMINI_API_KEY)"
 [ -n "$KEY" ] || { echo "ERROR: no API key (OS store gemini-api-key / env GEMINI_API_KEY / .env)" >&2; exit 1; }
 
 case "${GEMINI_MODEL:-flash}" in
-  flash) MODEL="gemini-3.5-flash" ;;
+  flash) MODEL="gemini-3.7-flash" ;;
   pro)   MODEL="gemini-3.1-pro-preview" ;;
   *)     MODEL="${GEMINI_MODEL}" ;;
 esac

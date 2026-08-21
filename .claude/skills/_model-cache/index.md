@@ -17,6 +17,7 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 | Any OpenAI: gpt-5.5 / codex / realtime / gpt-image-2 | [`examples/openai.md`](examples/openai.md) |
 | Grok / xAI via OpenRouter (route-to/away, effort dial, agentic patterns) | [`examples/grok.md`](examples/grok.md) |
 | Kimi K3 / Moonshot via OpenRouter (route-to/away, param traps, board-seat verdict) | [`examples/kimi.md`](examples/kimi.md) |
+| DeepSeek V4 Pro 0813 / Flash 0731 (effort ladder, caching, peak pricing, provider pinning, no-vision, Harness) | [`examples/deepseek.md`](examples/deepseek.md) |
 
 ## Capability routing, who to reach for
 | need | first choice | id (verify in provider file) | why |
@@ -63,19 +64,20 @@ Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, co
 | Wrapper plumbing / mid-taste | sonnet-5 | cheap, reliable executor of ready-made prompts |
 | Read-only scout | haiku | cheapest useful |
 | Cross-family opinion (board Grok seat) | x-ai grok chain (`openrouter-bridge/ask.sh --grok`) | latest = grok-4.6 (2026-08-12): cost/task ~2x 4.5 via token inflation, no longer a fast lane; route-to/away in `examples/grok.md` |
-| Cheap diverse opinion (board open-family seat) | `openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro` (2nd seat: `-m z-ai/glm-5.2`) | non-OAI/Anthropic/Google/xAI architecture diversity; one plain call per model, never a router. DeepSeek direct API goes time-variable 2026-08-16 16:00 UTC (peak $1.32/$3.96, off-peak $0.66/$1.98 vs $0.435/$0.87 now); OR route verified 2026-08-14, re-check after |
+| Cheap diverse opinion (board open-family seat) | `openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro-0813` (2nd seat: `-m z-ai/glm-5.3`) | non-OAI/Anthropic/Google/xAI architecture diversity; one plain call per model, never a router. 0813 = GA snapshot (2026-08-12), effort `high` (max overthinks); unsuffixed `deepseek-v4-pro` on OpenRouter is the April build. GLM 5.3 (2026-08-14) = AA 60, mandatory thinking, ignores json_schema silently. DeepSeek direct price is time-variable since 2026-08-16 (2x at 01-04 and 06-10 UTC) and our OpenRouter key cannot reach the DeepSeek-hosted endpoint (data-policy guardrail), so seats land on re-hosts at 1.2-2x: see `examples/deepseek.md` |
+| Cheap security / cyber second opinion (opt-in) | `-m deepseek/deepseek-v4-pro-0813`, effort high | CyberGym 83.3 = Fable 5; ~20x cheaper per solved exploit task than Opus 4.8 and no refusal downgrade; text-only, slow (50-90 tok/s), never the judge of its own work |
 | High-stakes extra seat (opt-in) | `-m moonshotai/kimi-k3` | strongest open-weight (above Opus 4.8 on GDPval-AA v2), adds Moonshot family; day-one caveats + flip-to-default conditions in `examples/kimi.md` (verified 2026-07-16) |
-| Video / multimodal / 1M-ctx dumps / non-English | gemini (REST) | the moat; Claude can't do video |
+| Video / multimodal / 1M-ctx dumps / non-English / one-shot UI + PDF-to-dashboard | gemini-3.7-flash (REST) | the moat; Claude can't do video. 340 tok/s, thinking `low|medium|high` (`minimal` = 400). NOT for spec-strict multi-component builds or long-horizon agent runs (drifts off spec, hallucinates scope; 3.1-pro-preview follows spec) |
 | **Bulk structured extraction** (thousands of schema-constrained calls over a fixed rulebook) | cheapest model that PASSES a schema probe on your real schema, then batch it | the price spread across rungs is 10-100x, and the deciding factor is never the headline benchmark: it is strict-schema support, max output, and cache-read price. Probe, do not read it off a spec sheet, see the trap list below |
 
 ## Typical response time
 Measured once 2026-06-13 (a few runs, median, reference only; not re-run every verify). `verify.sh` prints a live `SECS` column (single run by default). **Scales with output length, image resolution, video/audio duration, and context size.**
 | capability | model | latency | per unit |
 |---|---|---|---|
-| lite / text-fallback | gemini-flash-lite-latest · openrouter | ~0.5 s | per request |
-| text (short) | gemini-3.5-flash · gpt-5.5 · gpt-5.3-codex | ~1-2 s | per request; +~output tokens |
+| lite / text-fallback | gemini-flash-lite-latest (= 3.5-flash-lite) · openrouter | ~0.5 s | per request |
+| text (short) | gemini-3.7-flash · gpt-5.6-sol | ~1-2 s | per request; +~output tokens. 3.7-flash measured 2026-08-21: 170-185 tok/s on a 600-word answer, TTFB 1.3 s at thinkingLevel low |
 | tts | gemini-3.1-flash-tts-preview | ~2-3 s | per short utterance (~1× audio length) |
-| video analysis | gemini-3.5-flash | ~2-3 s | short clip; +~ video length / ingestion |
+| video analysis | gemini-3.7-flash | ~2-3 s | short clip; +~ video length / ingestion |
 | realtime audio | gemini-live · gpt-realtime | ~4 s round-trip | first audio <1 s, then streams in real time |
 | image | gemini-3.1-flash-image | ~10 s | per image @1K (more @2K/4K) |
 | music | lyria-3-pro-preview | ~20 s | per song |

@@ -1,6 +1,6 @@
 # Gemini video, analysis + Veo generation prompt examples
 
-Verified 2026-06-13. Analysis: `gemini-3.5-flash` (collect) / `gemini-3.1-pro-preview` (reason). Generation: `veo-3.1-lite-generate-preview`. Call shapes → `../gemini.md`; local-file analysis uses `../../gemini/video.sh`. Timestamps `MM:SS`. `[off]`=official, `[com]`=community.
+Verified 2026-06-13. Analysis: `gemini-3.7-flash` (collect, video-verified 2026-08-21 on 24 YouTube videos) / `gemini-3.1-pro-preview` (reason). Generation: `veo-3.1-lite-generate-preview`. Call shapes → `../gemini.md`; local-file analysis uses `../../gemini/video.sh`. Timestamps `MM:SS`. `[off]`=official, `[com]`=community.
 
 ---
 

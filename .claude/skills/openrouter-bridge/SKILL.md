@@ -22,7 +22,7 @@ One OpenAI-compatible endpoint proxying many providers behind a single prepaid k
 
 | Mode | Command | What it does |
 |------|---------|--------------|
-| plain | `bash openrouter-bridge/ask.sh <file-or-stdin>` | one model, default `z-ai/glm-5.2`. Override per call with `-m provider/model`, or session-wide with `OPENROUTER_MODEL`. |
+| plain | `bash openrouter-bridge/ask.sh <file-or-stdin>` | one model, default `z-ai/glm-5.3`. Override per call with `-m provider/model`, or session-wide with `OPENROUTER_MODEL`. |
 | grok | `bash openrouter-bridge/ask.sh --grok <file-or-stdin>` | xAI seat, self-healing chain: latest flagship direct → US-proxy retry on region-block → prior flagship fallback (notes the substitution). Mechanics + envs documented in the `ask.sh` header; model facts in the cache. The /board Grok seat. |
 | smoke | `bash openrouter-bridge/smoke.sh` | cheap single-model ping; verifies key + endpoint. |
 | conv | `bash openrouter-bridge/conv.sh new\|msg\|show\|ls\|rm` | multi-turn conversation with persisted history (see below). |
@@ -47,8 +47,8 @@ bash $C show <name> | ls | rm <name>
 ## Multiple models = multiple calls
 Want several families on one question? Fire one `-m` call per model, in the BACKGROUND, and compare the answers yourself. That is what `/board` does; it keeps every seat's raw answer, and one slow or empty seat cannot take the others down with it.
 ```bash
-bash openrouter-bridge/ask.sh -m z-ai/glm-5.2            /tmp/brief > /tmp/a.txt 2>&1 &
-bash openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro /tmp/brief > /tmp/b.txt 2>&1 &
+bash openrouter-bridge/ask.sh -m z-ai/glm-5.3            /tmp/brief > /tmp/a.txt 2>&1 &
+bash openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro-0813 /tmp/brief > /tmp/b.txt 2>&1 &
 ```
 
 ## When to use vs a direct provider

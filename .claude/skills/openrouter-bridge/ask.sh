@@ -4,17 +4,17 @@
 # works in the keychain-only setup where the session env has no OPENROUTER_API_KEY.
 #
 # Two modes:
-#   plain    bash openrouter-bridge/ask.sh /tmp/brief        (model = $OPENROUTER_MODEL, default z-ai/glm-5.2)
-#            bash openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro /tmp/brief   (per-call model)
+#   plain    bash openrouter-bridge/ask.sh /tmp/brief        (model = $OPENROUTER_MODEL, default z-ai/glm-5.3)
+#            bash openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro-0813 /tmp/brief   (per-call model)
 #   grok     bash openrouter-bridge/ask.sh --grok /tmp/brief
 #            -> the /board Grok seat. Self-healing chain (xAI region-blocks the newest
 #               model in the EU; OpenRouter egresses from a Cloudflare edge near YOUR IP):
-#                 1. $OPENROUTER_GROK_MODEL (default x-ai/grok-4.5) direct
+#                 1. $OPENROUTER_GROK_MODEL (default x-ai/grok-4.6) direct
 #                 2. on "not available in your region": retry through a US SOCKS5 proxy
 #                    ($OPENROUTER_PROXY, else NordVPN service creds "user:pass" from
 #                    keychain item `nordvpn-socks5` -> $NORD_SOCKS_HOST:1080, default
 #                    us.socks.nordhold.net)
-#                 3. still failing: fall back to $OPENROUTER_GROK_FALLBACK (x-ai/grok-4.3)
+#                 3. still failing: fall back to $OPENROUTER_GROK_FALLBACK (x-ai/grok-4.5)
 # $OPENROUTER_PROXY (any curl --proxy URL) applies to ALL modes when set.
 # All modes retry 429/5xx/transport with backoff under a total deadline (see call() below);
 # tune with OPENROUTER_TIMEOUT / OPENROUTER_MAX_RETRIES / OPENROUTER_RETRY_DEADLINE.
@@ -75,19 +75,21 @@ mkbody() { jq -n --arg p "$brief" --arg m "$1" '{model:$m,messages:[{role:"user"
 extract() {
   local in out; in="$(cat)"
   # empty/whitespace body = transport or timeout kill (jq would exit 0 on empty stdin = silent blank)
-  if [ -z "${in//[[:space:]]/}" ]; then echo "OpenRouter seat ERR: empty response (transport/timeout?)"; return; fi
+  # NOTE: never use bash ${var//[[:space:]]/} here: it is superlinear (11 KB = 110 s) and a
+  # reasoning-heavy body (DeepSeek/GLM return the reasoning text too) hung the seat for 7+ min.
+  if ! grep -q '[^[:space:]]' <<<"$in"; then echo "OpenRouter seat ERR: empty response (transport/timeout?)"; return; fi
   out="$(jq -r '
     (.choices[0].message.content // "") as $c
     | if ($c | gsub("^\\s+|\\s+$";"")) != "" then $c
       else "OpenRouter seat ERR: " + ((.error.metadata.raw // .error.message) // "empty content returned")
       end' <<<"$in" 2>/dev/null)"
-  if [ -z "${out//[[:space:]]/}" ]; then echo "OpenRouter seat ERR: unparseable response"; else printf '%s\n' "$out"; fi
+  if ! grep -q '[^[:space:]]' <<<"$out"; then echo "OpenRouter seat ERR: unparseable response"; else printf '%s\n' "$out"; fi
 }
 ok() { jq -e '(.choices[0].message.content // "") | gsub("^\\s+|\\s+$";"") != ""' >/dev/null 2>&1 <<<"$1"; }
 
 if [ "$grok" = 1 ]; then
-  primary="${OPENROUTER_GROK_MODEL:-x-ai/grok-4.5}"
-  fallback="${OPENROUTER_GROK_FALLBACK:-x-ai/grok-4.3}"
+  primary="${OPENROUTER_GROK_MODEL:-x-ai/grok-4.6}"
+  fallback="${OPENROUTER_GROK_FALLBACK:-x-ai/grok-4.5}"
   resp="$(call "$(mkbody "$primary")")"
   if ! ok "$resp" && grep -qi "not available in your region" <<<"$resp"; then
     # region-blocked: retry through a US egress if we have one
@@ -104,6 +106,6 @@ if [ "$grok" = 1 ]; then
   fi
   extract <<<"$resp"
 else
-  model="${OPENROUTER_MODEL:-z-ai/glm-5.2}"
+  model="${OPENROUTER_MODEL:-z-ai/glm-5.3}"
   call "$(mkbody "$model")" | extract
 fi

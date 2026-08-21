@@ -73,7 +73,7 @@ Don't dump raw output. Summarize, quote the key bits. For copy/translations, off
 - **`IneligibleTierError` / migrate-to-Antigravity** → something invoked a retired `gemini` binary; route through REST instead (`ask.sh` / `yt.sh` / curl from the cache).
 - **`TerminalQuotaError` / quota** → an OAuth path burned its tier; you should be on the key via REST.
 - **Smoke ERR: no key** → add the key to keychain (`gemini-api-key`) or export `GEMINI_API_KEY`; `lib.sh` resolves env→`~/.zshrc`→keychain.
-- **Key throttled / credits depleted (text)** → route the request through OpenRouter (`google/gemini-3.5-flash`) - see `_model-cache/openrouter.md`. (Media endpoints stay direct.)
+- **Key throttled / credits depleted (text)** → route the request through OpenRouter (`google/gemini-3.7-flash`) - see `_model-cache/openrouter.md`. (Media endpoints stay direct.)
 
 ## See also
 - `/youtube` - YouTube wrapper adding title + description + top comments

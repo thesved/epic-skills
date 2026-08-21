@@ -1,6 +1,6 @@
 # Gemini text/reasoning, prompt examples
 
-Verified 2026-06-13. Models: `gemini-3.5-flash` (collect), `gemini-3.1-pro-preview` (reason). Call shapes → `../gemini.md`. `[off]`=official, `[com]`=community.
+Verified 2026-08-21. Models: `gemini-3.7-flash` (collect, one-shot build, extraction; thinking floor `low`, `minimal` is rejected with 400 on 3.7), `gemini-3.1-pro-preview` (reason, spec-strict work). Call shapes → `../gemini.md`. `[off]`=official, `[com]`=community.
 
 ## Gemini 3.x rules (load-bearing) [off]
 - **Do NOT set temperature/top_p/top_k**: leave default 1.0; lowering causes looping/degradation.
@@ -11,11 +11,16 @@ Verified 2026-06-13. Models: `gemini-3.5-flash` (collect), `gemini-3.1-pro-previ
 ```python
 ThinkingConfig(thinking_level="high")    # 3.1-Pro default, hard math/coding/data
 ThinkingConfig(thinking_level="low")     # fact lookup / chat, cuts spend 50-70%
-ThinkingConfig(thinking_level="minimal") # batch extract/classify/route, near-zero thinking
+ThinkingConfig(thinking_level="minimal") # 3.1-pro / lite only; 3.7-flash returns 400, use "low" there
 ThinkingConfig(thinking_level="high", include_thoughts=True)  # debug + meter thoughts_token_count
 # Flash-lite/2.5 only: thinking_budget=0 (off) | -1 (dynamic)
 ```
-REST is camelCase: `generationConfig.thinkingConfig.thinkingLevel` (verified working on gemini-3.5-flash).
+REST is camelCase: `generationConfig.thinkingConfig.thinkingLevel` (verified on gemini-3.7-flash 2026-08-21: low 160 / medium 246 / high 321 thought tokens on a one-liner; default = medium). Legacy `thinkingBudget` on 3.7-flash: 0 = off, 1024 = silently off, 4096 = thinks (undocumented floor).
+
+## 3.7-flash task fit [com, 24-video sweep 2026-08-21]
+- Send it: one-shot single-file apps/games, UI cards matching a design system, PDF or video to structured output, intent classification, cheap parallel sub-agents under a frontier planner, long-context iteration loops.
+- Do not send it: multi-component specs where every number must be right (it added unrequested features and got totals wrong while 3.1-pro followed the spec), Three.js/GLSL shaders, CSS animation logic, CAD overhangs, long unsupervised agent runs (takes shortcuts, "no errors found" while IDE is red).
+- Schema: integer `enum` accepted on 3.7-flash (the older integer-enum rejection did not reproduce); still keep bounds checks in code.
 
 ## System-instruction style, "use ONLY provided context" beats long negative lists; 3-line scaffold > rambling [off/com]
 ```

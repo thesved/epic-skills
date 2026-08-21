@@ -38,7 +38,7 @@ post_turn() { # post_turn <dir>  -> appends assistant reply to conv.json, prints
         ${OPENROUTER_PROXY:+--proxy "$OPENROUTER_PROXY"} -d @-)"
   printf '%s' "$resp" > "$d/r$n.json"
   content="$(jq -r '.choices[0].message.content // empty' <<<"$resp" 2>/dev/null)"
-  if [ -z "${content//[[:space:]]/}" ]; then
+  if ! grep -q '[^[:space:]]' <<<"$content"; then  # not ${var//[[:space:]]/}: superlinear in bash on big bodies
     echo "ERR turn $n: empty content. Raw error: $(jq -r '.error.message // "none"' <<<"$resp" 2>/dev/null) (full: $d/r$n.json)"
     return 1
   fi
@@ -53,7 +53,7 @@ post_turn() { # post_turn <dir>  -> appends assistant reply to conv.json, prints
 case "$cmd" in
 new)
   name="${1:?name}"; shift
-  model="${OPENROUTER_MODEL:-z-ai/glm-5.2}"
+  model="${OPENROUTER_MODEL:-z-ai/glm-5.3}"
   if [ "${1:-}" = "-m" ]; then model="${2:?-m needs provider/model}"; shift 2; fi
   d="$BASE/$name"
   [ -f "$d/conv.json" ] && { echo "ERR: conversation '$name' exists (conv.sh rm $name first, or msg to continue)"; exit 1; }

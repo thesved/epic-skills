@@ -7,9 +7,10 @@ Default auth = **paid `GEMINI_API_KEY`** (env, else keychain `gemini-api-key`), 
 ## TEXT / REASONING
 | id | in | out | status | notes |
 |---|---|---|---|---|
-| `gemini-3.7-flash` | 0.75 | 3.75 | **GA, default workhorse** | intro price to end-2026 (then expect ~1.50/7.50); coding/agent focus; text+video verified live 2026-08-14 |
-| `gemini-3.5-flash` | 1.50 | 9.00 | GA, prior workhorse | cache-in 0.15; 1M ctx / 65k out |
-| `gemini-3.1-pro-preview` | 2.00→4.00 | 12.00→18.00 | preview, **best reasoning** | >200k ctx doubles in / +50% out; out incl thinking tokens |
+| `gemini-3.7-flash` | 0.75 | 3.75 | **GA, default workhorse** (`gemini-flash-latest` resolves here, live-verified 2026-08-21) | intro price to 2026-12-31, then $1.50/$7.50 (official); cache read 0.075, cache storage 0.50/M/h; Batch and Flex 0.375/1.875; Priority 1.35/6.75; 1,048,576 in / 65,536 out; `thinkingLevel` low|medium(default)|high, **`minimal` = 400**; legacy `thinkingBudget` 1024 silently = off, 4096 thinks; integer-enum schema trap FIXED on this model; no implicit cache hit seen on a 4.6k repeat; 340 tok/s headline, 170-185 tok/s measured on a 600-word answer; best: one-shot single-file apps, UI cards, PDF/vision to dashboard, cheap parallel sub-agents; worst: spec-strict multi-component builds (drifts, invents features, wrong math), GLSL/Three.js shaders, CSS animation, long-horizon agent runs; via OpenRouter+OpenCode users hit "Upstream idle timeout", direct AI Studio key is stable. Evidence `research/2026-08-21/` |
+| `gemini-3.6-flash` | 0.75 | 3.75 | GA (2026-07-21) | same price as 3.7 through 2026; superseded, use 3.7 |
+| `gemini-3.5-flash` | 1.50 | 9.00 | GA, old workhorse, now PRICIER than 3.7 | cache-in 0.15; 1M ctx / 65k out |
+| `gemini-3.1-pro-preview` | 2.00→4.00 | 12.00→18.00 | preview, **best reasoning, only Pro that exists** (`gemini-pro-latest` resolves here; no 3.5/3.7 Pro as of 2026-08-21, Google declined to say if 3.5 Pro ships) | follows specs where 3.7-flash drifts; >200k ctx doubles in / +50% out; out incl thinking tokens |
 | `gemini-3-flash-preview` | 0.50 | 3.00 | preview | cheap mid-tier; prefer 3.7-flash for prod |
 | `gemini-2.5-pro` | 1.25→2.50 | 10.00→15.00 | GA, **shutdown 2026-10-16** | |
 | `gemini-2.5-flash` | 0.30 | 2.50 | GA, **shutdown 2026-10-16** | |

@@ -58,7 +58,7 @@ def need(key, cap, model):
 
 # ---- TIER 0: text liveness ----
 def t_gemini_text():
-    m = "gemini-3.5-flash"
+    m = "gemini-3.7-flash"
     if not need(GKEY, "gemini-text", m): return
     s, d = http(f"{GBASE}/models/{m}:generateContent?key={GKEY}",
                 {"contents":[{"parts":[{"text":"Reply with exactly: GEMINI_OK"}]}]})
@@ -197,7 +197,7 @@ def t_deep_research():
     rec("deep-research", m, "FAIL", "still in_progress after ~4.5min (create-verified)")
 
 def t_video_analysis():
-    m = "gemini-3.5-flash"
+    m = "gemini-3.7-flash"
     if not need(GKEY, "video-analysis(yt)", m): return
     s, d = http(f"{GBASE}/models/{m}:generateContent?key={GKEY}",
                 {"contents":[{"parts":[{"text":"In one word: is this a video? Answer YES or NO."},
