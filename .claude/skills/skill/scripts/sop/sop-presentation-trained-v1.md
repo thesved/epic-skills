@@ -1,3 +1,4 @@
+<!-- superseded 2026-09-03: trained under rubric v1, which banned illustrative examples; the owner wants them. Use sop-presentation-recommended.md. Kept as the record of the first machine win (sealed 2-1-3, det 5/6 vs 0/6). -->
 # Presenting a finding to the reader
 
 Lead with the conclusion in the first line. Then the reason. Then the evidence.

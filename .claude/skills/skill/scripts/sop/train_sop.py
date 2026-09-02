@@ -29,7 +29,7 @@ RUBRIC_FILE = ROOT / "rubric.md"
 INPUT_DIR = ROOT / "inputs"
 SPLIT_FILE = ROOT / "split.json"
 CACHE_DIR = ROOT / "cache"
-PROMPT_TEMPLATE_VERSION = 2
+PROMPT_TEMPLATE_VERSION = 3
 TARGET_TIMEOUT_SECONDS = 300
 PROPOSER_TIMEOUT_SECONDS = 600
 JUDGE_TIMEOUT_SECONDS = 300
@@ -214,9 +214,14 @@ class CheckResult:
     failures: list[str]
 
 
-def _number_values(text: str) -> set[str]:
+ILLUSTRATIVE_RE = re.compile(r"\b(for example|e\.g\.|say,? |imagine|illustrative|hypothetical|suppose)\b", re.IGNORECASE)
+
+
+def _number_values(text: str, skip_illustrative: bool = False) -> set[str]:
     values: set[str] = set()
     for line in text.splitlines():
+        if skip_illustrative and ILLUSTRATIVE_RE.search(line):
+            continue
         stripped = re.sub(r"^\s*(?:[-*]|\d+[.)])\s+", "", line)
         for token in NUMBER_RE.findall(stripped):
             core = token.rstrip(".,;:%").replace(",", "")
@@ -271,7 +276,7 @@ def deterministic_checks(output: str, source: str) -> CheckResult:
     if word_count(output) > 1.30 * word_count(source):
         failures.append("bloat_ratio")
 
-    if _number_values(output) - _number_values(source):
+    if _number_values(output, skip_illustrative=True) - _number_values(source):
         failures.append("fabricated_number")
     return CheckResult(not failures, failures)
 

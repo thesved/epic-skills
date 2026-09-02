@@ -231,6 +231,8 @@ Built `skill/scripts/sop/train_sop.py` (Codex-implemented to my spec, two indepe
 - Run 3 (panel judge, recalibrated checks, deterministic-gain acceptance path): 2 accepts, sealed vs seed 2-1-3 pairwise and 5/6 vs 0/6 deterministic, training pass 6/12 to 11/12, 118 calls, 17 minutes. Accepted edits are rules that target the judged fault (invented examples), not scorer vocabulary. Trained SOP saved as `skill/scripts/sop/sop-presentation-trained.md`; full run report in `sop-pilot-report.md`.
 - What generalizes: calibrate the judge and the checks BEFORE the loop; single judges lie in different ways (position bias vs taste); undecided dominates and the deterministic-gain path produces the honest accepts; the loop works on subscriptions (Codex targets and proposer, Opus headless judge) plus cents of OpenRouter.
 
+Addendum 2026-09-03 (owner correction): the v1 rubric punished every added detail, so the loop learned "never invent an example"; the owner wants diverse illustrative examples and front-loading on both axes above all. Rubric v2 and seed v2 encode that (facts exact, marked illustrative examples rewarded, front-loading as criteria 1 and 2 with a first-five-words test). Retrain: 1 deterministic accept, sealed vs seed v2 lost 2-3-1 (det 3/6 vs 1/6). The corrected hand-written seed is the strongest SOP; the machine's job here was to verify that at scale. Samples: `sop-samples.md`; run report: `sop-pilot-v2-report.md`.
+
 ## 12. Runbook for our machine (verified against code, not yet run end-to-end; pilot A will confirm)
 
 ```bash
