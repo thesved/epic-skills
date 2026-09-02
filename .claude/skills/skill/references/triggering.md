@@ -29,6 +29,8 @@ Before claiming a description works, test it. Write 10 queries:
 
 Judge fire/no-fire for each against the description and report the matrix. Fix the description toward the failures, then re-judge. Note: simple one-step tasks may not trigger any skill because Claude just does them; that is expected, not a failure.
 
+For a measured loop instead of a judged one (real `claude -p` runs, held-out split, up to 5 Claude-proposed revisions), use `references/train.md` section A. Two traps: the installed original shadows every candidate unless the run is isolated from user-level skills (`scripts/train_desc.sh` does this with a `--setting-sources project` shim; never move a live skill), and the loop's own "test" split is a validation set, so keep a sealed set it never sees.
+
 ## Collision check
 
 A new skill competes with every sibling skill for the same trigger phrases. Load the descriptions of the other installed skills, find ones whose triggers overlap, and report the competition. Differentiate the descriptions so each owns a distinct intent. Collision is a top real-world reason a good skill never fires.

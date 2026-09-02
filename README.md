@@ -34,7 +34,7 @@ The skills are designed to chain. A typical session:
 /wrap          →  close the session so a cold start resumes with zero context loss
 ```
 
-Plus two utilities: **`/caveman`** (terse mode, ~75% fewer tokens) and **`/skill`** (create, change, review, or doctor a Claude Code skill: the meta-tool that built and maintains this set).
+Plus two utilities: **`/caveman`** (terse mode, ~75% fewer tokens) and **`/skill`** (create, change, review, doctor, or train a Claude Code skill against evals with a held-out gate: the meta-tool that built and maintains this set).
 
 ## Prerequisites
 

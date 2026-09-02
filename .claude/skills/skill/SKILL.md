@@ -1,7 +1,7 @@
 ---
 name: skill
-description: Creates, changes, reviews, and doctors Claude Code skills. Use this whenever the user asks to make a new skill, modify an existing skill, audit a skill, improve triggering, write a SKILL.md, add examples, validate frontmatter, fix bloat, or diagnose why a skill does not auto-trigger. It is intentionally pushy for skill authoring and maintenance work because skill requests are easy to under-trigger.
-argument-hint: new <idea> | change <name> | review <name> | doctor <name>
+description: Creates, changes, reviews, doctors, and trains Claude Code skills. Use this whenever the user asks to make a new skill, modify an existing skill, audit a skill, improve triggering, write a SKILL.md, add examples, validate frontmatter, fix bloat, diagnose why a skill does not auto-trigger, or optimize a skill, description, or workflow SOP against evals (SkillOpt, skill-creator run_loop, claude plugin eval, GEPA, self-improving skills). It is intentionally pushy for skill authoring and maintenance work because skill requests are easy to under-trigger.
+argument-hint: new <idea> | change <name> | review <name> | doctor <name> | train <name>
 ---
 
 # Skill
@@ -20,14 +20,17 @@ Pick the verb from the request. Read only the references a verb names; do not lo
 | `change <name>` | ASSESS then BUILD | Improve an existing skill |
 | `review <name>` | ASSESS | Read-only audit |
 | `doctor <name>` | ASSESS (triggering lens) | Diagnose why it will not auto-fire |
+| `train <name>` | TRAIN | Optimize a description, body, or SOP against evals with a held-out gate |
 
 - `references/spec.md`: frontmatter fields, limits, structure rules (the ground truth)
 - `references/authoring.md`: the BUILD engine
 - `references/rubric.md`: the ASSESS engine (two gates, then findings)
 - `references/triggering.md`: description writing, trigger-query design, collision check
 - `references/anti-patterns.md`: named anti-patterns, fixes, a before/after bloat cut
+- `references/train.md`: the TRAIN engine (routing gate, run_loop for descriptions, plugin eval ablation, SkillOpt trainer, rubric-judged loop)
 - `scripts/validate.py`: deterministic linter (run it, do not re-derive its checks)
 - `scripts/scaffold.sh`: create a new skill directory from `assets/SKILL.template.md`
+- `scripts/train_desc.sh`: description optimization, isolated (shim + scratch project), sealed before/after
 
 ## Standing rules (apply to every verb)
 
@@ -46,7 +49,7 @@ BUILD from an empty prior (`references/authoring.md`).
 1. **Triage.** Should this even be a skill? If it is one `CLAUDE.md` line, a manual-only command, or a non-reusable one-off, say so and stop.
 2. **Get the example first.** Elicit one real input and the exact expected output. It defines the output shape. If the user cannot give one, the skill is premature; say so.
 3. **Draft the minimum** `SKILL.md` that produces that output. Default to a single file.
-4. **Write the description with codex-bridge** (`references/triggering.md`): pushy, concrete, third person.
+4. **Write the description with codex-bridge** (`references/triggering.md`): pushy, concrete, third person. If the skill matters enough to have 20 trigger queries, optimize the description with `run_loop` per `references/train.md` section A, sealed set included.
 5. **Enforce the examples gate** and run `scripts/validate.py` plus the trigger-query check.
 6. Show the result and the validation outcome.
 
@@ -79,6 +82,16 @@ ASSESS with the triggering lens (`references/triggering.md`). Check in order:
 5. Collisions with sibling skills.
 
 Propose fixed frontmatter. Do not rewrite the whole skill unless asked.
+
+## `/skill train <name>`
+
+TRAIN (`references/train.md`). Optimize against evidence with a held-out gate; never accept an edit on the optimizer's own score.
+
+1. **Routing gate first**: description, exact-checker body, rubric-judged body, or "is it worth its tokens". Each routes to a different tool; the gate rules decide, not the user's tool preference.
+2. Build the eval set AND a sealed set the loop never sees. No sealed set, no run.
+3. Run the section the gate picked. For descriptions use `scripts/train_desc.sh` (isolates the trigger test; never move a live skill, parallel sessions see it vanish).
+4. Accept only on the sealed set (descriptions: +2/10 or more; bodies: beats seed on sealed split and the diff reads as rules, not scorer vocabulary). Lint the winner like hand-written text.
+5. Report: before/after on train, held-out, sealed; calls and tokens spent; the accepted diff; what the optimizer tried to game.
 
 ## Examples
 

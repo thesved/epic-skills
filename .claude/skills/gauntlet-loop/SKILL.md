@@ -56,6 +56,7 @@ Beating the reference is comparative, not a fitness floor: each axis also gets a
 ## GATE 3: critic integrity
 
 - **Binary blind A/B, positions randomized.** Never scores out of 10 (they drift up and still regress).
+- **Executor never sees the graders.** Self-grading inflated skill A/B scores by about 60 points across 92 evals (BuidlGuidl 2026); the builder gets the task, the critic gets the bar. When the artifact is a skill or SOP, run `/skill train` for the with/without ablation before looping.
 - **Real separation**: a fresh-context agent that sees goal + bar + artifact, never the builder's history. Same-conversation "now critique it" roleplay is a named ban (documented shipping broken camera math after days of "harsh critic" language).
 - **Evidence channel matches the artifact**: same-viewpoint screenshots for visuals, instrumented/JSON state for behavior (frames-to-critic failed where state JSON worked), deterministic checks for logic. If no rig exists, building the measurement harness is the first piece.
 - **Calibrate the judge once before round one, both directions**: reference vs itself must return "tie" (AA test), AND reference vs a deliberately degraded copy must pick the reference (an always-tie judge passes AA). Strip identifying metadata (filenames, URLs, watermarks) from both sides before any A/B.
