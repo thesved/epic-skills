@@ -35,7 +35,7 @@ You are writing native-quality <lang> <copy type>. Audience: <…>. Voice: <…>
 Avoid: <literal-from-English, clichés>. Task: <…>. Constraints: <length/tone>. Output: just the copy.
 EOF
 ```
-(`ask.sh` = keychain-resolving REST one-shot; model via `BOARD_GEMINI_MODEL`, default tracks newest flash.)
+(`ask.sh` = keychain-resolving one-shot. Route default = OpenRouter `google/gemini-3.7-flash` (key `openrouter-api-key`), so it works with an empty Google prepaid balance; `GEMINI_ROUTE=google` = direct generateContent on `gemini-flash-latest`; model override `BOARD_GEMINI_MODEL`. `smoke.sh` follows the same switch.)
 Review mode: ask for surgical defects ("quote each phrase that sounds translated, suggest a natural alternative"), not generic praise.
 
 ### `image` - generate / edit
@@ -73,7 +73,7 @@ Don't dump raw output. Summarize, quote the key bits. For copy/translations, off
 - **`IneligibleTierError` / migrate-to-Antigravity** → something invoked a retired `gemini` binary; route through REST instead (`ask.sh` / `yt.sh` / curl from the cache).
 - **`TerminalQuotaError` / quota** → an OAuth path burned its tier; you should be on the key via REST.
 - **Smoke ERR: no key** → add the key to keychain (`gemini-api-key`) or export `GEMINI_API_KEY`; `lib.sh` resolves env→`~/.zshrc`→keychain.
-- **Key throttled / credits depleted** → text: `openrouter-bridge/ask.sh -m google/gemini-3.7-flash`; YouTube: `yt.sh` already defaults to OpenRouter. Direct-only: `video.sh` (Files API), agentic video, TTS, image-gen.
+- **Key throttled / credits depleted** → nothing to do for text or YouTube: `ask.sh`, `smoke.sh`, and `yt.sh` default to the OpenRouter route (2026-09-02). Direct-only paths (TTS, image, agentic video, Live API) still need the Google balance. Direct-only: `video.sh` (Files API), agentic video, TTS, image-gen.
 - **`yt.sh ERR: ... Cannot fetch content from the provided URL ... Vertex AI`** → the OpenRouter call fell through to Vertex; only the Google AI Studio provider fetches YouTube. `yt.sh` pins it; if you hand-roll the curl, add `provider: {order: ["Google AI Studio"], allow_fallbacks: false}`.
 
 ## See also

@@ -222,6 +222,15 @@ Pilot A, SkillOpt trainer on Codex (optimizer gpt-5.6-sol, target gpt-5.6-terra,
 - `claude plugin eval` and `/skill-doctor` are early access; the CLI here has the flags, but the docs agent could not find public documentation.
 - Gemini via SkillOpt's OpenAI-compatible backend is untested; reasoning effort is not forwarded on that path.
 
+## 11b. Non-coding SOP pilot (added 2026-09-02, later the same day)
+
+Built `skill/scripts/sop/train_sop.py` (Codex-implemented to my spec, two independent reviews, 12 fixes) and ran it on a real non-coding SOP: "present a finding to the reader" (the grok-first presentation rule), with 24 finding passages from previous research sessions as inputs.
+- Run 1 (single DeepSeek judge): 0 accepts; the judge chose position A in both orders on 5 of 6 pairs; deterministic checks failed every output including the seed (0.7x compression rule, unnormalized number guard, tables and URLs counted as sentences).
+- Judge calibration on the same cached pairs: Opus and Gemini self-consistent on 5 of 6, but disagreeing on direction (2-3 vs 4-1). Panel rule adopted: decision only when both judges agree in both orders.
+- Run 2 (panel judge, old checks): 0 accepts, 4-5 of 6 undecided per epoch; the proposer had been steered toward compression by the wrong checks.
+- Run 3 (panel judge, recalibrated checks, deterministic-gain acceptance path): 2 accepts, sealed vs seed 2-1-3 pairwise and 5/6 vs 0/6 deterministic, training pass 6/12 to 11/12, 118 calls, 17 minutes. Accepted edits are rules that target the judged fault (invented examples), not scorer vocabulary. Trained SOP saved as `skill/scripts/sop/sop-presentation-trained.md`; full run report in `sop-pilot-report.md`.
+- What generalizes: calibrate the judge and the checks BEFORE the loop; single judges lie in different ways (position bias vs taste); undecided dominates and the deterministic-gain path produces the honest accepts; the loop works on subscriptions (Codex targets and proposer, Opus headless judge) plus cents of OpenRouter.
+
 ## 12. Runbook for our machine (verified against code, not yet run end-to-end; pilot A will confirm)
 
 ```bash

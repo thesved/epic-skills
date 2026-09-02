@@ -71,7 +71,9 @@ No published system has beaten Goodhart on taste. The minimum loop that survived
 4. Deterministic checks alongside (forbidden phrases, structure, length, tokens, latency).
 5. Sealed tasks; per-task deltas; any regression rejects.
 6. Human reads every accepted diff. Cut before add: the largest production gains reported came from halving a prompt, and only 1 to 4 edits survive a full SkillOpt run.
-Tooling: GEPA `optimize_anything` (Claude Code plugin `gepa-optimize-anything@gepa`, any evaluator, $2 to $300 per run depending on judge) or a hand-rolled loop over `claude plugin eval` pairwise graders.
+Tooling: `scripts/sop/train_sop.py` (ours, stdlib): target Codex Terra, proposer Codex Sol, judge = Opus + Gemini panel with both presentation orders, deterministic checks calibrated on seed outputs, sealed split vs seed; run `--mock` first, then `calib.py` on the judge, then the real run. See `scripts/sop/README.md` for the measured lessons (single judges are position-biased or disagree; miscalibrated checks steer the proposer wrong; undecided dominates; deterministic-gain accepts are the honest ones). GEPA `optimize_anything` (Claude Code plugin `gepa-optimize-anything@gepa`) is the alternative when you need Pareto search over many artifacts.
+
+Named ban: **the uncalibrated judge**. Test: `calib.py` output shows self-consistency across orders on at least 4 of 6 cached pairs for every judge in the panel, before any epoch runs. Negative example: DeepSeek V4 Pro passed the rubric but chose position A on 5 of 6 pairs in both orders; a run judged by it alone reports 100% "position-dependent" and wastes 48 judge calls.
 
 ## Examples
 
@@ -80,6 +82,9 @@ Output (trace, real run 2026-09-02): 20 queries + 10 sealed written; live `godvi
 
 Input: `/skill train meet-reality` (forward test by a fresh Sonnet agent, 2026-09-02)
 Output (trace): routed to section A; 20 eval + 10 sealed queries with near misses owned by deep-research, godview, gauntlet-loop, autoresearch, wiki, think, board, ask; train 5/13 to 5/13, held-out 3/7 to 4/7, sealed 4/10 to 4/10 (near misses 4/4 quiet both times, should-trigger 0/6 both times); winner was 1139 chars; verdict REJECT on both the sealed rule and the lint; live skill untouched.
+
+Input: `/skill train presentation-sop` (rubric-judged, section D, definitive run 2026-09-02)
+Output (trace): 24 real finding passages from previous research sessions, 12/6/6 split; target Codex Terra, proposer Codex Sol, judge panel Opus + Gemini in both orders; deterministic checks calibrated on seed outputs first (compression rule replaced by a 1.3x bloat guard, number guard by value, tables and URLs excluded); epoch 1 accepted on the deterministic path (3-0-3, det 3/6 to 5/6), epoch 2 on the judged path (3-2-1), epochs 3-4 rejected; sealed vs seed 2-1-3 pairwise and 5/6 vs 0/6 deterministic; 118 calls, 17 minutes. Accepted rules: closed-world sourcing (never invent an example), never longer than the source, verify the paragraph limit before returning. Two earlier runs (single DeepSeek judge; miscalibrated checks) accepted nothing.
 
 Input: `/skill train caveman` with a deterministic scorer (60 paragraphs, required terms + word budget + no dashes + no filler)
 Output (trace, run 1): baseline soft 0.71 / hard 0.00 because every rewrite overshot the 0.45x word budget; default `hard` gate rejected all candidates; ungated slow update rewrote the skill anyway. Run 2 with `gate_metric: soft` and a gated slow update: 2 accepts, selection 0.708 to 0.750, sealed test 0.7375 to 0.725 (worse). 648 calls and 1.06M tokens across both runs for no real gain. Verdict: keep the seed; the trainer optimized selection noise. Full trace in `research/2026-09-02/report.md` section 11.
