@@ -42,7 +42,7 @@ Review mode: ask for surgical defects ("quote each phrase that sounds translated
 REST + key only. **Read the IMAGE section of the cache** for the current id (`gemini-3.1-flash-image` cheap / `gemini-3-pro-image` studio), the `imageConfig` call shape, edit-via-inlineData, and per-image pricing. Output is base64 in `inlineData` - read its `mimeType`. Codex `gpt-image-2` is the fallback (`/codex-bridge image`) when you'd rather use OpenAI. **Prompt examples → `_model-cache/examples/gemini-image.md`.**
 
 ### `video` - YouTube or local file (the moat)
-- **YouTube URL** → `~/.claude/skills/gemini-bridge/yt.sh "<url>" "<question>"` (or `yt.sh "<url>" - <<EOF` for long prompts); REST `generateContent` with `fileData.fileUri`, Gemini fetches the video server-side. For metadata + top comments folded in, prefer `/youtube`.
+- **YouTube URL** → `~/.claude/skills/gemini-bridge/yt.sh "<url>" "<question>"` (or `yt.sh "<url>" - <<EOF` for long prompts); Gemini fetches the video server-side. Default route is **OpenRouter** (`video_url` part, provider pinned to Google AI Studio, billed to OpenRouter credit); `GEMINI_ROUTE=google` uses the direct key (`generateContent` + `fileData.fileUri`, 10x faster wall time, needs prepaid balance). For metadata + top comments folded in, prefer `/youtube`.
 - **Local file** → `~/.claude/skills/gemini-bridge/video.sh "<path>" "<question>"` (Files API). `GEMINI_MODEL=pro` for reasoning, `GEMINI_FPS=n` for rapid motion/dense text. Flash to collect (transcribe/OCR/list), Pro to reason (intent/cause). See the VIDEO section of the cache for sampling/limits. **Prompt examples (transcript, tutorial-extract, Veo gen) → `_model-cache/examples/gemini-video.md`.**
 
 ### `tts` - spoken audio
@@ -73,10 +73,14 @@ Don't dump raw output. Summarize, quote the key bits. For copy/translations, off
 - **`IneligibleTierError` / migrate-to-Antigravity** → something invoked a retired `gemini` binary; route through REST instead (`ask.sh` / `yt.sh` / curl from the cache).
 - **`TerminalQuotaError` / quota** → an OAuth path burned its tier; you should be on the key via REST.
 - **Smoke ERR: no key** → add the key to keychain (`gemini-api-key`) or export `GEMINI_API_KEY`; `lib.sh` resolves env→`~/.zshrc`→keychain.
-- **Key throttled / credits depleted (text)** → route the request through OpenRouter (`google/gemini-3.7-flash`) - see `_model-cache/openrouter.md`. (Media endpoints stay direct.)
+- **Key throttled / credits depleted** → text: `openrouter-bridge/ask.sh -m google/gemini-3.7-flash`; YouTube: `yt.sh` already defaults to OpenRouter. Direct-only: `video.sh` (Files API), agentic video, TTS, image-gen.
+- **`yt.sh ERR: ... Cannot fetch content from the provided URL ... Vertex AI`** → the OpenRouter call fell through to Vertex; only the Google AI Studio provider fetches YouTube. `yt.sh` pins it; if you hand-roll the curl, add `provider: {order: ["Google AI Studio"], allow_fallbacks: false}`.
 
 ## See also
 - `/youtube` - YouTube wrapper adding title + description + top comments
 - `/codex-bridge` - OpenAI take, prompt-writing, image-gen fallback (`gpt-image-2`)
 - `/board` - multi-model panel (Opus + Gemini + Codex)
 - `/think` - escalate to Opus when the need is harder thinking, not a different model
+
+## Long YouTube videos: agentic mode (2026-09-01)
+`GEMINI_VIDEO=agentic bash gemini-bridge/yt.sh <url> "<question>"` routes through the Interactions API with `processing: "agentic"` (Google direct only, `yt.sh` forces the route; not available via OpenRouter): Gemini navigates the timeline itself instead of ingesting every frame. Measured 2026-09-02 on a 20-min video: 8.4k tokens vs 114.8k static, same answer, 28 s vs 15 s. Default stays static (short clips, frame-precise questions). Details and the probe in `_model-cache/gemini.md` → VIDEO ANALYSIS.

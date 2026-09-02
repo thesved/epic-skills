@@ -18,6 +18,7 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 | Grok / xAI via OpenRouter (route-to/away, effort dial, agentic patterns) | [`examples/grok.md`](examples/grok.md) |
 | Kimi K3 / Moonshot via OpenRouter (route-to/away, param traps, board-seat verdict) | [`examples/kimi.md`](examples/kimi.md) |
 | DeepSeek V4 Pro 0813 / Flash 0731 (effort ladder, caching, peak pricing, provider pinning, no-vision, Harness) | [`examples/deepseek.md`](examples/deepseek.md) |
+| GLM 5.3 Flash (ex ox-alpha: effort `high` not max, Baseten pinning, promo cliff 2026-09-09, route-to/away, local sizes) | [`examples/glm-flash.md`](examples/glm-flash.md) |
 
 ## Capability routing, who to reach for
 | need | first choice | id (verify in provider file) | why |
@@ -27,12 +28,13 @@ Single source of truth for **which model to use, its current id, pricing, and ho
 | Non-English copy / translate | **Gemini** | gemini-3.7-flash | stronger multilingual |
 | Image generate / edit | **Gemini** Nano Banana | gemini-3.1-flash-image (key) | cheap, fast edits; Codex gpt-image-2 fallback |
 | TTS / narration | **Gemini** | gemini-3.1-flash-tts-preview (key) | 30 voices, multi-speaker |
-| Analyze a video / YouTube | **Gemini** (only option) | gemini-3.7-flash / 3.1-pro | Claude can't; Gemini's moat |
+| Analyze a video / YouTube | **Gemini** (only option) | gemini-3.7-flash / 3.1-pro; `GEMINI_VIDEO=agentic` for >15 min (Interactions API, 93% fewer tokens measured 2026-09-02) | Claude can't; Gemini's moat |
 | Realtime/live voice audio | either | gemini-2.5-flash-native-audio-… / gpt-realtime-2.1(-mini) | WebSocket; Gemini audio-out ~5× cheaper than full 2.1, but 2.1-mini narrows it to ~1.5×; OpenAI GA + simpler |
 | Agentic coding via OpenAI key | OpenAI codex | gpt-5.3-codex (Responses API) | heavy coding; CLI `gpt-5.5` for interactive |
 | Text fallback when a route throttles | **OpenRouter** | provider/model | one key → many providers |
 | Long-context doc dump | **Gemini** | gemini-3.7-flash | 1M ctx |
-| Video generation | Gemini veo | veo-3.1-lite-generate-preview | |
+| Video generation | Gemini veo | veo-3.1-lite-generate-preview; `gemini-omni-1.1-flash` (GA 2026-08-27) for edit / extend / interpolate | |
+| Transcribe audio (meetings, podcasts) | **Gemini** | gemini-3.5-transcribe (unary, $0.005/min) / gemini-3.5-transcribe-live (WebSocket) | GA 2026-08-26; cheaper and cleaner than 3.7-flash on audio |
 | Music generation | Gemini lyria | lyria-3-pro-preview | |
 | Multi-step cited research | Gemini deep-research | deep-research-pro-preview-12-2025 | or use `/deep-research` skill |
 
@@ -53,21 +55,24 @@ Deep-research writeups behind each claim: [`research/2026-08-12/`](research/2026
 - **No Hungarian (or CEE) benchmark exists for ANY 2026 model**, from any vendor or leaderboard. OpenHuEval covers GPT-4-era models only; MMMLU's 14 languages exclude Hungarian. Multilingual quality for these languages can only be measured, never looked up.
 
 ## Delegation roles, current picks (refresh with every model update; skills point HERE, never hardcode)
-Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-12; review/gemini/grok/open-family rows refreshed 2026-08-14 (see `research/2026-08-14/model-sweep.md`).
+Axes: intelligence = how hard a problem it takes unsupervised; taste = UI/UX, code quality, API design, copy. Tie-break for anything that ships: intelligence > taste > cost. Verified 2026-07-12; review/gemini/grok/open-family rows refreshed 2026-08-14; **orchestrator, review-gate, video and open-family rows refreshed 2026-09-02 for Fable 5.1 and GLM 5.3 Flash** (see `research/2026-09-02/`).
 | role | current pick | why now |
 |---|---|---|
-| Orchestrator / plans / taste judging / final review | fable-5 (high effort, never above) | best planning layer AND highest taste available: taste review is orchestrator work, never delegated. 2x Opus price so it writes no bulk code |
+| Orchestrator / plans / taste judging / final review | **fable-5-1** (`/model fable`, Claude Code 2.1.255+): `high` to orchestrate, `medium` for routine planning turns, `xhigh` only after `high` failed, never `max` | released 2026-09-01; best planning layer and long-horizon runner (Terminal-Bench-Science 52.6 vs Opus 5 29.0), taste is a coin flip vs Opus 5 (verify). 2x Opus price, capped at 50% of a Max plan's weekly limit, `max` = 1.7x Fable 5's output tokens; Anthropic's own advice is start on Opus 5 |
+| Fable review pass (issue discovery, cheap) | fable-5-1 at `low` | CodeRabbit 2026-09-01: low beat high on recall (61.0 vs 57.1) and precision, 3 min faster; the one Fable job where the $0.25 cache read matters |
+| Implementation ESCALATION (Sol failed twice, integration-heavy, under-specified) | fable-5-1 at `medium`, clean branch | Senior SWE-Bench 2026-09-02: tasteful tie with Sol xhigh at ~2x Sol's output cost; FrontierCode peaks at medium. Exception path, not the default |
 | Implementation that ships (features, anything with judgment) | gpt-5.6-sol via codex CLI | best executor; cost is a tie-breaker only. **External verification mandatory, never accept Sol's own test results** (METR record reward-hacking, see `examples/openai.md`) |
 | Mechanical bulk (migrations, boilerplate, rote tests, log analysis) | gpt-5.6-terra via codex CLI | ~5.5-class at half price, sub-billed; ONLY when the task is rote AND low-stakes. When in doubt → sol |
-| Mission-critical review gate | best available, plural: fable-5 + opus-5 + gpt-5.6-sol as independent seats | a defect that slips a gate stalls all downstream work; gate cost is small vs stall cost and usually pays back in speed |
-| Independent review seat + security review | opus-5 (`claude-opus-5`, released 2026-07-24) | near-Fable at half price ($5/$25, same as 4.8), 1M ctx; security reports must not return through Fable (refusal-downgrade risk) |
+| Mission-critical review gate | best available, plural: fable-5-1 (low for discovery, high for the final verdict) + opus-5 (precision seat, 39.3 vs 37.3) + gpt-5.6-sol as independent seats | a defect that slips a gate stalls all downstream work; gate cost is small vs stall cost and usually pays back in speed |
+| Independent review seat + security review | opus-5 (`claude-opus-5`, released 2026-07-24) | near-Fable at half price ($5/$25), 1M ctx, ties Fable 5.1 on APEX-SWE and beats it on build/dependency tasks (Snorkel 2026-09-01); security reports must not return through Fable (cyber flag → session pinned to Opus 4.8). Fable 5.1 may now FIND vulnerabilities in source, still never exploit/pentest work |
 | Wrapper plumbing / mid-taste | sonnet-5 | cheap, reliable executor of ready-made prompts |
 | Read-only scout | haiku | cheapest useful |
 | Cross-family opinion (board Grok seat) | x-ai grok chain (`openrouter-bridge/ask.sh --grok`) | latest = grok-4.6 (2026-08-12): cost/task ~2x 4.5 via token inflation, no longer a fast lane; route-to/away in `examples/grok.md` |
 | Cheap diverse opinion (board open-family seat) | `openrouter-bridge/ask.sh -m deepseek/deepseek-v4-pro-0813` (2nd seat: `-m z-ai/glm-5.3`) | non-OAI/Anthropic/Google/xAI architecture diversity; one plain call per model, never a router. 0813 = GA snapshot (2026-08-12), effort `high` (max overthinks); unsuffixed `deepseek-v4-pro` on OpenRouter is the April build. GLM 5.3 (2026-08-14) = AA 60, mandatory thinking, ignores json_schema silently. DeepSeek direct price is time-variable since 2026-08-16 (2x at 01-04 and 06-10 UTC) and our OpenRouter key cannot reach the DeepSeek-hosted endpoint (data-policy guardrail), so seats land on re-hosts at 1.2-2x: see `examples/deepseek.md` |
 | Cheap security / cyber second opinion (opt-in) | `-m deepseek/deepseek-v4-pro-0813`, effort high | CyberGym 83.3 = Fable 5; ~20x cheaper per solved exploit task than Opus 4.8 and no refusal downgrade; text-only, slow (50-90 tok/s), never the judge of its own work |
+| Cheapest capable executor + 3rd opinion seat (bulk single-file frontend, scaffolding with a real DB, PR triage, structured extraction, tool loops, multilingual) | `-m z-ai/glm-5.3-flash` (released 2026-08-26 = ox-alpha; effort `high`, never `medium` (400), pin Baseten for 2-3x tok/s; promo $0.075/$0.25 to 2026-09-09, then $0.15/$0.50) | AA 57 = Terra at $0.09/task; MIT weights, vision in; 98-video verdict in `examples/glm-flash.md`. NOT for interactive loops (28-60 tok/s, 9-20 min per prompt), whole-repo generation, vision precision, prose, strict JSON-schema output, sole security review, or untrusted web input. DeepSeek V4 Flash stays the fast cheap sub-agent (2.5x tok/s, 7x fewer turns on one task) |
 | High-stakes extra seat (opt-in) | `-m moonshotai/kimi-k3` | strongest open-weight (above Opus 4.8 on GDPval-AA v2), adds Moonshot family; day-one caveats + flip-to-default conditions in `examples/kimi.md` (verified 2026-07-16) |
-| Video / multimodal / 1M-ctx dumps / non-English / one-shot UI + PDF-to-dashboard | gemini-3.7-flash (REST) | the moat; Claude can't do video. 340 tok/s, thinking `low|medium|high` (`minimal` = 400). NOT for spec-strict multi-component builds or long-horizon agent runs (drifts off spec, hallucinates scope; 3.1-pro-preview follows spec) |
+| Video / multimodal / 1M-ctx dumps / non-English / one-shot UI + PDF-to-dashboard | gemini-3.7-flash (REST); `GEMINI_VIDEO=agentic` for long videos | the moat; Claude can't do video. 340 tok/s, thinking `low|medium|high` (`minimal` = 400). NOT for spec-strict multi-component builds or long-horizon agent runs (drifts off spec, hallucinates scope; 3.1-pro-preview follows spec) |
 | **Bulk structured extraction** (thousands of schema-constrained calls over a fixed rulebook) | cheapest model that PASSES a schema probe on your real schema, then batch it | the price spread across rungs is 10-100x, and the deciding factor is never the headline benchmark: it is strict-schema support, max output, and cache-read price. Probe, do not read it off a spec sheet, see the trap list below |
 
 ## Typical response time

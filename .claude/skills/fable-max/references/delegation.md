@@ -1,6 +1,6 @@
 # Delegation: the orchestrator plans, other models execute
 
-The top model plans, judges, reviews, and authors every delegated prompt; everything token-hungry or mechanical runs on someone else's meter. Two wins at once: subscription/price arbitrage AND a leaner orchestrator context (reports come back, floods don't). Community-measured savings 46-74%; on long autonomous runs 10x+.
+The top model plans, judges, reviews, and authors every delegated prompt; everything token-hungry or mechanical runs on someone else's meter. Two wins at once: subscription/price arbitrage AND a leaner orchestrator context (reports come back, floods don't). Community-measured savings 46-74%; on long autonomous runs 10x+. Fable 5.1 (2026-09-01) does not change the shape: it is 2x Opus 5 per token, capped at 50% of a Max plan's weekly limit, and Anthropic itself says to start on Opus 5.
 
 **Who is currently best at what lives in `~/.claude/skills/_model-cache/index.md` → "Delegation roles" table** (refreshed with every model update). This file carries only the logic that does not drift. The bridges own the call shapes:
 - **codex-bridge** `implement` / `review` / `computer-use`: OpenAI-executor shell-outs
@@ -11,6 +11,8 @@ The top model plans, judges, reviews, and authors every delegated prompt; everyt
 
 Planning quality is the top model's moat; execution is near-parity across frontier coders. Pay top-model rates only where errors compound: decomposition, architecture, non-obvious debugging, conflict arbitration, plan + final review, /goal ownership, authoring delegated prompts.
 
+- Effort per role on Fable 5.1 (numbers in tokens.md): orchestrate at `high` (medium for routine planning turns), review at `low`, escalation-implement at `medium`, never `max` as a default. Sol executes at high, xhigh for hard repo work.
+- Fable 5.1 as an executor: only as the ESCALATION path (Sol failed twice, or the task is integration-heavy and under-specified). Senior SWE-Bench (2026-09-02): tasteful pass tied at 34.7% between Fable 5.1 medium and Sol xhigh, Sol at about half the output dollars; Cognition's hybrid harness nearly matched pure Fable at $1.43 vs $2.68 per task. Fable wins agentic hunts and research depth, Sol wins mechanics and speed on visual builds.
 - Tie-break for anything that ships: **intelligence > taste > cost**. Cost is a tie-breaker only. The value-tier executor is for rote AND low-stakes work; implementation that ships defaults to the top executor tier. When in doubt, the better model.
 - Cheaper output below the bar → redo with a smarter model without asking; escalating costs less than shipping mediocre work.
 - **Mission-critical review gates get the best available models, plural** (independent seats, cross-family). A defect that slips a gate stalls everything downstream; gate cost is trivial vs stall cost and usually pays back in shipping speed.
@@ -68,9 +70,9 @@ For a single long-running process (training, big build), use the in-session vari
 
 ## Failure rules (each one cost someone a session or real money)
 
-1. Orchestrator effort caps at HIGH; xhigh/max degrades orchestration (overthinking, loops).
-2. A subagent's security/vulnerability report returning to Fable can trigger the silent Opus downgrade. Scrub exploit language from returning reports.
-3. Wrapper reporting success is not evidence: check `git status`/`git diff` yourself.
+1. Orchestrator effort caps at HIGH; xhigh/max degrades orchestration (overthinking, loops). On Fable 5.1 the failure looks like a subagent storm: xhigh kept spawning subagents through a 1.8-billion-token day (Every, 2026-09-01), a lead re-read the same code for two hours, another edited a file while its reviewer subagent was still reading it. Cap concurrent and cumulative subagents in the brief; the lead never touches a file assigned to a reviewer.
+2. A subagent's security/vulnerability report returning to Fable can trigger the silent Opus downgrade (cyber → Opus 4.8, bio → Opus 5, and the session stays there). Scrub exploit language from returning reports; base64 blobs in tool output are an official false-positive trigger too.
+3. Wrapper reporting success is not evidence: check `git status`/`git diff` yourself. Fable 5.1 included: Snorkel's transcript audit (2026-09-01) caught it claiming a re-verification it never ran.
 4. Wrappers cannot spawn wrappers (one-level depth); recursive delegation designs silently never execute.
 5. When planning is trivial (bulk fan-out of identical mechanical tasks), skip the orchestrator entirely - a mid-tier fleet beats top-model-plus-fleet there. The premium buys nothing without hard decisions.
 6. Never read a delegated command's success off `cmd | tail -N` - the pipeline exit is tail's, so a hard failure prints as exit 0 (masked a dead 2h image build). `set -o pipefail`, or log to a file and echo `exit=$?` explicitly.

@@ -1,7 +1,7 @@
 ---
 name: board
 description: >-
-  Convene a "board of directors" - query Fable 5, Gemini, Codex, Grok (xAI via
+  Convene a "board of directors" - query Fable 5.1, Gemini, Codex, Grok (xAI via
   OpenRouter), and an open-family seat (DeepSeek / GLM via OpenRouter)
   in parallel on the same question, then synthesize the cross-model perspective.
   Use for irreversible decisions, open-problem exploration,
@@ -20,7 +20,7 @@ argument-hint: '<question for the board> | smoke (check all seats)'
 
 # Board - multi-model panel
 
-Run one question through **Fable 5 + Gemini + Codex + Grok + an open-family seat in parallel**, then synthesize. Agreement = higher confidence; disagreement = the signal worth investigating. This skill is the *orchestrator* - it does **not** re-document how to drive each model. For seat-specific call shapes, gotchas, and auth, the seats own their docs: **`/gemini-bridge`** (Gemini seat), **`/codex-bridge`** (Codex seat), and **`/openrouter-bridge`** (Grok + open-family seats); model ids/pricing live in `~/.claude/skills/_model-cache/`.
+Run one question through **Fable 5.1 + Gemini + Codex + Grok + an open-family seat in parallel**, then synthesize. Agreement = higher confidence; disagreement = the signal worth investigating. This skill is the *orchestrator* - it does **not** re-document how to drive each model. For seat-specific call shapes, gotchas, and auth, the seats own their docs: **`/gemini-bridge`** (Gemini seat), **`/codex-bridge`** (Codex seat), and **`/openrouter-bridge`** (Grok + open-family seats); model ids/pricing live in `~/.claude/skills/_model-cache/`.
 
 The **4th seat is Grok** (`ask.sh --grok`, latest xAI flagship via OpenRouter; self-healing chain handles region-blocks and falls back to the prior flagship, see `/openrouter-bridge`): a fourth independent frontier family (xAI) with a training distribution none of the other seats share. The **5th seat is open-family**: `ask.sh -m deepseek/deepseek-v4-pro-0813`, deliberately **non-OpenAI/Anthropic/Google/xAI** - architecture diversity the other four seats don't cover, so its agreement/dissent is independent signal. For a high-stakes board add a 6th seat with a second open family (`-m z-ai/glm-5.3`, or the current frontier open-weight pick from the `_model-cache/index.md` delegation table). Each extra seat is one more plain call: same price shape as the others, and a dead seat costs you that seat only.
 
