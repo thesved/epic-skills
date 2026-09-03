@@ -31,6 +31,7 @@ The skills are designed to chain. A typical session:
 /grill-me      →  get interviewed until the plan has no soft spots
 /ask           →  (the inverse) Claude asks YOU only when genuinely blocked
 /chrome        →  drive a real Chrome over CDP to verify/QA the change in-browser
+/mobbin  <q>   →  real app screens/flows from mobbin.com as image files + JSON, for any vision model
 /wrap          →  close the session so a cold start resumes with zero context loss
 ```
 
@@ -43,6 +44,7 @@ Plus two utilities: **`/caveman`** (terse mode, ~75% fewer tokens) and **`/skill
 | `codex` CLI | Codex seat | `npm i -g @openai/codex` → `codex login` |
 | `jq`, `curl` | Gemini seat plumbing | your package manager |
 | `ffmpeg` (opt) | TTS/audio output | your package manager |
+| `python3` + a Mobbin account | `/mobbin` design search (one-time OAuth login) | preinstalled on macOS; sign in at https://mobbin.com |
 
 **API keys** (set up by `/epic-install`, stored in your OS secret store, Keychain / libsecret / `pass`):
 
