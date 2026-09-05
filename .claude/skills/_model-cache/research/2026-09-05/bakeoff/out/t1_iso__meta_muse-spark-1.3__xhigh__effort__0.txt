@@ -1,0 +1,110 @@
+```python
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str):
+        raise ValueError("Invalid duration")
+    if s == "" or s[0] != "P":
+        raise ValueError("Invalid duration")
+    if len(s) == 1:
+        raise ValueError("Invalid duration")
+    if s.count("T") > 1:
+        raise ValueError("Invalid duration")
+    if "T" in s:
+        t_idx = s.index("T")
+        date_str = s[1:t_idx]
+        time_str = s[t_idx + 1:]
+        has_t = True
+        if time_str == "":
+            raise ValueError("Invalid duration")
+    else:
+        date_str = s[1:]
+        time_str = None
+        has_t = False
+
+    def parse_part(part, allowed):
+        order_map = {c: i for i, c in enumerate(allowed)}
+        res = {}
+        last = -1
+        i = 0
+        n = len(part)
+        while i < n:
+            if not ('0' <= part[i] <= '9'):
+                raise ValueError("Invalid duration")
+            j = i
+            while j < n and '0' <= part[j] <= '9':
+                j += 1
+            if j < n and part[j] in ('.', ','):
+                k = j + 1
+                if k >= n or not ('0' <= part[k] <= '9'):
+                    raise ValueError("Invalid duration")
+                k += 1
+                while k < n and '0' <= part[k] <= '9':
+                    k += 1
+                num = part[i:k]
+                i = k
+            else:
+                num = part[i:j]
+                i = j
+            if i >= n:
+                raise ValueError("Invalid duration")
+            d = part[i]
+            i += 1
+            if d not in order_map:
+                raise ValueError("Invalid duration")
+            if order_map[d] <= last:
+                raise ValueError("Invalid duration")
+            last = order_map[d]
+            if d in res:
+                raise ValueError("Invalid duration")
+            res[d] = num
+        return res
+
+    date_allowed = ['Y', 'M', 'W', 'D']
+    time_allowed = ['H', 'M', 'S']
+    date_comp = parse_part(date_str, date_allowed) if date_str != "" else {}
+    time_comp = parse_part(time_str, time_allowed) if has_t else {}
+    if has_t and len(time_comp) == 0:
+        raise ValueError("Invalid duration")
+    if len(date_comp) == 0 and len(time_comp) == 0:
+        raise ValueError("Invalid duration")
+    if 'W' in date_comp:
+        if len(date_comp) != 1 or has_t:
+            raise ValueError("Invalid duration")
+    ordered = []
+    if 'Y' in date_comp:
+        ordered.append(date_comp['Y'])
+    if 'M' in date_comp:
+        ordered.append(date_comp['M'])
+    if 'W' in date_comp:
+        ordered.append(date_comp['W'])
+    if 'D' in date_comp:
+        ordered.append(date_comp['D'])
+    if 'H' in time_comp:
+        ordered.append(time_comp['H'])
+    if 'M' in time_comp:
+        ordered.append(time_comp['M'])
+    if 'S' in time_comp:
+        ordered.append(time_comp['S'])
+    for idx, ns in enumerate(ordered):
+        if ('.' in ns or ',' in ns) and idx != len(ordered) - 1:
+            raise ValueError("Invalid duration")
+
+    def to_float(ns):
+        return float(ns.replace(',', '.'))
+
+    total = 0.0
+    if 'Y' in date_comp:
+        total += to_float(date_comp['Y']) * 365 * 86400
+    if 'M' in date_comp:
+        total += to_float(date_comp['M']) * 30 * 86400
+    if 'W' in date_comp:
+        total += to_float(date_comp['W']) * 7 * 86400
+    if 'D' in date_comp:
+        total += to_float(date_comp['D']) * 86400
+    if 'H' in time_comp:
+        total += to_float(time_comp['H']) * 3600
+    if 'M' in time_comp:
+        total += to_float(time_comp['M']) * 60
+    if 'S' in time_comp:
+        total += to_float(time_comp['S'])
+    return float(total)
+```

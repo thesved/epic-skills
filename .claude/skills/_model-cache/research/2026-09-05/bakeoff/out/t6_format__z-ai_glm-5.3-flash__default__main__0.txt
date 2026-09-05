@@ -1,0 +1,7 @@
+- version control gives every configuration change a clear and auditable history
+- teams can roll back broken settings quickly without guessing what changed
+- shared repositories let everyone see the current source of truth
+- diffs reveal exactly who modified which setting and why
+- branching lets new configuration ideas be tested safely before release
+- backups happen naturally whenever commits are pushed to remote servers
+- lost or corrupted files can be restored from past commits

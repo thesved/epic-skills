@@ -1,0 +1,99 @@
+```python
+import re
+
+_WHITESPACE_TRANS = str.maketrans({
+    '\t': ' ',
+    '\n': ' ',
+    '\r': ' ',
+    '\v': ' ',
+    '\f': ' ',
+    ' ': ' ',
+})
+
+_WORDSEP_RE = re.compile(
+    r'''
+    ( # any whitespace
+      \s+
+    | # em-dash
+      (?<= \A | [\s<([{\-]) ) --- (?= [\s>)\]}] | \Z )
+    | # hyphen
+      (?<= \A | [\w<>{}]) - (?= [\w<>{}()] )
+    | # other punctuation
+      (?<= \A | [^\w\s] ) (?= [^\w\s] )
+    )''',
+    re.VERBOSE,
+)
+
+
+def _munge_whitespace(text: str) -> str:
+    text = text.expandtabs(8)
+    text = text.translate(_WHITESPACE_TRANS)
+    return text
+
+
+def _split(text: str):
+    return [c for c in _WORDSEP_RE.split(text) if c]
+
+
+def _handle_long_word(chunks, cur_line, cur_len, width):
+    space_left = max(width - cur_len, 0)
+
+    # break_long_words is True
+    chunk = chunks[-1]
+
+    # break_on_hyphens is True
+    if len(chunk) > space_left:
+        parts = _split(chunk)
+        if len(parts) > 1:
+            for part in parts:
+                if len(part) <= space_left:
+                    cur_line.append(part)
+                    chunks[-1] = chunk[len(part):]
+                    return
+
+    cur_line.append(chunk[:space_left])
+    chunks[-1] = chunk[space_left:]
+
+
+def _wrap_chunks(chunks, width):
+    lines = []
+    chunks.reverse()
+
+    while chunks:
+        cur_line = []
+        cur_len = 0
+
+        # drop_whitespace is True
+        if chunks[-1].strip() == '' and lines:
+            del chunks[-1]
+
+        while chunks:
+            l = len(chunks[-1])
+            if cur_len + l <= width:
+                cur_line.append(chunks.pop())
+                cur_len += l
+            else:
+                break
+
+        if chunks and len(chunks[-1]) > width:
+            _handle_long_word(chunks, cur_line, cur_len, width)
+            cur_len = sum(map(len, cur_line))
+        else:
+            if cur_line and cur_line[-1].strip() == '':
+                cur_len -= len(cur_line[-1])
+                del cur_line[-1]
+
+        if cur_line:
+            lines.append(''.join(cur_line))
+
+    return lines
+
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+
+    text = _munge_whitespace(text)
+    chunks = _split(text)
+    return "\n".join(_wrap_chunks(chunks, width))
+```

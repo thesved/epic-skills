@@ -1,0 +1,117 @@
+```python
+import re
+
+_WS = re.compile(r"\s+")
+_WORD = re.compile(r"\w", re.UNICODE)
+_HYPHENS = "-"
+
+
+def _is_word_char(ch: str) -> bool:
+    return bool(_WORD.fullmatch(ch))
+
+
+def _split_word(word: str) -> list[str]:
+    parts = []
+    start = 0
+    i = 0
+    n = len(word)
+
+    while i < n:
+        if word[i] != "-" or i == 0 or not _is_word_char(word[i - 1]):
+            i += 1
+            continue
+
+        j = i
+        while j < n and word[j] == "-":
+            j += 1
+
+        if j < n and _is_word_char(word[j]):
+            parts.append(word[start:j])
+            start = j
+        i = j
+
+    if start < n:
+        parts.append(word[start:])
+    return parts
+
+
+def _chunks(text: str):
+    pos = 0
+    for match in _WS.finditer(text):
+        if match.start() > pos:
+            yield from _split_word(text[pos:match.start()])
+        yield match.group(0)
+        pos = match.end()
+    if pos < len(text):
+        yield from _split_word(text[pos:])
+
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError(f"invalid width {width} (must be > 0)")
+
+    text = text.expandtabs(8).translate({
+        ord("\t"): " ",
+        ord("\n"): " ",
+        ord("\v"): " ",
+        ord("\f"): " ",
+        ord("\r"): " ",
+    })
+
+    lines = []
+    current = ""
+    chunks = list(_chunks(text))
+    i = 0
+
+    while i < len(chunks):
+        chunk = chunks[i]
+
+        if chunk.isspace():
+            if current and i + 1 < len(chunks):
+                if len(current) + len(chunk) <= width:
+                    current += chunk
+                else:
+                    lines.append(current.rstrip())
+                    current = ""
+            i += 1
+            continue
+
+        while chunk:
+            available = width - len(current)
+
+            if len(chunk) <= available:
+                current += chunk
+                chunk = ""
+                continue
+
+            if current:
+                if available > 0:
+                    cut = available
+                    hyphen = chunk.rfind("-", 0, available)
+                    if hyphen > 0:
+                        cut = hyphen + 1
+                    current += chunk[:cut]
+                    chunk = chunk[cut:]
+                lines.append(current.rstrip())
+                current = ""
+                continue
+
+            cut = width
+            hyphen = chunk.rfind("-", 0, width)
+            if hyphen > 0:
+                cut = hyphen + 1
+
+            current = chunk[:cut]
+            chunk = chunk[cut:]
+
+            if chunk:
+                lines.append(current.rstrip())
+                current = ""
+
+        i += 1
+
+    if current:
+        lines.append(current.rstrip())
+
+    return "\n".join(lines)
+```

@@ -1,0 +1,7 @@
+- tracking changes helps teams identify when regressions were introduced
+- shared repositories ensure consistency across different environments and teammates
+- developers can revert bad settings quickly during major outages
+- peer reviews catch improper variables before deploying to production
+- automated pipelines deploy validated settings reliably to every host
+- detailed audit histories reveal who modified parameters for accountability
+- onboarding new engineers becomes faster with centralized application parameters

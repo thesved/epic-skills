@@ -144,7 +144,8 @@ Anthropic and the day-one evidence agree: Opus 5 is the daily driver, Fable 5.1 
 - **GPT-5.6 Sol**: the executor. Senior SWE-Bench tasteful pass tie at 34.7% with Sol xhigh at about half Fable's output cost; Sol wins mechanics/interaction logic and speed on visual builds (RemakeBench 2026-09-02; Finn: Sol 2 min vs Fable 12 min for the same 20/20 build), Fable wins agentic hunts (Finn's Gauntlet: Fable 100/100 in 143 tool calls, Sol 0/100) and factual research depth (Kasra: 344 tool calls, real ASINs). Full logic in delegation.md.
 - **Sonnet/Haiku**: mechanical execution, wrappers.
 - **Grok 4.6 / GLM 5.3 Flash / Kimi K3**: 90-96% of the quality at 1/10 to 1/400 the dollar cost on the same gauntlets (Johnston 2026-09-02: Grok $2.50 vs Fable $42.24 for a 94 vs 98 score). Opinion seats and bulk, per the cache table.
-- Sandwich (still the best shape): cheap model explores, Fable plans at medium/high, Sol executes, Fable or Opus reviews.
+- **GPT-6 Astra** (2026-09-03, `gpt-6-astra`, $10/$50 like Fable, cache read $1 vs Fable's $0.25): reachable on the Pro sub, API key and OpenRouter since 2026-09-05 (Codex 0.153.4). It takes computer use / browser QA (OSWorld 72.6 in 40 min vs Sol 65.7 in 75), long tool-heavy runs (1/3 of Sol's tokens per coding task) and terminal science (TB-Science 64.6 vs Fable 5.1 52.6); Fable 5.1 keeps orchestration, ambiguous asks, UI taste, review verdicts and breadth (AA Intelligence 66 vs 61, Coding Agent 70 vs 67, HLE 65.0 vs 57.2). Operating card and effort ladder in `_model-cache/examples/openai.md`, evidence in `_model-cache/research/2026-09-04/`.
+- Sandwich (still the best shape): cheap model explores, Fable plans at medium/high, Sol executes (Astra for GUI-in-the-loop or multi-hour tool runs; Muse Spark 1.3 at low for cheap bounded non-sensitive work and 1M-token reads, card in `_model-cache/examples/muse.md`), Fable or Opus reviews.
 
 ## Inversions (how competent users sabotage themselves)
 

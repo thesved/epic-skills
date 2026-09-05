@@ -1,0 +1,7 @@
+- version control tracks every configuration change with full history  
+- teams can audit who altered settings and when it happened  
+- configuration mistakes become reversible through simple rollback commands  
+- consistent environments are easier to recreate across different machines  
+- configuration drift is visible in diff views before deployment  
+- code review practices extend naturally to infrastructure and settings  
+- collaboration improves because peers can propose and discuss config edits

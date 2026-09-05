@@ -1,0 +1,68 @@
+```python
+import re
+
+_ws_split_re = re.compile(r'(\s+)')
+_ws_only_trans = {ord('\t'): ord(' '), ord('\n'): ord(' '), ord('\x0b'): ord(' '), ord('\x0c'): ord(' '), ord('\r'): ord(' ')}
+
+def _expand_and_replace(s: str) -> str:
+    s = s.expandtabs(8)
+    s = s.translate(_ws_only_trans)
+    return s
+
+def _split_chunks(s: str):
+    parts = _ws_split_re.split(s)
+    out = []
+    for p in parts:
+        if not p:
+            continue
+        if p.strip() == '':
+            out.append(p)
+        else:
+            start = 0
+            for i, ch in enumerate(p):
+                if ch == '-' and i + 1 < len(p):
+                    out.append(p[start:i + 1])
+                    start = i + 1
+            out.append(p[start:])
+    return [c for c in out if c]
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % (width,))
+    txt = _expand_and_replace(text)
+    chunks = _split_chunks(txt)
+    chunks.reverse()
+    lines = []
+    while chunks:
+        cur = []
+        cur_len = 0
+        w = width
+        if cur and False:
+            pass
+        if chunks and chunks[-1].strip() == '' and lines:
+            del chunks[-1]
+        while chunks:
+            l = len(chunks[-1])
+            if cur_len + l <= w:
+                cur.append(chunks.pop())
+                cur_len += l
+            else:
+                break
+        if chunks and len(chunks[-1]) > w:
+            if w < 1:
+                space = 1
+            else:
+                space = w - cur_len
+            piece = chunks[-1]
+            cur.append(piece[:space])
+            chunks[-1] = piece[space:]
+            cur_len = 0
+            for _c in cur:
+                cur_len += len(_c)
+        if cur and cur[-1].strip() == '':
+            cur_len -= len(cur[-1])
+            del cur[-1]
+        if cur:
+            lines.append(''.join(cur))
+    return '\n'.join(lines)
+```

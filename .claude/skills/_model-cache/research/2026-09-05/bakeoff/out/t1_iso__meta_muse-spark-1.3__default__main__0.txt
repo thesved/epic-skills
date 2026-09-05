@@ -1,0 +1,96 @@
+```python
+import re
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str):
+        raise ValueError("Invalid duration")
+    if s == "" or s[0] != "P":
+        raise ValueError("Invalid duration")
+    if "W" in s:
+        m = re.fullmatch(r"P\d+(?:[.,]\d+)?W", s)
+        if not m:
+            raise ValueError("Invalid duration")
+        num_str = s[1:-1].replace(",", ".")
+        return float(num_str) * 604800.0
+    if s.count("T") > 1:
+        raise ValueError("Invalid duration")
+    if s == "P":
+        raise ValueError("Invalid duration")
+    if "T" in s:
+        t_pos = s.index("T")
+        date_str = s[1:t_pos]
+        time_str = s[t_pos + 1:]
+        if time_str == "":
+            raise ValueError("Invalid duration")
+    else:
+        date_str = s[1:]
+        time_str = ""
+        if date_str == "":
+            raise ValueError("Invalid duration")
+
+    date_allowed = ["Y", "M", "D"]
+    time_allowed = ["H", "M", "S"]
+
+    def parse_segment(seg: str, allowed):
+        res = {}
+        pos = 0
+        prev_idx = -1
+        L = len(seg)
+        while pos < L:
+            m = re.match(r"\d+(?:[.,]\d+)?", seg[pos:])
+            if not m:
+                raise ValueError("Invalid duration")
+            num_str = m.group(0)
+            nxt = pos + len(num_str)
+            if nxt >= L:
+                raise ValueError("Invalid duration")
+            des = seg[nxt]
+            if des not in allowed:
+                raise ValueError("Invalid duration")
+            idx = allowed.index(des)
+            if idx <= prev_idx:
+                raise ValueError("Invalid duration")
+            prev_idx = idx
+            has_frac = ("." in num_str or "," in num_str)
+            res[des] = (num_str, has_frac)
+            pos = nxt + 1
+        return res
+
+    date_res = parse_segment(date_str, date_allowed) if date_str != "" else {}
+    time_res = parse_segment(time_str, time_allowed) if time_str != "" else {}
+
+    if not date_res and not time_res:
+        raise ValueError("Invalid duration")
+
+    present = []
+    if "Y" in date_res:
+        present.append(date_res["Y"][1])
+    if "M" in date_res:
+        present.append(date_res["M"][1])
+    if "D" in date_res:
+        present.append(date_res["D"][1])
+    if "H" in time_res:
+        present.append(time_res["H"][1])
+    if "M" in time_res:
+        present.append(time_res["M"][1])
+    if "S" in time_res:
+        present.append(time_res["S"][1])
+
+    if any(present[:-1]):
+        raise ValueError("Invalid duration")
+
+    total = 0.0
+    if "Y" in date_res:
+        total += float(date_res["Y"][0].replace(",", ".")) * 31536000.0
+    if "M" in date_res:
+        total += float(date_res["M"][0].replace(",", ".")) * 2592000.0
+    if "D" in date_res:
+        total += float(date_res["D"][0].replace(",", ".")) * 86400.0
+    if "H" in time_res:
+        total += float(time_res["H"][0].replace(",", ".")) * 3600.0
+    if "M" in time_res:
+        total += float(time_res["M"][0].replace(",", ".")) * 60.0
+    if "S" in time_res:
+        total += float(time_res["S"][0].replace(",", ".")) * 1.0
+    return float(total)
+```

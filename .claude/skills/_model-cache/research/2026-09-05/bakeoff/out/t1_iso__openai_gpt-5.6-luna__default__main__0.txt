@@ -1,0 +1,80 @@
+```python
+import re
+
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str) or not s.startswith("P"):
+        raise ValueError("Invalid duration")
+
+    body = s[1:]
+    if not body:
+        raise ValueError("Invalid duration")
+
+    number_pattern = r"[0-9]+(?:[.,][0-9]+)?"
+    week_match = re.fullmatch(rf"({number_pattern})W", body)
+    if week_match:
+        return float(week_match.group(1).replace(",", ".")) * 7 * 86400
+
+    total = 0.0
+    position = 0
+    in_time = False
+    component_count = 0
+    fraction_seen = False
+    last_date_order = -1
+    last_time_order = -1
+    date_units = {"Y": 365 * 86400, "M": 30 * 86400, "D": 86400}
+    time_units = {"H": 3600, "M": 60, "S": 1}
+    date_order = {"Y": 0, "M": 1, "D": 2}
+    time_order = {"H": 0, "M": 1, "S": 2}
+
+    while position < len(body):
+        if body[position] == "T":
+            if in_time or position == len(body) - 1:
+                raise ValueError("Invalid duration")
+            in_time = True
+            position += 1
+            continue
+
+        match = re.match(number_pattern, body[position:])
+        if not match:
+            raise ValueError("Invalid duration")
+
+        token = match.group(0)
+        position += len(token)
+
+        if position >= len(body):
+            raise ValueError("Invalid duration")
+
+        unit = body[position]
+        position += 1
+
+        if fraction_seen:
+            raise ValueError("Invalid duration")
+
+        has_fraction = "." in token or "," in token
+        if has_fraction:
+            fraction_seen = True
+
+        if in_time:
+            if unit not in time_units:
+                raise ValueError("Invalid duration")
+            if time_order[unit] <= last_time_order:
+                raise ValueError("Invalid duration")
+            last_time_order = time_order[unit]
+            multiplier = time_units[unit]
+        else:
+            if unit not in date_units:
+                raise ValueError("Invalid duration")
+            if date_order[unit] <= last_date_order:
+                raise ValueError("Invalid duration")
+            last_date_order = date_order[unit]
+            multiplier = date_units[unit]
+
+        total += float(token.replace(",", ".")) * multiplier
+        component_count += 1
+
+    if component_count == 0:
+        raise ValueError("Invalid duration")
+
+    return float(total)
+```

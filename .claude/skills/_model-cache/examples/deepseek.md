@@ -48,3 +48,8 @@ AA index 52 vs 53; Pro leads official agent benches (Terminal-Bench 82.7 vs 87.9
 
 ## DeepSeek Harness (dsh)
 MIT, RC (0.1.0-rc.8 on 2026-08-21), `npx @deepseek-ai/dsh web`. Presets: Standard, PTC (TypeScript programmatic tool calling), Minimal (bash + str_replace_editor; the benchmark config), Creator. Provider-neutral (deepseek-official, OpenAI, Anthropic, custom gateways). Trajectory replay. Expect breaking changes; not a Claude Code replacement yet.
+
+## 2026-09-03 pepita kbdistil: judge vs grader (measured live via OpenRouter)
+- Registry/alias `deepseek-v4-pro` (unsuffixed) resolves to the April build; always `deepseek/deepseek-v4-pro-0813`.
+- Thinking ON (`reasoning: effort low, exclude`) on a 10k-token "find defects" review prompt: 40-100 s/call, 6-8k output tokens, sometimes starves (`finish=length`, empty). Thinking OFF (`reasoning: {enabled: false}`): 2 s, returns ZERO issues (useless as reviewer).
+- Thinking OFF as a GRADER (judge given assignments + product + labels, structured verdicts): 3-7 s, $0.004/call, verdicts identical to kimi-k3 on the probe. Use OFF for rule-following judgments, never for open-ended defect hunting.

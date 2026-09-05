@@ -1,0 +1,84 @@
+```python
+import re
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str) or not s or not s.startswith('P'):
+        raise ValueError(f"Invalid duration: {s!r}")
+    if 'W' in s:
+        m = re.fullmatch(r'P(\d+(?:[.,]\d+)?)W', s)
+        if not m:
+            raise ValueError(f"Invalid duration: {s!r}")
+        val = float(m.group(1).replace(',', '.'))
+        return float(val * 604800.0)
+    if s == 'P':
+        raise ValueError(f"Invalid duration: {s!r}")
+    if s.count('T') > 1:
+        raise ValueError(f"Invalid duration: {s!r}")
+    if 'T' in s:
+        body = s[1:]
+        date_str, time_str = body.split('T', 1)
+        if time_str == '':
+            raise ValueError(f"Invalid duration: {s!r}")
+    else:
+        date_str = s[1:]
+        time_str = None
+        if date_str == '':
+            raise ValueError(f"Invalid duration: {s!r}")
+
+    y_str = mo_str = d_str = None
+    h_str = mi_str = sec_str = None
+
+    if date_str != '':
+        m_date = re.fullmatch(
+            r'(?:(\d+(?:[.,]\d+)?)Y)?(?:(\d+(?:[.,]\d+)?)M)?(?:(\d+(?:[.,]\d+)?)D)?',
+            date_str
+        )
+        if not m_date:
+            raise ValueError(f"Invalid duration: {s!r}")
+        y_str, mo_str, d_str = m_date.group(1), m_date.group(2), m_date.group(3)
+        if y_str is None and mo_str is None and d_str is None:
+            raise ValueError(f"Invalid duration: {s!r}")
+
+    if time_str is not None:
+        m_time = re.fullmatch(
+            r'(?:(\d+(?:[.,]\d+)?)H)?(?:(\d+(?:[.,]\d+)?)M)?(?:(\d+(?:[.,]\d+)?)S)?',
+            time_str
+        )
+        if not m_time:
+            raise ValueError(f"Invalid duration: {s!r}")
+        h_str, mi_str, sec_str = m_time.group(1), m_time.group(2), m_time.group(3)
+        if h_str is None and mi_str is None and sec_str is None:
+            raise ValueError(f"Invalid duration: {s!r}")
+
+    ordered = []
+    for v in (y_str, mo_str, d_str, h_str, mi_str, sec_str):
+        if v is not None:
+            ordered.append(v)
+    if not ordered:
+        raise ValueError(f"Invalid duration: {s!r}")
+
+    def _has_frac(x: str) -> bool:
+        return '.' in x or ',' in x
+
+    for v in ordered[:-1]:
+        if _has_frac(v):
+            raise ValueError(f"Invalid duration: {s!r}")
+
+    def _num(x):
+        return float(x.replace(',', '.'))
+
+    total = 0.0
+    if y_str is not None:
+        total += _num(y_str) * 31536000.0
+    if mo_str is not None:
+        total += _num(mo_str) * 2592000.0
+    if d_str is not None:
+        total += _num(d_str) * 86400.0
+    if h_str is not None:
+        total += _num(h_str) * 3600.0
+    if mi_str is not None:
+        total += _num(mi_str) * 60.0
+    if sec_str is not None:
+        total += _num(sec_str) * 1.0
+    return float(total)
+```

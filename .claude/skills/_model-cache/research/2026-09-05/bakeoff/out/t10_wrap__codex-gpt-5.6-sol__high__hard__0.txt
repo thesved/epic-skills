@@ -1,0 +1,84 @@
+```python
+import re
+
+_ASCII_WHITESPACE = "\t\n\v\f\r "
+_WHITESPACE_TRANSLATION = str.maketrans(
+    {character: " " for character in _ASCII_WHITESPACE}
+)
+
+_WORD_SEPARATOR = re.compile(
+    r"("
+    r"[\t\n\v\f\r ]+"
+    r"|(?<=[\w!\"'&.,?])-{2,}(?=\w)"
+    r"|[^\t\n\v\f\r ]+?(?:"
+    r"-(?:(?<=[^\d\W]{2}-)|(?<=[^\d\W]-[^\d\W]-))"
+    r"(?=[^\d\W]-?[^\d\W])"
+    r"|(?=[\t\n\v\f\r ]|\Z)"
+    r"|(?<=[\w!\"'&.,?])(?=-{2,}\w)"
+    r")"
+    r")"
+)
+
+
+def _split_chunks(text: str) -> list[str]:
+    return [chunk for chunk in _WORD_SEPARATOR.split(text) if chunk]
+
+
+def _take_long_chunk(
+    chunks: list[str],
+    line: list[str],
+    line_length: int,
+    width: int,
+) -> None:
+    available = max(width - line_length, 1)
+    chunk = chunks[-1]
+    end = available
+
+    if len(chunk) > available:
+        hyphen = chunk.rfind("-", 0, available)
+        if hyphen > 0 and any(character != "-" for character in chunk[:hyphen]):
+            end = hyphen + 1
+
+    line.append(chunk[:end])
+    remainder = chunk[end:]
+    if remainder:
+        chunks[-1] = remainder
+    else:
+        chunks.pop()
+
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError(f"invalid width {width!r} (must be > 0)")
+
+    normalized = text.expandtabs(8).translate(_WHITESPACE_TRANSLATION)
+    chunks = _split_chunks(normalized)
+    chunks.reverse()
+
+    lines: list[str] = []
+
+    while chunks:
+        line: list[str] = []
+        line_length = 0
+
+        if lines and chunks[-1].strip() == "":
+            chunks.pop()
+
+        while chunks:
+            chunk_length = len(chunks[-1])
+            if line_length + chunk_length > width:
+                break
+            line.append(chunks.pop())
+            line_length += chunk_length
+
+        if chunks and len(chunks[-1]) > width:
+            _take_long_chunk(chunks, line, line_length, width)
+
+        if line and line[-1].strip() == "":
+            line.pop()
+
+        if line:
+            lines.append("".join(line))
+
+    return "\n".join(lines)
+```

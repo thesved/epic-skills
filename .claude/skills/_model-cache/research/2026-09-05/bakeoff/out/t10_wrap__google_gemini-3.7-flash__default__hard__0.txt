@@ -1,0 +1,59 @@
+```python
+import re
+
+_WORDSEP_RE = re.compile(
+    r"("
+    r"\s+|"
+    r"[^\s\w]*\w+[^0-9\W]-(?=\w+)|"
+    r"(?<=[\w\!\"\'\&\.\,\?])-{2,}(?=\w)"
+    r")"
+)
+_WHITESPACE_TRANS = str.maketrans("\t\n\v\f\r", "     ")
+
+
+def fill(text: str, width: int = 70) -> str:
+    if width <= 0:
+        raise ValueError(f"invalid width {width!r} (must be > 0)")
+
+    text = text.expandtabs().translate(_WHITESPACE_TRANS)
+    chunks = [c for c in _WORDSEP_RE.split(text) if c]
+    chunks.reverse()
+
+    lines = []
+    cur_line = []
+    cur_len = 0
+
+    while chunks:
+        chunk = chunks[-1]
+        if cur_len + len(chunk) <= width:
+            cur_line.append(chunks.pop())
+            cur_len += len(chunk)
+        else:
+            if cur_line and cur_line[-1].isspace():
+                cur_len -= len(cur_line[-1])
+                del cur_line[-1]
+
+            if cur_line:
+                lines.append("".join(cur_line))
+                cur_line = []
+                cur_len = 0
+                while chunks and chunks[-1].isspace():
+                    chunks.pop()
+            else:
+                end = width - cur_len
+                if end > 1:
+                    hyphen = chunk.rfind("-", 0, end)
+                    if hyphen > 0 and any(c.isalnum() for c in chunk[:hyphen]):
+                        end = hyphen + 1
+                cur_line.append(chunk[:end])
+                chunks[-1] = chunk[end:]
+                cur_len += end
+
+    if cur_line:
+        if cur_line[-1].isspace():
+            del cur_line[-1]
+        if cur_line:
+            lines.append("".join(cur_line))
+
+    return "\n".join(lines)
+```

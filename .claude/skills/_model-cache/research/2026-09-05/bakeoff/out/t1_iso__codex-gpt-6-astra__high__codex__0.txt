@@ -1,0 +1,47 @@
+```python
+import re
+
+
+def parse_duration(s: str) -> float:
+    number = r"[0-9]+(?:[.,][0-9]+)?"
+
+    week_match = re.fullmatch(rf"P({number})W", s)
+    if week_match:
+        return float(week_match.group(1).replace(",", ".")) * 604800.0
+
+    match = re.fullmatch(
+        rf"P(?:({number})Y)?(?:({number})M)?(?:({number})D)?"
+        rf"(?:(T)(?:({number})H)?(?:({number})M)?(?:({number})S)?)?",
+        s,
+    )
+    if match is None:
+        raise ValueError("Invalid duration")
+
+    years, months, days, time_marker, hours, minutes, seconds = match.groups()
+    if time_marker and all(v is None for v in (hours, minutes, seconds)):
+        raise ValueError("T must be followed by a time component")
+
+    components = [
+        (value, multiplier)
+        for value, multiplier in (
+            (years, 365 * 86400),
+            (months, 30 * 86400),
+            (days, 86400),
+            (hours, 3600),
+            (minutes, 60),
+            (seconds, 1),
+        )
+        if value is not None
+    ]
+    if not components:
+        raise ValueError("Duration must contain a component")
+
+    if any("." in value or "," in value for value, _ in components[:-1]):
+        raise ValueError("Only the last component may have a fraction")
+
+    return sum(
+        (float(value.replace(",", ".")) * multiplier
+         for value, multiplier in components),
+        0.0,
+    )
+```

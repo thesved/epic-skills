@@ -18,6 +18,8 @@ One OpenAI-compatible endpoint proxying many providers behind a single prepaid k
 
 **Auth**: key `OPENROUTER_API_KEY` (`sk-or-...`), resolved via `_model-cache/lib.sh` (env -> `~/.zshrc` -> keychain `openrouter-api-key`). Keychain-safe: works when the session env has no key. First keychain read may prompt - click **Always Allow**.
 
+**Sub-covered families stay native.** Claude models = Claude Code subagents, OpenAI models = codex CLI. `-m anthropic/*` or `-m openai/*` here only when the user explicitly approved it in this session (say it or ASK first); never as a convenience or fallback. Bake-offs use the native harnesses.
+
 ## Modes
 
 | Mode | Command | What it does |

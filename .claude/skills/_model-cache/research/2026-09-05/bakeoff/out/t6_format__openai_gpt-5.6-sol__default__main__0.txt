@@ -1,0 +1,7 @@
+- configuration history reveals when settings changed and who changed them
+- versioned files make deployments repeatable across environments and team members
+- code reviews catch risky configuration changes before they reach production
+- rollbacks quickly restore known settings after mistakes or failed releases
+- shared configuration reduces undocumented differences between developer machines and servers
+- branches keep experimental settings isolated from stable project configurations
+- audits become easier when every configuration change has clear context

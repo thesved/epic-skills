@@ -1,0 +1,7 @@
+- version control keeps complete history of all configuration changes
+- teams can easily roll back faulty settings to stable versions
+- shared repositories improve collaboration and reduce conflicting manual edits
+- code reviews catch errors before broken settings reach production
+- automated deployments become reliable with tracked consistent configuration files
+- audit trails help demonstrate compliance during security reviews and investigations
+- new members onboard faster by exploring documented past configuration decisions

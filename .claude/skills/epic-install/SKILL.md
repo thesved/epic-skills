@@ -42,6 +42,7 @@ read -rs GEMINI_API_KEY && printf '%s' "$GEMINI_API_KEY" | \
 
 ## 3. CLIs + auth
 - **Gemini**: no CLI; the bridge is pure REST via `GEMINI_API_KEY` (set up in step 2).
+- **Runner agents** (fable-max delegate mode): `mkdir -p ~/.claude/agents && cp <TARGET>/fable-max/agents/*.md ~/.claude/agents/`; they appear as `subagent_type` after the next session start.
 - **Codex**: `npm i -g @openai/codex`, then **`codex login`** (ChatGPT account OAuth - the Codex seat needs this, not an API key).
 
 ## 4. CLAUDE.md setup

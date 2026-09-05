@@ -1,0 +1,96 @@
+```python
+import re
+
+_WORDSEP_RE = re.compile(
+    r"""
+    (
+        \s+
+      | (?<=\w)-{2,}(?=\w)
+      | (?<=[^\W_])-(?=[^\W_])
+    )
+    """,
+    re.VERBOSE,
+)
+
+_SIMPLE_WORDSEP_RE = re.compile(r"(\s+)")
+_WHITESPACE_TRANS = str.maketrans("\t\n\v\f\r", "     ")
+
+
+def _split_chunks(text: str, break_on_hyphens: bool = True) -> list[str]:
+    pattern = _WORDSEP_RE if break_on_hyphens else _SIMPLE_WORDSEP_RE
+    return [chunk for chunk in pattern.split(text) if chunk]
+
+
+def _handle_long_word(
+    chunks: list[str],
+    cur_line: list[str],
+    cur_len: int,
+    width: int,
+    break_on_hyphens: bool,
+) -> None:
+    chunk = chunks[-1]
+    remainder = width - cur_len
+
+    if remainder <= 0:
+        return
+
+    if break_on_hyphens and len(chunk) > remainder:
+        hyphen = chunk.rfind("-", 0, remainder)
+        if hyphen > 0 and chunk[hyphen - 1].isalnum():
+            end = hyphen + 1
+        else:
+            end = remainder
+    else:
+        end = remainder
+
+    cur_line.append(chunk[:end])
+    rest = chunk[end:]
+    if rest:
+        chunks[-1] = rest
+    else:
+        chunks.pop()
+
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError(f"invalid width {width} (must be > 0)")
+
+    text = text.expandtabs()
+    text = text.translate(_WHITESPACE_TRANS)
+    chunks = _split_chunks(text)
+
+    lines: list[str] = []
+
+    while chunks:
+        cur_line: list[str] = []
+        cur_len = 0
+
+        while chunks:
+            chunk_len = len(chunks[-1])
+            if cur_len + chunk_len <= width:
+                chunk = chunks.pop()
+                cur_line.append(chunk)
+                cur_len += chunk_len
+            else:
+                break
+
+        if chunks:
+            if cur_len == width:
+                pass
+            else:
+                _handle_long_word(
+                    chunks,
+                    cur_line,
+                    cur_len,
+                    width,
+                    True,
+                )
+
+        if cur_line and cur_line[-1].strip() == "":
+            del cur_line[-1]
+
+        if cur_line:
+            lines.append("".join(cur_line))
+
+    return "\n".join(lines)
+```

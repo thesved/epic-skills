@@ -48,3 +48,7 @@ Why not default: launch-day 429 waves on a single provider (a dead seat mid-boar
 - [BenchLM Kimi K3](https://benchlm.ai/models/kimi-3), 2026-07 (3 published scores, no global rank).
 - [Pandaily preview](https://pandaily.com/kimi-k3-moonshot-ai-model-preview-jul2026), 2026-07 (social benchmark videos, "approaches Fable 5 level" anecdotes).
 - Live E2E: 2 successful calls 2026-07-16 (ask.sh + raw curl, 23s latency short answer), 6 rate-limited.
+
+## 2026-09-03 pepita kbdistil: kimi-k3 as defect reviewer (OpenRouter)
+- Works (finds 2-5 issues per 10k-token document, $0.044/call, 32 s cold) but issue-level stability is ~1 in 10 across two identical temperature-0 runs. Counts are a floor, not a measure.
+- Under a sustained sequential load latency climbed 113 s → 242 s → 327 s per call within 20 minutes and answers truncated at 8000 tokens. Not for 100+ call loops.

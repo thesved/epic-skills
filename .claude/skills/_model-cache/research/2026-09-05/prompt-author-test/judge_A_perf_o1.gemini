@@ -1,0 +1,3 @@
+VERDICT: P2
+DROPPED_OR_ADDED: none
+REASON: P2 captures all constraints and metrics with 100% fidelity while formatting the prompt into structured sections and bullet points, making it significantly clearer and harder for an executor to miss specific deliverables compared to P1's dense paragraph text.

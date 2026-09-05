@@ -1,0 +1,83 @@
+```python
+import re
+
+_WHITESPACE = "\t\n\v\f\r "
+_TRANSLATION = str.maketrans({char: " " for char in _WHITESPACE})
+
+_WORD_SEPARATOR = re.compile(
+    r'([\t\n\v\f\r ]+'
+    r'|(?<=[\w!"\'&.,?])-{2,}(?=\w)'
+    r'|[^\t\n\v\f\r ]+?(?:'
+    r'-(?:(?<=[^\d\W]{2}-)|(?<=[^\d\W]-[^\d\W]-))'
+    r'(?=[^\d\W]-?[^\d\W])'
+    r'|(?=[\t\n\v\f\r ]|\Z)'
+    r'|(?<=[\w!"\'&.,?])(?=-{2,}\w)'
+    r'))'
+)
+
+
+def _split_words(text: str) -> list[str]:
+    return [part for part in _WORD_SEPARATOR.split(text) if part]
+
+
+def _split_long_word(
+    chunks: list[str],
+    line: list[str],
+    line_length: int,
+    width: int,
+) -> None:
+    available = max(width - line_length, 1)
+    chunk = chunks[-1]
+    end = available
+
+    if len(chunk) > available:
+        hyphen = chunk.rfind("-", 0, available)
+        if hyphen > 0 and any(char != "-" for char in chunk[:hyphen]):
+            end = hyphen + 1
+
+    line.append(chunk[:end])
+    remainder = chunk[end:]
+
+    if remainder:
+        chunks[-1] = remainder
+    else:
+        chunks.pop()
+
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError(f"invalid width {width!r} (must be > 0)")
+
+    text = text.expandtabs(8).translate(_TRANSLATION)
+    chunks = _split_words(text)
+    chunks.reverse()
+
+    lines: list[str] = []
+
+    while chunks:
+        if lines and not chunks[-1].strip():
+            chunks.pop()
+
+        line: list[str] = []
+        line_length = 0
+
+        while chunks:
+            chunk_length = len(chunks[-1])
+            if line_length + chunk_length > width:
+                break
+            line.append(chunks.pop())
+            line_length += chunk_length
+
+        if chunks and len(chunks[-1]) > width:
+            _split_long_word(chunks, line, line_length, width)
+            line_length = sum(map(len, line))
+
+        if line and not line[-1].strip():
+            line_length -= len(line[-1])
+            line.pop()
+
+        if line:
+            lines.append("".join(line))
+
+    return "\n".join(lines)
+```

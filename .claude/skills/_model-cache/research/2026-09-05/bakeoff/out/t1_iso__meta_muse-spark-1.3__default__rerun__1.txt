@@ -1,0 +1,88 @@
+```python
+import re
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str):
+        raise ValueError("Invalid duration")
+    if s == "" or s[0] != "P":
+        raise ValueError("Invalid duration")
+    if "-" in s:
+        raise ValueError("Invalid duration")
+    if s.count("T") > 1:
+        raise ValueError("Invalid duration")
+
+    if "T" in s:
+        t_index = s.index("T")
+        date_part = s[1:t_index]
+        time_part = s[t_index + 1:]
+        if time_part == "":
+            raise ValueError("Invalid duration")
+    else:
+        date_part = s[1:]
+        time_part = None
+        if date_part == "":
+            raise ValueError("Invalid duration")
+
+    y_str = m_date_str = w_str = d_str = None
+    h_str = m_time_str = s_str = None
+
+    if date_part != "":
+        m = re.fullmatch(
+            r"(?:(\d+(?:[.,]\d+)?)Y)?(?:(\d+(?:[.,]\d+)?)M)?(?:(\d+(?:[.,]\d+)?)W)?(?:(\d+(?:[.,]\d+)?)D)?",
+            date_part,
+        )
+        if m is None:
+            raise ValueError("Invalid duration")
+        y_str, m_date_str, w_str, d_str = m.groups()
+        if y_str is None and m_date_str is None and w_str is None and d_str is None:
+            raise ValueError("Invalid duration")
+    else:
+        if time_part is None:
+            raise ValueError("Invalid duration")
+
+    if time_part is not None:
+        m2 = re.fullmatch(
+            r"(?:(\d+(?:[.,]\d+)?)H)?(?:(\d+(?:[.,]\d+)?)M)?(?:(\d+(?:[.,]\d+)?)S)?",
+            time_part,
+        )
+        if m2 is None:
+            raise ValueError("Invalid duration")
+        h_str, m_time_str, s_str = m2.groups()
+        if h_str is None and m_time_str is None and s_str is None:
+            raise ValueError("Invalid duration")
+
+    if w_str is not None:
+        if (y_str is not None or m_date_str is not None or d_str is not None
+                or h_str is not None or m_time_str is not None or s_str is not None):
+            raise ValueError("Invalid duration")
+
+    ordered = [y_str, m_date_str, w_str, d_str, h_str, m_time_str, s_str]
+    present = [x for x in ordered if x is not None]
+    if not present:
+        raise ValueError("Invalid duration")
+    last = present[-1]
+    for comp in present[:-1]:
+        if "." in comp or "," in comp:
+            raise ValueError("Invalid duration")
+
+    def _val(num: str) -> float:
+        return float(num.replace(",", "."))
+
+    total = 0.0
+    if y_str is not None:
+        total += _val(y_str) * 365 * 86400
+    if m_date_str is not None:
+        total += _val(m_date_str) * 30 * 86400
+    if w_str is not None:
+        total += _val(w_str) * 7 * 86400
+    if d_str is not None:
+        total += _val(d_str) * 86400
+    if h_str is not None:
+        total += _val(h_str) * 3600
+    if m_time_str is not None:
+        total += _val(m_time_str) * 60
+    if s_str is not None:
+        total += _val(s_str)
+
+    return float(total)
+```

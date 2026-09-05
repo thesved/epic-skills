@@ -1,6 +1,6 @@
 ---
 name: wrap
-description: Cleanly close out the session so a brand-new one can resume cold - flush todos, consolidate the resume doc, capture durable learnings, resolve ambiguity, prune bloat. Use at the end of a work session, or on "wrap", "wrap up", "close the session", "sign off", "clean close".
+description: Cleanly close out the session so a brand-new one can resume cold - flush todos, consolidate the resume doc, capture durable learnings, run the retro (what we fucked up, used wrong, wasted, and the non-obvious 100x fix), resolve ambiguity, prune bloat. Use at the end of a work session, or on "wrap", "wrap up", "close the session", "sign off", "clean close".
 ---
 
 Close the session so a cold-start agent resumes with zero context loss.
@@ -13,8 +13,9 @@ Close the session so a cold-start agent resumes with zero context loss.
 1. **Flush.** Land every open todo, decision, and loose end into the resume doc(s) - nothing important lives only in this chat.
 2. **Resume test.** Could a brand-new session continue from the docs alone? Fix every gap. Resolve open ambiguities now; if one can't be resolved, name it and what would settle it.
 3. **Learn.** Fold durable, reusable lessons into the learnings index, never into CLAUDE.md. Real signal only; never edit for edit's sake.
-4. **Prune.** Cut stale, duplicate, or bloated instructions before they cause context implosion - docs should shrink as often as they grow.
-5. **Frontload + group.** Group related info; lead each section AND each line with the key noun/status/action; most important first, top-to-bottom.
+4. **Retro.** Four questions, answered from the transcript with evidence, results into the learnings index: What did we fuck up (wrong diagnosis, broken output, claim without proof)? What did we use wrong (model, effort, route, tool, skill: e.g. main thread babysat an executor, an expensive model did rote work, sequential where a graph was possible)? Where did we waste resource (tokens, waiting, manual polling, re-reads, retries)? What non-obvious change makes the next run 100x better (a skill fix, a rule, a script, a different routing)? Scout rule: a small fix found here gets done now, not filed.
+5. **Prune.** Cut stale, duplicate, or bloated instructions before they cause context implosion - docs should shrink as often as they grow.
+6. **Frontload + group.** Group related info; lead each section AND each line with the key noun/status/action; most important first, top-to-bottom.
 
 ## CLAUDE.md gate (run before finishing)
 - **Ban: no war stories in CLAUDE.md.** A war story = session narrative, chronology, or debugging play-by-play: past-tense events ("tried X, it failed, then Y"), "we discovered", "spent the afternoon", dates-of-what-happened.

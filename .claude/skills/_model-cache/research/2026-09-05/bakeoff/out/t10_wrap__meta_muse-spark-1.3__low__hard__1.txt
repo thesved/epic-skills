@@ -1,0 +1,86 @@
+```python
+import re
+
+def _expand_and_replace(text):
+    text = text.expandtabs(8)
+    text = re.sub(r'[\t\n\x0b\x0c\r]', ' ', text)
+    return text
+
+def _is_word_char(ch):
+    return re.match(r'\w', ch, re.UNICODE) is not None
+
+def _hyphen_splits(word):
+    n = len(word)
+    points = []
+    j = 0
+    while j < n:
+        if word[j] == '-':
+            k = j
+            while k < n and word[k] == '-':
+                k += 1
+            if j > 0 and k < n:
+                prev = word[j - 1]
+                nxt = word[k]
+                if _is_word_char(prev) and _is_word_char(nxt):
+                    points.append(k)
+            j = k
+        else:
+            j += 1
+    return points
+
+def _split_chunks(text):
+    parts = re.split(r'(\s+)', text)
+    chunks = []
+    for tok in parts:
+        if not tok:
+            continue
+        if tok.strip() == '' and (tok[0].isspace() if tok else False):
+            chunks.append(tok)
+        elif re.fullmatch(r'\s+', tok, flags=re.UNICODE):
+            chunks.append(tok)
+        else:
+            pts = _hyphen_splits(tok)
+            prev = 0
+            for p in pts:
+                chunks.append(tok[prev:p])
+                prev = p
+            chunks.append(tok[prev:])
+    return [c for c in chunks if c != '']
+
+def fill(text: str, width: int) -> str:
+    t = _expand_and_replace(text)
+    chunks = _split_chunks(t)
+    rev = list(reversed(chunks))
+    lines = []
+    while rev:
+        cur_line = []
+        cur_len = 0
+        w = width
+        if lines and rev and rev[-1].strip() == '':
+            del rev[-1]
+            if not rev:
+                break
+        while rev:
+            l = len(rev[-1])
+            if cur_len + l <= w:
+                cur_line.append(rev.pop())
+                cur_len += l
+            else:
+                break
+        if rev and len(rev[-1]) > w:
+            space_left = w - cur_len
+            if space_left < 1:
+                space_left = 1
+            cur_line.append(rev[-1][:space_left])
+            rev[-1] = rev[-1][space_left:]
+            cur_len = sum(map(len, cur_line))
+        if cur_line and cur_line[-1].strip() == '':
+            cur_len -= len(cur_line[-1])
+            del cur_line[-1]
+        if cur_line:
+            lines.append(''.join(cur_line))
+        else:
+            if not rev:
+                break
+    return "\n".join(lines)
+```

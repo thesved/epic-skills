@@ -1,0 +1,111 @@
+```python
+import re
+
+# Same whitespace characters used by the stdlib textwrap module.
+_whitespace = '\t\n\x0b\x0c\r '
+
+def _build_wordsep_re():
+    word_punct = r'[\w!"\'&.,?]'
+    letter = r'[^\d\W]'
+    whitespace = r'[%s]' % re.escape(_whitespace)
+    nowhitespace = '[^' + whitespace[1:]
+
+    pattern = r'''
+        ( # any whitespace
+          %(ws)s+
+        | # em-dash between words
+          (?<=%(wp)s) -{2,} (?=\w)
+        | # word, possibly hyphenated
+          %(nws)s+? (?:
+            # hyphenated word
+              -(?: (?<=%(lt)s{2}-) | (?<=%(lt)s-%(lt)s-))
+              (?= %(lt)s -? %(lt)s)
+            | # end of word
+              (?=%(ws)s|\Z)
+            | # em-dash
+              (?<=%(wp)s) (?=-{2,}\w)
+            )
+        )''' % {'wp': word_punct, 'lt': letter,
+                 'ws': whitespace, 'nws': nowhitespace}
+    return re.compile(pattern, re.VERBOSE)
+
+
+_wordsep_re = _build_wordsep_re()
+
+_unicode_whitespace_trans = {ord(c): ' ' for c in _whitespace}
+
+
+def _munge_whitespace(text: str) -> str:
+    text = text.expandtabs()
+    text = text.translate(_unicode_whitespace_trans)
+    return text
+
+
+def _split(text: str):
+    chunks = _wordsep_re.split(text)
+    chunks = [c for c in chunks if c]
+    return chunks
+
+
+def _handle_long_word(reversed_chunks, cur_line, cur_len, width):
+    if width < 1:
+        space_left = 1
+    else:
+        space_left = width - cur_len
+
+    end = space_left
+    chunk = reversed_chunks[-1]
+
+    if len(chunk) > space_left:
+        hyphen = chunk.rfind('-', 0, space_left)
+        if hyphen > 0 and any(c != '-' for c in chunk[:hyphen]):
+            end = hyphen + 1
+
+    cur_line.append(chunk[:end])
+    reversed_chunks[-1] = chunk[end:]
+
+
+def _wrap_chunks(chunks, width):
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+
+    lines = []
+    chunks = chunks[::-1]
+
+    while chunks:
+        cur_line = []
+        cur_len = 0
+
+        cur_width = width
+
+        if chunks[-1].strip() == '' and lines:
+            del chunks[-1]
+
+        while chunks:
+            l = len(chunks[-1])
+            if cur_len + l <= cur_width:
+                cur_line.append(chunks.pop())
+                cur_len += l
+            else:
+                break
+
+        if chunks and len(chunks[-1]) > cur_width:
+            _handle_long_word(chunks, cur_line, cur_len, cur_width)
+            cur_len = sum(map(len, cur_line))
+
+        if cur_line and cur_line[-1].strip() == '':
+            cur_len -= len(cur_line[-1])
+            del cur_line[-1]
+
+        if cur_line:
+            lines.append(''.join(cur_line))
+
+    return lines
+
+
+def fill(text: str, width: int) -> str:
+    text = _munge_whitespace(text)
+    chunks = _split(text)
+    lines = _wrap_chunks(chunks, width)
+    return '\n'.join(lines)
+```

@@ -1,0 +1,53 @@
+```python
+import re
+
+_wordsep_re = re.compile(
+    r"("
+    r"\s+|"
+    r"[^\s\w]*\w+[^0-9\W]-(?=\w+[^0-9\W])|"
+    r"(?<=[\w!\"\'&.,?])-{2,}(?=\w)"
+    r")"
+)
+
+_whitespace_trans = str.maketrans("\t\n\x0b\x0c\r ", "      ")
+
+
+def fill(text: str, width: int = 70) -> str:
+    if width <= 0:
+        raise ValueError(f"invalid width {width!r} (must be > 0)")
+
+    text = text.expandtabs()
+    text = text.translate(_whitespace_trans)
+
+    chunks = [c for c in _wordsep_re.split(text) if c]
+    chunks.reverse()
+
+    lines = []
+    while chunks:
+        cur_line = []
+        cur_len = 0
+
+        if chunks[-1].strip() == "" and lines:
+            del chunks[-1]
+
+        while chunks:
+            chunk_len = len(chunks[-1])
+            if cur_len + chunk_len <= width:
+                cur_line.append(chunks.pop())
+                cur_len += chunk_len
+            else:
+                break
+
+        if chunks and len(chunks[-1]) > width:
+            space_left = 1 if width < 1 else width - cur_len
+            cur_line.append(chunks[-1][:space_left])
+            chunks[-1] = chunks[-1][space_left:]
+
+        if cur_line and cur_line[-1].strip() == "":
+            del cur_line[-1]
+
+        if cur_line:
+            lines.append("".join(cur_line))
+
+    return "\n".join(lines)
+```

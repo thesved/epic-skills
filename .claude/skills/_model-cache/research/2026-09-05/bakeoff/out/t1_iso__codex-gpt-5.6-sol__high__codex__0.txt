@@ -1,0 +1,70 @@
+```python
+import re
+
+
+_DURATION_RE = re.compile(
+    r"""
+    P(?:
+        (?:(?P<weeks>\d+(?:[.,]\d+)?)W)
+        |
+        (?:
+            (?:(?P<years>\d+(?:[.,]\d+)?)Y)?
+            (?:(?P<date_months>\d+(?:[.,]\d+)?)M)?
+            (?:(?P<days>\d+(?:[.,]\d+)?)D)?
+            (?:
+                (?P<time_marker>T)
+                (?:(?P<hours>\d+(?:[.,]\d+)?)H)?
+                (?:(?P<minutes>\d+(?:[.,]\d+)?)M)?
+                (?:(?P<seconds>\d+(?:[.,]\d+)?)S)?
+            )?
+        )
+    )
+    """,
+    re.VERBOSE,
+)
+
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str):
+        raise ValueError("duration must be a string")
+
+    match = _DURATION_RE.fullmatch(s)
+    if match is None:
+        raise ValueError("invalid ISO 8601 duration")
+
+    groups = match.groupdict()
+
+    if groups["weeks"] is not None:
+        return float(groups["weeks"].replace(",", ".")) * 7 * 86400
+
+    names = ("years", "date_months", "days", "hours", "minutes", "seconds")
+    present = [(name, groups[name]) for name in names if groups[name] is not None]
+
+    if not present:
+        raise ValueError("duration must contain at least one component")
+
+    if groups["time_marker"] is not None and not any(
+        groups[name] is not None for name in ("hours", "minutes", "seconds")
+    ):
+        raise ValueError("T must be followed by a time component")
+
+    for _, value in present[:-1]:
+        if "." in value or "," in value:
+            raise ValueError("only the last component may contain a fraction")
+
+    multipliers = {
+        "years": 365 * 86400,
+        "date_months": 30 * 86400,
+        "days": 86400,
+        "hours": 3600,
+        "minutes": 60,
+        "seconds": 1,
+    }
+
+    return float(
+        sum(
+            float(value.replace(",", ".")) * multipliers[name]
+            for name, value in present
+        )
+    )
+```

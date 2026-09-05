@@ -1,0 +1,7 @@
+- version control preserves a full history of every configuration change
+- teams can review config edits before they reach production
+- rolling back a broken setting becomes quick and painless
+- everyone works from the same trusted source of truth
+- commit messages explain why each setting was changed
+- tracked files make environments reproducible across machines and deployments
+- audits become easier when changes are visible and attributable

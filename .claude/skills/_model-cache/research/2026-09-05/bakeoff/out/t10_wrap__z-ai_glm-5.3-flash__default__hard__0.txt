@@ -1,0 +1,63 @@
+```python
+import re
+
+_WHITESPACE = '\t\n\x0b\x0c\r '
+_WHITESPACE_TRANS = str.maketrans(_WHITESPACE, ' ' * len(_WHITESPACE))
+
+# Indivisible chunks: runs of whitespace, plus the breakable prefixes of
+# hyphenated compound words (word characters followed by a hyphen that is
+# glued to another word character).  Ordinary words, dashes such as "--",
+# and trailing or standalone hyphens remain single chunks.
+_WORDSEP_RE = re.compile(r'(\s+|\w+-(?=\w))')
+
+
+def _munge_whitespace(text):
+    # expand_tabs=True (tabsize 8), replace_whitespace=True
+    return text.expandtabs().translate(_WHITESPACE_TRANS)
+
+
+def _split(text):
+    return [chunk for chunk in _WORDSEP_RE.split(text) if chunk]
+
+
+def _handle_long_word(reversed_chunks, cur_line, cur_len, width):
+    space_left = 1 if width < 1 else width - cur_len
+    if space_left > 0:
+        chunk = reversed_chunks[-1]
+        reversed_chunks[-1] = chunk[space_left:]
+        cur_line.append(chunk[:space_left])
+
+
+def _wrap_chunks(chunks, width):
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+    lines = []
+    chunks.reverse()
+    while chunks:
+        cur_len = 0
+        cur_line = []
+        # drop_whitespace=True: wrapped lines never start with whitespace
+        if chunks[-1].strip() == '' and lines:
+            del chunks[-1]
+        while chunks:
+            length = len(chunks[-1])
+            if cur_len + length <= width:
+                cur_line.append(chunks.pop())
+                cur_len += length
+            else:
+                break
+        # next chunk cannot fit on any line: break it (break_long_words=True)
+        if chunks and len(chunks[-1]) > width:
+            _handle_long_word(chunks, cur_line, cur_len, width)
+            cur_len = sum(map(len, cur_line))
+        # drop_whitespace=True: lines never end with whitespace
+        if cur_line and cur_line[-1].strip() == '':
+            del cur_line[-1]
+        if cur_line:
+            lines.append(''.join(cur_line))
+    return lines
+
+
+def fill(text: str, width: int) -> str:
+    return '\n'.join(_wrap_chunks(_split(_munge_whitespace(text)), width))
+```

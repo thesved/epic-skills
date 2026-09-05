@@ -1,0 +1,81 @@
+```python
+import re as _re
+
+_wordsep_re = _re.compile(
+    r'(\s+|'
+    r'[^\s\w]*\w+[^0-9\W]-(?=\w+[^0-9\W])|'
+    r'(?<=[\w\!\"\'\&\.\,\?])-{2,}(?=\w))'
+)
+_wordsep_simple_re = _re.compile(r'(\s+)')
+_whitespace_chars = '\t\n\x0b\x0c\r'
+_ws_trans = {ord(c): ord(' ') for c in _whitespace_chars}
+
+
+def _munge(text):
+    text = text.expandtabs(8)
+    text = text.translate(_ws_trans)
+    return text
+
+
+def _split(text, break_on_hyphens=True):
+    if break_on_hyphens:
+        chunks = _wordsep_re.split(text)
+    else:
+        chunks = _wordsep_simple_re.split(text)
+    return [c for c in chunks if c]
+
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % (width,))
+    break_long_words = True
+    break_on_hyphens = True
+    drop_whitespace = True
+
+    text = _munge(text)
+    chunks = _split(text, break_on_hyphens)
+    # reverse for efficient pop from the end (pop(0) would be O(n))
+    chunks = chunks[::-1]
+
+    lines = []
+    while chunks:
+        cur_line = []
+        cur_len = 0
+        w = width
+
+        if drop_whitespace and chunks[-1].strip() == '' and lines:
+            del chunks[-1]
+            if not chunks:
+                break
+
+        while chunks:
+            l = len(chunks[-1])
+            if cur_len + l <= w:
+                cur_line.append(chunks.pop())
+                cur_len += l
+            else:
+                if cur_line and cur_line[-1].strip() == '':
+                    cur_len -= len(cur_line[-1])
+                    del cur_line[-1]
+                if not cur_line:
+                    if break_long_words:
+                        if w < 1:
+                            space_left = 1
+                        else:
+                            space_left = w - cur_len
+                        cur_line.append(chunks[-1][:space_left])
+                        cur_len += len(cur_line[-1])
+                        chunks[-1] = chunks[-1][space_left:]
+                        if chunks[-1] == '':
+                            del chunks[-1]
+                    else:
+                        cur_line.append(chunks.pop())
+                        cur_len += len(cur_line[-1])
+                break
+
+        if drop_whitespace and cur_line and cur_line[-1].strip() == '':
+            del cur_line[-1]
+        lines.append(''.join(cur_line))
+
+    return '\n'.join(lines)
+```

@@ -24,7 +24,7 @@ Core insight: **Opus is not the best model for writing prompts Opus will execute
 **Model ids, pricing, call shapes, gotchas live in the cache - read before use:** `~/.claude/skills/_model-cache/openai.md`. For **how to prompt gpt-5.5/codex/realtime/gpt-image well** (spec/contract prompts, eagerness + reasoning_effort, AGENTS.md, voice-agent instructions, metaprompting for Opus) → `~/.claude/skills/_model-cache/examples/openai.md`. Don't hardcode ids; they drift and most `-codex`/`-pro` ids 400 on ChatGPT login.
 
 ## The one rule that breaks everything
-Pass the prompt via **stdin**, never a positional arg (positional hangs on "Reading additional input from stdin…"). On ChatGPT-account login use **`-m gpt-5.6-sol` / `-terra` / `-luna`** (bare `gpt-5.6` 400s; fallback `gpt-5.5`). `--skip-git-repo-check` outside a repo. Web search: `-c tools.web_search=true` (there is NO `--search` flag; it errors, verified 2026-08-14).
+Pass the prompt via **stdin**, never a positional arg (positional hangs on "Reading additional input from stdin…"). On ChatGPT-account login use **`-m gpt-5.6-sol` / `-terra` / `-luna`** (bare `gpt-5.6` 400s; fallback `gpt-5.5`). `-m gpt-6-astra` works on the ChatGPT Pro login since 2026-09-05 (CLI 0.153.4; `-c model_reasoning_effort=high`, `ultra` = Codex-only auto-subagents, skip by default); it burns the sub's allowance fast (100-900 local messages per 5 h on Pro 20x plus weekly limits), operating card in `_model-cache/examples/openai.md`. **Custom providers**: `wire_api = "chat"` is gone since 0.153, only `"responses"`; OpenRouter works that way for OpenAI models (`-c model_providers.openrouter.base_url="https://openrouter.ai/api/v1" -c model_providers.openrouter.env_key="OPENROUTER_API_KEY" -c model_providers.openrouter.wire_api="responses" -c model_provider=openrouter`), but **Meta Muse Spark rejects Codex's tool set** (400 "`name` must be at most 64 characters, got 66", verified 2026-09-05), so Muse is driven through openrouter-bridge or an own loop, never Codex. `--skip-git-repo-check` outside a repo. Web search: `-c tools.web_search=true` (there is NO `--search` flag; it errors, verified 2026-08-14).
 
 ## Modes
 
@@ -108,6 +108,9 @@ With `OPENAI_API_KEY` set (in `~/.zshrc`), the full API opens up - details + ver
 ### `smoke` / `verify` - is it actually working?
 - `bash ~/.claude/skills/codex-bridge/smoke.sh` → pings `gpt-5.6-sol` via stdin (`CODEX_MODEL=<id>` to override).
 - `bash ~/.claude/skills/_model-cache/verify.sh` → E2E PASS/FAIL across all providers (incl. openai text/codex/realtime).
+
+### `update` - keep the CLI fresh (the runner checks, you decide when)
+`codex update` (built-in; the `~/.local/bin/codex` shim pins the npm prefix so it updates the copy that runs, not a stale Volta/global one), then `codex doctor`. Do it at SESSION START only: the steer driver speaks the app-server protocol, which drifts per version, so an update under a live run breaks `driver.py`. `smoke.sh` prints installed vs latest; the `codex-runner` agent reports drift in every run report and never updates by itself.
 
 ### `update-models` - refresh the cache
 `bash ~/.claude/skills/_model-cache/update.sh openai` (needs `OPENAI_API_KEY`; on ChatGPT-login it's research-only - verify the id via `codex exec --help`), then web-research flagged models and edit `_model-cache/openai.md`.

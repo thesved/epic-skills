@@ -1,0 +1,89 @@
+```python
+import re
+
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str) or not s.startswith("P"):
+        raise ValueError(f"Invalid ISO 8601 duration string: {s!r}")
+
+    if "W" in s:
+        match = re.fullmatch(r"P(\d+(?:[.,]\d+)?)W", s)
+        if not match:
+            raise ValueError(f"Invalid duration with week component: {s!r}")
+        return float(match.group(1).replace(",", ".")) * 7 * 86400.0
+
+    rest = s[1:]
+    if not rest:
+        raise ValueError("Duration cannot consist solely of 'P'")
+
+    if "T" in rest:
+        parts = rest.split("T")
+        if len(parts) != 2:
+            raise ValueError("Multiple 'T' separators encountered")
+        date_str, time_str = parts
+        if not time_str:
+            raise ValueError("'T' designator must be followed by at least one time component")
+    else:
+        date_str, time_str = rest, None
+
+    date_pattern = re.compile(
+        r"^(?:(?P<Y>\d+(?:[.,]\d+)?)Y)?(?:(?P<M>\d+(?:[.,]\d+)?)M)?(?:(?P<D>\d+(?:[.,]\d+)?)D)?$"
+    )
+    time_pattern = re.compile(
+        r"^(?:(?P<H>\d+(?:[.,]\d+)?)H)?(?:(?P<M>\d+(?:[.,]\d+)?)M)?(?:(?P<S>\d+(?:[.,]\d+)?)S)?$"
+    )
+
+    factors = {
+        "Y": 365 * 86400.0,
+        "M_date": 30 * 86400.0,
+        "D": 86400.0,
+        "H": 3600.0,
+        "M_time": 60.0,
+        "S": 1.0,
+    }
+
+    components = []
+
+    date_match = date_pattern.fullmatch(date_str)
+    if date_match is None:
+        raise ValueError(f"Invalid date part in duration: {date_str!r}")
+
+    if date_match.group("Y") is not None:
+        components.append((date_match.group("Y"), "Y"))
+    if date_match.group("M") is not None:
+        components.append((date_match.group("M"), "M_date"))
+    if date_match.group("D") is not None:
+        components.append((date_match.group("D"), "D"))
+
+    if time_str is not None:
+        time_match = time_pattern.fullmatch(time_str)
+        if time_match is None:
+            raise ValueError(f"Invalid time part in duration: {time_str!r}")
+
+        time_components = []
+        if time_match.group("H") is not None:
+            time_components.append((time_match.group("H"), "H"))
+        if time_match.group("M") is not None:
+            time_components.append((time_match.group("M"), "M_time"))
+        if time_match.group("S") is not None:
+            time_components.append((time_match.group("S"), "S"))
+
+        if not time_components:
+            raise ValueError("'T' present without any valid time components")
+
+        components.extend(time_components)
+
+    if not components:
+        raise ValueError("No duration components found")
+
+    for value, _ in components[:-1]:
+        if "." in value or "," in value:
+            raise ValueError("Only the last present component may carry a decimal fraction")
+
+    total_seconds = sum(
+        float(value.replace(",", ".")) * factors[unit]
+        for value, unit in components
+    )
+
+    return float(total_seconds)
+```

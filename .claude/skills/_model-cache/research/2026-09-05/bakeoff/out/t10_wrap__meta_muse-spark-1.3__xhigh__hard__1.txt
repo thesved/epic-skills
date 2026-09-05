@@ -1,0 +1,35 @@
+```python
+import re
+_sep_pat = re.compile("(\\s+|[^\\s\\w]*\\w+[^0-9\\W]-(?=\\w+[^0-9\\W])|(?<=[\\w!\"'&.,?])-{2,}(?=\\w))")
+def fill(text: str, width: int) -> str:
+    s = text.expandtabs(8)
+    s = s.translate({ord(c): ord(" ") for c in "\t\n\v\f\r"})
+    pieces = [p for p in _sep_pat.split(s) if p]
+    pieces.reverse()
+    out = []
+    while pieces:
+        cur = []
+        cur_len = 0
+        if out and pieces[-1].strip() == "":
+            del pieces[-1]
+        while pieces:
+            l = len(pieces[-1])
+            if cur_len + l <= width:
+                cur.append(pieces.pop())
+                cur_len += l
+            else:
+                break
+        if pieces and len(pieces[-1]) > width:
+            if width < 1:
+                take = 1
+            else:
+                take = width - cur_len
+            cur.append(pieces[-1][:take])
+            pieces[-1] = pieces[-1][take:]
+            cur_len = sum(len(x) for x in cur)
+        if cur and cur[-1].strip() == "":
+            del cur[-1]
+        if cur:
+            out.append("".join(cur))
+    return "\n".join(out)
+```

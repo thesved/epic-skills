@@ -1,0 +1,49 @@
+t11_agent    openai/gpt-5.6-luna                      default  score=1.00 10s in=2837 out=248 r=76 $0.0009 OpenAI 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    openai/gpt-5.6-sol                       default  score=1.00 13s in=2837 out=232 r=62 $0.0080 OpenAI 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    meta/muse-spark-1.3                      default  score=1.00 13s in=7701 out=1036 r=540 $0.0077 Meta 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    google/gemini-3.7-flash                  default  score=1.00 16s in=2231 out=321 r=155 $0.0029 Google 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     openai/gpt-5.6-luna                      default  score=0.03 35s in=169 out=3672 r=3106 $0.0044 OpenAI 2/60 b phi delta beta-gamma beta-gamma kappa lambda ome 19 | FAIL 'mu sigma chi -b delta h
+t11_agent    z-ai/glm-5.3-flash                       default  score=1.00 28s in=3830 out=161 r=26 $0.0004 GMICloud 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    deepseek/deepseek-v4-pro-0813            default  score=1.00 18s in=6743 out=608 r=249 $0.0085 StreamLake 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     google/gemini-3.7-flash                  default  score=0.62 56s in=172 out=10393 r=9866 $0.0391 Google 37/60 FAIL 'state-of-the-art\nchi state-of-the-art -- tau tau phi state 19 | FAIL 'theta d
+t11_agent    anthropic/claude-sonnet-5                default  score=1.00 18s in=7643 out=479 r=64 $0.0201 Claude Platform on AWS 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     meta/muse-spark-1.3                      default  score=1.00 74s in=170 out=8255 r=7631 $0.0353 Meta 60/60 PASSED 60/60 | 
+t10_wrap     openai/gpt-5.6-sol                       default  score=0.95 90s in=169 out=5750 r=5178 $0.0578 OpenAI 57/60 FAIL 'theta delta chi a- hyper-connected supercalifragilisticexpi 10 | PASSED 57/60 
+t10_wrap     anthropic/claude-fable-5.1               default  score=1.00 33s in=255 out=3232 r=2112 $0.1641 Anthropic 60/60 PASSED 60/60 | 
+t11_agent    anthropic/claude-fable-5.1               default  score=1.00 26s in=7443 out=508 r=0 $0.0998 Anthropic 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    google/gemini-3.8-flash                  default  score=1.00 14s in=2231 out=342 r=176 $0.0030 Google 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    meta/muse-spark-1.3                      default  score=1.00 17s in=7701 out=1352 r=821 $0.0075 Meta 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    openai/gpt-5.6-sol                       default  score=1.00 14s in=2837 out=234 r=64 $0.0080 OpenAI 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     anthropic/claude-sonnet-5                default  score=0.50 110s in=253 out=12633 r=11331 $0.1268 Claude Platform on AWS 30/60 listicexpi 10 | FAIL '  alpha -b phi delta beta-gamma beta-gamma kappa lambda ome 19
+t11_agent    openai/gpt-5.6-luna                      default  score=1.00 10s in=2837 out=221 r=51 $0.0008 OpenAI 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     google/gemini-3.8-flash                  default  score=1.00 87s in=172 out=16092 r=15661 $0.0605 Google 60/60 PASSED 60/60 | 
+t10_wrap     openai/gpt-5.6-luna                      default  score=0.13 43s in=169 out=4178 r=3527 $0.0050 OpenAI 8/60 b phi delta beta-gamma beta-gamma kappa lambda ome 19 | FAIL 'mu sigma chi -b delta h
+t11_agent    google/gemini-3.7-flash                  default  score=1.00 14s in=2231 out=305 r=139 $0.0028 Google 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     google/gemini-3.7-flash                  default  score=0.72 26s in=172 out=3879 r=3453 $0.0147 Google 43/60 FAIL 'theta delta chi a- hyper-connected supercalifragilisticexpi 10 | FAIL '  alpha
+t10_wrap     openai/gpt-5.6-sol                       default  score=0.95 89s in=169 out=6118 r=5610 $0.0615 OpenAI 57/60 FAIL 'theta delta chi a- hyper-connected supercalifragilisticexpi 10 | PASSED 57/60 
+t11_agent    z-ai/glm-5.3-flash                       default  score=1.00 27s in=3838 out=162 r=27 $0.0005 BaseTen 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    deepseek/deepseek-v4-pro-0813            default  score=1.00 18s in=6922 out=612 r=253 $0.0098 StreamLake 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     deepseek/deepseek-v4-pro-0813            default  score=0.00 30s in=184 out=2541 r=2541 $0.0000 Together no PASSED line: Traceback (most recent call last): |   File "/private/var/folders/rp/q8kkn
+t11_agent    anthropic/claude-sonnet-5                default  score=1.00 16s in=7643 out=444 r=29 $0.0197 Claude Platform on AWS 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     anthropic/claude-sonnet-5                default  score=1.00 45s in=253 out=5888 r=4658 $0.0594 Claude Platform on AWS 60/60 PASSED 60/60 | 
+t11_agent    anthropic/claude-fable-5.1               default  score=1.00 29s in=7300 out=473 r=0 $0.0966 Anthropic 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     anthropic/claude-fable-5.1               default  score=1.00 41s in=255 out=3962 r=2923 $0.2006 Anthropic 60/60 PASSED 60/60 | 
+t11_agent    google/gemini-3.8-flash                  default  score=1.00 13s in=2231 out=348 r=182 $0.0030 Google 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     meta/muse-spark-1.3                      default  score=0.92 194s in=170 out=21620 r=20887 $0.0921 Meta 55/60 FAIL '  alpha -b phi delta beta-gamma beta-gamma kappa lambda ome 19 | PASSED 55/60 
+t10_wrap     google/gemini-3.8-flash                  default  score=1.00 153s in=172 out=27781 r=27341 $0.1043 Google 60/60 PASSED 60/60 | 
+t10_wrap     deepseek/deepseek-v4-pro-0813            default  score=0.00 951s in=250 out=67598 r=66925 $0.2251 Novita no PASSED line: Traceback (most recent call last): |   File "/private/var/folders/rp/q8kkn
+t10_wrap     z-ai/glm-5.3-flash                       default  score=0.95 1229s in=173 out=55287 r=54674 $0.0138 GMICloud 57/60 FAIL 'theta delta chi a- hyper-connected supercalifragilisticexpi 10 | PASSED 57/60 
+t10_wrap     z-ai/glm-5.3-flash                       default  score=0.68 2340s in=173 out=87823 r=86568 $0.0220 GMICloud 41/60 FAIL '  alpha -b phi delta beta-gamma beta-gamma kappa lambda ome 19 | FAIL 'mu sigm
+t11_agent    meta/muse-spark-1.3                      low      score=1.00 11s in=7701 out=900 r=408 $0.0069 Meta 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t11_agent    meta/muse-spark-1.3                      low      score=1.00 12s in=7701 out=785 r=292 $0.0051 Meta 3/3 pages=[1, 2, 3] sent=['Reka.Kovacs@Example.com paid total: 186.00'] ncalls=6
+t10_wrap     meta/muse-spark-1.3                      low      score=0.62 60s in=170 out=7495 r=6713 $0.0321 Meta 37/60 FAIL 'state-of-the-art\nchi state-of-the-art -- tau tau phi state 19 | FAIL 'theta d
+t10_wrap     meta/muse-spark-1.3                      low      score=0.95 85s in=170 out=9283 r=8436 $0.0397 Meta 57/60 FAIL 'theta delta chi a- hyper-connected supercalifragilisticexpi 10 | PASSED 57/60 
+t11_agent    meta/muse-spark-1.3                      xhigh    score=0.00 1s in=0 out=0 r=0 $0.0000 None ERROR {"message": "Provider returned error", "code": 503, "metadata": {"raw": "{\"error\":
+t11_agent    meta/muse-spark-1.3                      xhigh    score=0.00 62s in=3649 out=659 r=319 $0.0054 Meta ERROR {"message": "Provider returned error", "code": 503, "metadata": {"raw": "{\"error\":
+t10_wrap     meta/muse-spark-1.3                      xhigh    score=1.00 307s in=170 out=22942 r=22402 $0.0977 Meta 60/60 PASSED 60/60 | 
+t10_wrap     meta/muse-spark-1.3                      xhigh    score=1.00 379s in=170 out=28617 r=28045 $0.1218 Meta 60/60 PASSED 60/60 | 
+t10_wrap     codex/gpt-5.6-sol          high   score=0.95 81s tok={'input_tokens': 15791, 'cached_input_tokens': 11136, 'cache_write_input_tokens': 0, 'output_tokens': 3702, 'reasoning_output_tokens': 3106} 57/60 FAIL 'theta delta chi a- hyper-connected supercalifragilisticexpi 10 | PASSED 57/60 
+t10_wrap     codex/gpt-6-astra          high   score=1.00 91s tok={'input_tokens': 16686, 'cached_input_tokens': 12160, 'cache_write_input_tokens': 0, 'output_tokens': 2416, 'reasoning_output_tokens': 2003} 60/60 PASSED 60/60 | 
+t10_wrap     codex/gpt-5.6-sol          high   score=0.95 67s tok={'input_tokens': 15605, 'cached_input_tokens': 11136, 'cache_write_input_tokens': 0, 'output_tokens': 2791, 'reasoning_output_tokens': 2196} 57/60 FAIL 'theta delta chi a- hyper-connected supercalifragilisticexpi 10 | PASSED 57/60 
+t10_wrap     codex/gpt-6-astra          high   score=1.00 115s tok={'input_tokens': 16496, 'cached_input_tokens': 12160, 'cache_write_input_tokens': 0, 'output_tokens': 2936, 'reasoning_output_tokens': 2430} 60/60 PASSED 60/60 | 
+ALLDONE

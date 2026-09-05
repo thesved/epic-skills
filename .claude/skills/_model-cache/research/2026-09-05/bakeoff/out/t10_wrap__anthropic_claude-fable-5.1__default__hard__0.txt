@@ -1,0 +1,87 @@
+```python
+import re
+
+_WS_CHARS = '\t\n\x0b\x0c\r '
+_WS_TRANS = {ord(c): ord(' ') for c in _WS_CHARS}
+
+_ws = '[' + re.escape(_WS_CHARS) + ']'
+_nws = '[^' + re.escape(_WS_CHARS) + ']'
+_wp = r'[\w!"\'&.,?]'
+_lt = r'[^\d\W]'
+
+_WORDSEP_RE = re.compile(
+    '('
+    + _ws + '+'
+    + '|'
+    + '(?<=' + _wp + ')-{2,}(?=\\w)'
+    + '|'
+    + _nws + '+?(?:'
+    + '-(?:(?<=' + _lt + '{2}-)|(?<=' + _lt + '-' + _lt + '-))'
+    + '(?=' + _lt + '-?' + _lt + ')'
+    + '|'
+    + '(?=' + _ws + '|\\Z)'
+    + '|'
+    + '(?<=' + _wp + ')(?=-{2,}\\w)'
+    + ')'
+    + ')'
+)
+
+
+def _munge_whitespace(text: str) -> str:
+    text = text.expandtabs(8)
+    return text.translate(_WS_TRANS)
+
+
+def _split(text: str) -> list:
+    return [c for c in _WORDSEP_RE.split(text) if c]
+
+
+def _handle_long_word(rev_chunks: list, cur_line: list, cur_len: int, width: int) -> None:
+    if width < 1:
+        space_left = 1
+    else:
+        space_left = width - cur_len
+    end = space_left
+    chunk = rev_chunks[-1]
+    if len(chunk) > space_left:
+        hyphen = chunk.rfind('-', 0, space_left)
+        if hyphen > 0 and any(ch != '-' for ch in chunk[:hyphen]):
+            end = hyphen + 1
+    cur_line.append(chunk[:end])
+    rev_chunks[-1] = chunk[end:]
+
+
+def _wrap_chunks(chunks: list, width: int) -> list:
+    lines = []
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+    chunks = list(chunks)
+    chunks.reverse()
+    while chunks:
+        cur_line = []
+        cur_len = 0
+        if chunks[-1].strip() == '' and lines:
+            del chunks[-1]
+        while chunks:
+            l = len(chunks[-1])
+            if cur_len + l <= width:
+                cur_line.append(chunks.pop())
+                cur_len += l
+            else:
+                break
+        if chunks and len(chunks[-1]) > width:
+            _handle_long_word(chunks, cur_line, cur_len, width)
+            cur_len = sum(len(c) for c in cur_line)
+        if cur_line and cur_line[-1].strip() == '':
+            cur_len -= len(cur_line[-1])
+            del cur_line[-1]
+        if cur_line:
+            lines.append(''.join(cur_line))
+    return lines
+
+
+def fill(text: str, width: int) -> str:
+    text = _munge_whitespace(text)
+    chunks = _split(text)
+    return '\n'.join(_wrap_chunks(chunks, width))
+```

@@ -1,0 +1,64 @@
+```python
+import re
+
+_PATTERN = re.compile(
+    r"^P"
+    r"(?:(\d+(?:[.,]\d+)?)Y)?"
+    r"(?:(\d+(?:[.,]\d+)?)M)?"
+    r"(?:(\d+(?:[.,]\d+)?)W)?"
+    r"(?:(\d+(?:[.,]\d+)?)D)?"
+    r"(?:T"
+    r"(?:(\d+(?:[.,]\d+)?)H)?"
+    r"(?:(\d+(?:[.,]\d+)?)M)?"
+    r"(?:(\d+(?:[.,]\d+)?)S)?"
+    r")?$"
+)
+
+_MULTIPLIERS = (
+    365 * 86400.0,  # years
+    30 * 86400.0,   # months (date part)
+    7 * 86400.0,    # weeks
+    86400.0,        # days
+    3600.0,         # hours
+    60.0,           # minutes (time part)
+    1.0,            # seconds
+)
+
+_FRACTION_RE = re.compile(r"[.,]")
+
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str):
+        raise ValueError("duration must be a string")
+
+    match = _PATTERN.match(s)
+    if match is None:
+        raise ValueError("invalid ISO 8601 duration: %r" % (s,))
+
+    groups = match.groups()
+
+    # At least one component must be present ("P" alone, "PT" alone, "").
+    if all(g is None for g in groups):
+        raise ValueError("duration has no components: %r" % (s,))
+
+    # Weeks cannot be combined with any other component.
+    if groups[2] is not None and any(g is not None for i, g in enumerate(groups) if i != 2):
+        raise ValueError("weeks cannot be combined with other components: %r" % (s,))
+
+    # A 'T' separator must be followed by at least one time component.
+    if "T" in s and groups[4] is None and groups[5] is None and groups[6] is None:
+        raise ValueError("'T' must be followed by a time component: %r" % (s,))
+
+    # Only the LAST present component may carry a decimal fraction.
+    present = [g for g in groups if g is not None]
+    for g in present[:-1]:
+        if _FRACTION_RE.search(g):
+            raise ValueError("fraction allowed only on the last component: %r" % (s,))
+
+    total = 0.0
+    for g, multiplier in zip(groups, _MULTIPLIERS):
+        if g is not None:
+            total += float(g.replace(",", ".")) * multiplier
+
+    return float(total)
+```

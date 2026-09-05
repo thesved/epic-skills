@@ -1,0 +1,83 @@
+```python
+import re
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str) or s == "":
+        raise ValueError("Invalid duration")
+    if not s.startswith("P"):
+        raise ValueError("Invalid duration")
+    rest = s[1:]
+    if rest == "":
+        raise ValueError("Invalid duration")
+
+    if "W" in s:
+        m = re.fullmatch(r"(\d+(?:[.,]\d+)?)W", rest)
+        if m is None:
+            raise ValueError("Invalid duration")
+        num = m.group(1).replace(",", ".")
+        return float(num) * 7 * 86400.0
+
+    if rest.count("T") > 1:
+        raise ValueError("Invalid duration")
+
+    if "T" in rest:
+        date_part, time_part = rest.split("T", 1)
+        if time_part == "":
+            raise ValueError("Invalid duration")
+    else:
+        date_part = rest
+        time_part = None
+
+    if date_part == "" and time_part is None:
+        raise ValueError("Invalid duration")
+
+    y_s = m_d_s = d_s = h_s = mi_s = sec_s = None
+
+    if date_part != "":
+        md = re.fullmatch(
+            r"(?:(\d+(?:[.,]\d+)?)Y)?(?:(\d+(?:[.,]\d+)?)M)?(?:(\d+(?:[.,]\d+)?)D)?",
+            date_part,
+        )
+        if md is None:
+            raise ValueError("Invalid duration")
+        y_s, m_d_s, d_s = md.group(1), md.group(2), md.group(3)
+        if y_s is None and m_d_s is None and d_s is None:
+            raise ValueError("Invalid duration")
+    else:
+        if time_part is None:
+            raise ValueError("Invalid duration")
+
+    if time_part is not None:
+        mt = re.fullmatch(
+            r"(?:(\d+(?:[.,]\d+)?)H)?(?:(\d+(?:[.,]\d+)?)M)?(?:(\d+(?:[.,]\d+)?)S)?",
+            time_part,
+        )
+        if mt is None:
+            raise ValueError("Invalid duration")
+        h_s, mi_s, sec_s = mt.group(1), mt.group(2), mt.group(3)
+        if h_s is None and mi_s is None and sec_s is None:
+            raise ValueError("Invalid duration")
+
+    ordered = [y_s, m_d_s, d_s, h_s, mi_s, sec_s]
+    present_idx = [i for i, v in enumerate(ordered) if v is not None]
+    if not present_idx:
+        raise ValueError("Invalid duration")
+    last = present_idx[-1]
+    for i in present_idx:
+        v = ordered[i]
+        if ("." in v or "," in v) and i != last:
+            raise ValueError("Invalid duration")
+
+    def val(x):
+        return float(x.replace(",", ".")) if x is not None else 0.0
+
+    total = (
+        val(y_s) * 365 * 86400.0
+        + val(m_d_s) * 30 * 86400.0
+        + val(d_s) * 86400.0
+        + val(h_s) * 3600.0
+        + val(mi_s) * 60.0
+        + val(sec_s)
+    )
+    return float(total)
+```

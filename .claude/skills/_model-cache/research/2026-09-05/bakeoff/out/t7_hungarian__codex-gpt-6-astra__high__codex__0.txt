@@ -1,0 +1,5 @@
+Egy cégben sokféle feladat van, és nem biztos, hogy ugyanaz a mesterséges intelligencia mindegyikben ugyanolyan jó. Az egyik modell ügyesebben fogalmaz, a másik pontosabban elemez adatokat, a harmadik gyorsan megold egyszerűbb feladatokat. Ha többet használsz, könnyebben választhatsz az adott munkához megfelelőt.
+
+Ezzel időt és pénzt is megtakaríthatsz: egy rövid levél megírásához nem feltétlenül kell a drágább, összetettebb feladatokra szánt modell. Fontos döntéseknél pedig összevetheted több modell válaszát, így könnyebben észreveheted az eltéréseket. Ettől még tévedhetnek ugyanúgy, ezért az emberi ellenőrzést nem érdemes kihagynod.
+
+A több modell nagyobb mozgásteret is ad: ha az egyik szolgáltatás leáll vagy megdrágul, könnyebben válthatsz másikra. Cserébe több odafigyelést igényel a használatuk és a céges adatok védelme. Akkor éri meg, ha mindegyiknek világos szerepet adsz, és megnézed, valóban javítja-e a munka minőségét, gyorsaságát vagy költségét.

@@ -1,0 +1,7 @@
+- versioned configuration files make changes traceable and easy to review
+- teams can safely reproduce environments across machines and deployments
+- history reveals who changed settings and why they changed them
+- peer review catches mistakes before configurations reach production systems
+- rollback becomes simple when a recent change causes unexpected problems
+- automated testing can validate configuration changes alongside application updates
+- shared repositories preserve organizational knowledge beyond individual team members

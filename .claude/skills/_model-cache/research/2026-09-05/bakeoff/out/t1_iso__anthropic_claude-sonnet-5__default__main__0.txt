@@ -1,0 +1,81 @@
+```python
+import re
+
+
+def parse_duration(s: str) -> float:
+    if not isinstance(s, str) or len(s) == 0:
+        raise ValueError("Empty duration string")
+    if s[0] != 'P' or len(s) == 1:
+        raise ValueError("Duration must start with 'P' and have content")
+
+    rest = s[1:]
+
+    # Handle week format (mutually exclusive with everything else)
+    if 'W' in rest:
+        m = re.fullmatch(r'(\d+(?:[.,]\d+)?)W', rest)
+        if not m:
+            raise ValueError("Invalid week duration")
+        num = m.group(1).replace(',', '.')
+        return float(num) * 7 * 86400.0
+
+    if 'T' in rest:
+        date_part, _, time_part = rest.partition('T')
+        if time_part == '':
+            raise ValueError("'T' must be followed by at least one time component")
+    else:
+        date_part = rest
+        time_part = ''
+
+    def parse_component(part, allowed):
+        if part == '':
+            return {}, []
+        matches = re.findall(r'(\d+(?:[.,]\d+)?)([A-Za-z])', part)
+        reconstructed = ''.join(f'{num}{letter}' for num, letter in matches)
+        if reconstructed != part or not matches:
+            raise ValueError(f"Invalid component: {part}")
+        result = {}
+        ordered_values = []
+        last_index = -1
+        for num, letter in matches:
+            if letter not in allowed:
+                raise ValueError(f"Unknown or invalid component letter: {letter}")
+            idx = allowed.index(letter)
+            if idx <= last_index:
+                raise ValueError("Repeated or out-of-order component")
+            last_index = idx
+            result[letter] = num
+            ordered_values.append(num)
+        return result, ordered_values
+
+    date_map, date_values = parse_component(date_part, ['Y', 'M', 'D'])
+    time_map, time_values = parse_component(time_part, ['H', 'M', 'S'])
+
+    if not date_map and not time_map:
+        raise ValueError("No valid duration components found")
+
+    all_values = date_values + time_values
+    if not all_values:
+        raise ValueError("No valid duration components found")
+
+    # Only the last component overall may have a fraction
+    for v in all_values[:-1]:
+        if '.' in v or ',' in v:
+            raise ValueError("Only the last component may have a fractional value")
+
+    total = 0.0
+
+    if 'Y' in date_map:
+        total += float(date_map['Y'].replace(',', '.')) * 365 * 86400.0
+    if 'M' in date_map:
+        total += float(date_map['M'].replace(',', '.')) * 30 * 86400.0
+    if 'D' in date_map:
+        total += float(date_map['D'].replace(',', '.')) * 86400.0
+    if 'H' in time_map:
+        total += float(time_map['H'].replace(',', '.')) * 3600.0
+    if 'M' in time_map:
+        total += float(time_map['M'].replace(',', '.')) * 60.0
+    if 'S' in time_map:
+        total += float(time_map['S'].replace(',', '.'))
+
+    return float(total)
+```

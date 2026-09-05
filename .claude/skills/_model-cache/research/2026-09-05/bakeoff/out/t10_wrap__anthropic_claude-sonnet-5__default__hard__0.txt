@@ -1,0 +1,119 @@
+```python
+import re
+
+# --- internal constants replicating the whitespace handling rules -------
+
+_WHITESPACE = '\t\n\x0b\x0c\r '
+
+_whitespace_trans = {ord(c): ord(' ') for c in _WHITESPACE}
+
+# --- word separation regex (mirrors the word/hyphen splitting behaviour) --
+
+_word_punct = r'[\w!"\'&.,?]'
+_letter = r'[^\d\W]'
+_ws_class = r'[%s]' % re.escape(_WHITESPACE)
+_nows_class = '[^' + _ws_class[1:]
+
+_wordsep_re = re.compile(r'''
+    ( # any whitespace
+      %(ws)s+
+    | # em-dash between words
+      (?<=%(wp)s) -{2,} (?=\w)
+    | # word, possibly hyphenated
+      %(nws)s+? (?:
+        # hyphenated word
+          -(?: (?<=%(lt)s{2}-) | (?<=%(lt)s-%(lt)s-))
+          (?= %(lt)s -? %(lt)s)
+        | # end of word
+          (?=%(ws)s|\Z)
+        | # em-dash
+          (?<=%(wp)s) (?=-{2,}\w)
+        )
+    )''' % {'wp': _word_punct, 'lt': _letter,
+             'ws': _ws_class, 'nws': _nows_class},
+    re.VERBOSE)
+
+
+def _munge_whitespace(text: str) -> str:
+    # expand_tabs
+    text = text.expandtabs()
+    # replace_whitespace
+    text = text.translate(_whitespace_trans)
+    return text
+
+
+def _split(text: str):
+    chunks = _wordsep_re.split(text)
+    chunks = [c for c in chunks if c]
+    return chunks
+
+
+def _handle_long_word(reversed_chunks, cur_line, cur_len, width):
+    if width < 1:
+        space_left = 1
+    else:
+        space_left = width - cur_len
+
+    end = space_left
+    chunk = reversed_chunks[-1]
+
+    if len(chunk) > space_left:
+        hyphen = chunk.rfind('-', 0, space_left)
+        if hyphen > 0 and any(c != '-' for c in chunk[:hyphen]):
+            end = hyphen + 1
+
+    cur_line.append(chunk[:end])
+    reversed_chunks[-1] = chunk[end:]
+
+
+def _wrap_chunks(chunks, width):
+    lines = []
+
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+
+    chunks = list(reversed(chunks))
+
+    while chunks:
+        cur_line = []
+        cur_len = 0
+
+        # no indentation used (initial_indent = subsequent_indent = '')
+        indent = ''
+        w = width - len(indent)
+
+        if chunks[-1].strip() == '' and lines:
+            del chunks[-1]
+
+        while chunks:
+            l = len(chunks[-1])
+
+            if cur_len + l <= w:
+                cur_line.append(chunks.pop())
+                cur_len += l
+            else:
+                break
+
+        if chunks and len(chunks[-1]) > w:
+            _handle_long_word(chunks, cur_line, cur_len, w)
+            cur_len = sum(map(len, cur_line))
+
+        if cur_line and cur_line[-1].strip() == '' and lines:
+            cur_len -= len(cur_line[-1])
+            del cur_line[-1]
+
+        if cur_line:
+            lines.append(indent + ''.join(cur_line))
+
+    return lines
+
+
+def wrap(text: str, width: int):
+    text = _munge_whitespace(text)
+    chunks = _split(text)
+    return _wrap_chunks(chunks, width)
+
+
+def fill(text: str, width: int) -> str:
+    return '\n'.join(wrap(text, width))
+```

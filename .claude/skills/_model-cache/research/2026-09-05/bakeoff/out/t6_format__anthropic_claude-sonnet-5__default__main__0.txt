@@ -1,0 +1,7 @@
+- version control tracks every change made to configuration files
+- teams can quickly roll back to previous working configurations
+- it enables clear visibility into who changed what settings
+- collaborators avoid conflicts by merging configuration updates safely together
+- history logs help teams audit changes for compliance reasons
+- branching allows safe experimentation without breaking production configuration files
+- it improves onboarding by showing configuration evolution over time

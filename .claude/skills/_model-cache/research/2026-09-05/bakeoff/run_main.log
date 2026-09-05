@@ -1,0 +1,106 @@
+t4_reason    meta/muse-spark-1.3                      default  score=1.00 6s in=121 out=975 r=922 $0.0043 Meta 6/6 got=[1060, 31, 60, 576, 130, 60]
+t5_needle    meta/muse-spark-1.3                      default  score=1.00 7s in=51507 out=619 r=562 $0.0670 Meta 3/3
+t3_extract   meta/muse-spark-1.3                      default  score=1.00 11s in=407 out=1324 r=1175 $0.0061 Meta 9/9 due=2026-09-06 total=1028.7
+t8_vision    meta/muse-spark-1.3                      default  score=1.00 7s in=231 out=835 r=773 $0.0038 Meta 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t9_tools     meta/muse-spark-1.3                      default  score=1.00 9s in=3342 out=594 r=353 $0.0042 Meta 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21.0}), (
+t6_format    meta/muse-spark-1.3                      default  score=1.00 16s in=56 out=1906 r=1765 $0.0082 Meta 5/5 lines=7
+t3_extract   openai/gpt-5.6-sol                       default  score=1.00 2s in=529 out=120 r=0 $0.0023 OpenAI 9/9 due=2026-09-06 total=1028.7
+t2_bugfix    meta/muse-spark-1.3                      default  score=1.00 18s in=492 out=2456 r=1993 $0.0111 Meta 12/12 PASSED 12/12 | 
+t5_needle    openai/gpt-5.6-sol                       default  score=1.00 2s in=51497 out=31 r=0 $0.1291 OpenAI 3/3
+t4_reason    openai/gpt-5.6-sol                       default  score=1.00 4s in=121 out=165 r=145 $0.0019 OpenAI 6/6 got=[1060, 31, 60, 576, 130, 60]
+t8_vision    openai/gpt-5.6-sol                       default  score=1.00 3s in=248 out=114 r=91 $0.0016 OpenAI 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t6_format    openai/gpt-5.6-sol                       default  score=1.00 6s in=55 out=357 r=266 $0.0037 OpenAI 5/5 lines=7
+t2_bugfix    openai/gpt-5.6-sol                       default  score=1.00 11s in=491 out=853 r=516 $0.0095 OpenAI 12/12 PASSED 12/12 | 
+t7_hungarian openai/gpt-5.6-sol                       default  score=0.67 5s in=117 out=281 r=20 $0.0030 OpenAI 2/3 paras=3 words=116 hu=62
+t3_extract   openai/gpt-5.6-luna                      default  score=1.00 3s in=529 out=190 r=66 $0.0003 OpenAI 9/9 due=2026-09-06 total=1028.7
+t9_tools     openai/gpt-5.6-sol                       default  score=1.00 7s in=866 out=86 r=14 $0.0026 OpenAI 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t4_reason    openai/gpt-5.6-luna                      default  score=1.00 3s in=121 out=236 r=216 $0.0003 OpenAI 6/6 got=[1060, 31, 60, 576, 130, 60]
+t1_iso       openai/gpt-5.6-sol                       default  score=0.00 20s in=251 out=1328 r=760 $0.0138 OpenAI 0/24  183') | FAIL wrong exc 'P1H' error('unbalanced parenthesis at position 183') | FAIL 
+t7_hungarian meta/muse-spark-1.3                      default  score=1.00 33s in=102 out=2429 r=2010 $0.0105 Meta 3/3 paras=3 words=165 hu=79
+t5_needle    openai/gpt-5.6-luna                      default  score=1.00 2s in=51497 out=77 r=44 $0.0130 OpenAI 3/3
+t2_bugfix    openai/gpt-5.6-luna                      default  score=1.00 9s in=491 out=852 r=516 $0.0011 OpenAI 12/12 PASSED 12/12 | 
+t6_format    openai/gpt-5.6-luna                      default  score=1.00 4s in=55 out=338 r=251 $0.0004 OpenAI 5/5 lines=7
+t8_vision    openai/gpt-5.6-luna                      default  score=1.00 3s in=248 out=144 r=121 $0.0002 OpenAI 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t7_hungarian openai/gpt-5.6-luna                      default  score=1.00 5s in=117 out=375 r=44 $0.0005 OpenAI 3/3 paras=3 words=126 hu=84
+t9_tools     openai/gpt-5.6-luna                      default  score=1.00 5s in=866 out=87 r=15 $0.0003 OpenAI 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t4_reason    google/gemini-3.7-flash                  default  score=1.00 7s in=131 out=699 r=671 $0.0027 Google 6/6 got=[1060, 31, 60, 576, 130, 60]
+t3_extract   google/gemini-3.7-flash                  default  score=1.00 8s in=790 out=833 r=709 $0.0037 Google 9/9 due=2026-09-06 total=1028.7
+t5_needle    google/gemini-3.7-flash                  default  score=1.00 7s in=53410 out=481 r=429 $0.0419 Google 3/3
+t1_iso       openai/gpt-5.6-luna                      default  score=1.00 20s in=251 out=2140 r=1552 $0.0026 OpenAI 24/24 PASSED 24/24 | 
+t8_vision    google/gemini-3.7-flash                  default  score=1.00 7s in=1143 out=590 r=557 $0.0031 Google 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t9_tools     google/gemini-3.7-flash                  default  score=1.00 9s in=711 out=164 r=102 $0.0011 Google 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t2_bugfix    google/gemini-3.7-flash                  default  score=1.00 20s in=550 out=3019 r=2647 $0.0117 Google 12/12 PASSED 12/12 | 
+t6_format    google/gemini-3.7-flash                  default  score=1.00 14s in=50 out=2350 r=2274 $0.0089 Google 5/5 lines=7
+t7_hungarian google/gemini-3.7-flash                  default  score=1.00 14s in=110 out=1436 r=988 $0.0055 Google 3/3 paras=3 words=190 hu=127
+t1_iso       google/gemini-3.7-flash                  default  score=1.00 25s in=265 out=4235 r=3283 $0.0161 Google 24/24 PASSED 24/24 | 
+t5_needle    z-ai/glm-5.3-flash                       default  score=1.00 2s in=52298 out=45 r=0 $0.0079 BaseTen 3/3
+t1_iso       z-ai/glm-5.3-flash                       default  score=1.00 9s in=259 out=1896 r=1267 $0.0010 BaseTen 24/24 PASSED 24/24 | 
+t6_format    z-ai/glm-5.3-flash                       default  score=1.00 3s in=62 out=431 r=344 $0.0002 BaseTen 5/5 lines=7
+t8_vision    z-ai/glm-5.3-flash                       default  score=1.00 1s in=263 out=88 r=63 $0.0001 BaseTen 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t3_extract   z-ai/glm-5.3-flash                       default  score=1.00 7s in=438 out=236 r=41 $0.0001 Wafer 9/9 due=2026-09-06 total=1028.7
+t7_hungarian z-ai/glm-5.3-flash                       default  score=1.00 5s in=139 out=553 r=24 $0.0003 BaseTen 3/3 paras=3 words=221 hu=116
+t1_iso       meta/muse-spark-1.3                      default  score=1.00 71s in=252 out=7956 r=6877 $0.0341 Meta 24/24 PASSED 24/24 | 
+t3_extract   deepseek/deepseek-v4-pro-0813            default  score=1.00 9s in=764 out=505 r=406 $0.0030 NextBit 9/9 due=2026-09-06 total=1028.7
+t4_reason    z-ai/glm-5.3-flash                       default  score=0.83 21s in=151 out=356 r=335 $0.0001 Wafer 5/6 got=[1060, 30, 60, 576, 130, 60]
+t9_tools     z-ai/glm-5.3-flash                       default  score=1.00 17s in=1829 out=177 r=125 $0.0003 BaseTen 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t5_needle    deepseek/deepseek-v4-pro-0813            default  score=1.00 4s in=51953 out=114 r=92 $0.0685 CoreWeave 3/3
+t8_vision    deepseek/deepseek-v4-pro-0813            default  score=0.00 0s in=0 out=0 r=0 $0.0000 None ERROR {"message": "No endpoints found that support image input", "code": 404, "metadata": 
+t4_reason    deepseek/deepseek-v4-pro-0813            default  score=1.00 10s in=198 out=1324 r=1311 $0.0037 DeepInfra 6/6 got=[1060, 31, 60, 576, 130, 60]
+t6_format    deepseek/deepseek-v4-pro-0813            default  score=1.00 6s in=132 out=614 r=604 $0.0026 CoreWeave 5/5 lines=7
+t9_tools     deepseek/deepseek-v4-pro-0813            default  score=1.00 8s in=2612 out=205 r=59 $0.0036 StreamLake 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t2_bugfix    z-ai/glm-5.3-flash                       default  score=1.00 34s in=494 out=1863 r=1530 $0.0005 GMICloud 12/12 PASSED 12/12 | 
+t2_bugfix    anthropic/claude-sonnet-5                default  score=1.00 6s in=761 out=582 r=78 $0.0073 Claude Platform on AWS 12/12 PASSED 12/12 | 
+t3_extract   anthropic/claude-sonnet-5                default  score=1.00 6s in=1173 out=270 r=90 $0.0050 Claude Platform on AWS 9/9 due=2026-09-06 total=1028.7
+t5_needle    anthropic/claude-sonnet-5                default  score=0.00 4s in=0 out=0 r=0 $0.0000 Claude Platform on AWS 0/3
+t2_bugfix    deepseek/deepseek-v4-pro-0813            default  score=1.00 33s in=519 out=2001 r=1562 $0.0086 DigitalOcean 12/12 PASSED 12/12 | 
+t4_reason    anthropic/claude-sonnet-5                default  score=1.00 12s in=180 out=792 r=772 $0.0083 Claude Platform on AWS 6/6 got=[1060, 31, 60, 576, 130, 60]
+t8_vision    anthropic/claude-sonnet-5                default  score=1.00 6s in=294 out=189 r=160 $0.0025 Claude Platform on AWS 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t6_format    anthropic/claude-sonnet-5                default  score=1.00 10s in=84 out=833 r=697 $0.0085 Claude Platform on AWS 5/5 lines=7
+t9_tools     anthropic/claude-sonnet-5                default  score=1.00 8s in=3205 out=197 r=30 $0.0084 Claude Platform on AWS 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t7_hungarian deepseek/deepseek-v4-pro-0813            default  score=1.00 30s in=204 out=1645 r=1143 $0.0058 GMICloud 3/3 paras=3 words=183 hu=89
+t2_bugfix    anthropic/claude-fable-5.1               default  score=1.00 9s in=763 out=589 r=0 $0.0371 Anthropic 12/12 PASSED 12/12 | 
+t7_hungarian anthropic/claude-sonnet-5                default  score=1.00 19s in=165 out=804 r=55 $0.0084 Claude Platform on AWS 3/3 paras=3 words=223 hu=134
+t3_extract   anthropic/claude-fable-5.1               default  score=1.00 7s in=1175 out=211 r=0 $0.0223 Anthropic 9/9 due=2026-09-06 total=1028.7
+t4_reason    anthropic/claude-fable-5.1               default  score=1.00 8s in=182 out=236 r=215 $0.0136 Anthropic 6/6 got=[1060, 31, 60, 576, 130, 60]
+t5_needle    anthropic/claude-fable-5.1               default  score=1.00 5s in=91896 out=45 r=0 $0.9212 Anthropic 3/3
+t8_vision    anthropic/claude-fable-5.1               default  score=0.67 5s in=296 out=30 r=0 $0.0045 Anthropic 2/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.9} want={'rows': 5, 'total_qty': 5
+t1_iso       anthropic/claude-sonnet-5                default  score=1.00 43s in=350 out=4939 r=3860 $0.0501 Claude Platform on AWS 24/24 PASSED 24/24 | 
+t6_format    anthropic/claude-fable-5.1               default  score=1.00 11s in=86 out=676 r=558 $0.0347 Anthropic 5/5 lines=7
+t3_extract   google/gemini-3.8-flash                  default  score=1.00 4s in=790 out=493 r=369 $0.0024 Google 9/9 due=2026-09-06 total=1028.7
+t9_tools     anthropic/claude-fable-5.1               default  score=1.00 16s in=2995 out=204 r=21 $0.0401 Anthropic 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t4_reason    google/gemini-3.8-flash                  default  score=1.00 7s in=131 out=1089 r=1061 $0.0042 Google 6/6 got=[1060, 31, 60, 576, 130, 60]
+t1_iso       anthropic/claude-fable-5.1               default  score=1.00 35s in=352 out=2820 r=1657 $0.1445 Anthropic 24/24 PASSED 24/24 | 
+t5_needle    google/gemini-3.8-flash                  default  score=1.00 5s in=53410 out=312 r=260 $0.0412 Google 3/3
+t7_hungarian anthropic/claude-fable-5.1               default  score=1.00 26s in=167 out=882 r=0 $0.0458 Anthropic 3/3 paras=3 words=262 hu=141
+t8_vision    google/gemini-3.8-flash                  default  score=1.00 5s in=1143 out=448 r=415 $0.0025 Google 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t7_hungarian google/gemini-3.8-flash                  default  score=1.00 11s in=110 out=1254 r=775 $0.0048 Google 3/3 paras=3 words=211 hu=145
+t6_format    google/gemini-3.8-flash                  default  score=1.00 13s in=50 out=2024 r=1940 $0.0076 Google 5/5 lines=7
+t9_tools     google/gemini-3.8-flash                  default  score=1.00 7s in=711 out=192 r=130 $0.0013 Google 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21}), ('s
+t1_iso       google/gemini-3.8-flash                  default  score=1.00 35s in=265 out=5318 r=4582 $0.0201 Google 24/24 PASSED 24/24 | 
+t2_bugfix    google/gemini-3.8-flash                  default  score=1.00 48s in=550 out=9180 r=8800 $0.0348 Google 12/12 PASSED 12/12 | 
+t1_iso       deepseek/deepseek-v4-pro-0813            default  score=0.00 157s in=329 out=16384 r=16381 $0.0430 DeepInfra no PASSED line: Traceback (most recent call last): |   File "/private/var/folders/rp/q8kkn
+t3_extract   meta/muse-spark-1.3                      low      score=1.00 5s in=407 out=624 r=496 $0.0032 Meta 9/9 due=2026-09-06 total=1028.7
+t4_reason    meta/muse-spark-1.3                      low      score=1.00 8s in=121 out=836 r=797 $0.0037 Meta 6/6 got=[1060, 31, 60, 576, 130, 60]
+t2_bugfix    meta/muse-spark-1.3                      low      score=1.00 10s in=492 out=1151 r=715 $0.0055 Meta 12/12 PASSED 12/12 | 
+t5_needle    meta/muse-spark-1.3                      low      score=1.00 9s in=51507 out=199 r=157 $0.0652 Meta 3/3
+t6_format    meta/muse-spark-1.3                      low      score=1.00 7s in=56 out=918 r=792 $0.0040 Meta 5/5 lines=7
+t8_vision    meta/muse-spark-1.3                      low      score=1.00 5s in=231 out=666 r=618 $0.0031 Meta 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t9_tools     meta/muse-spark-1.3                      low      score=1.00 7s in=3342 out=423 r=186 $0.0034 Meta 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21.0}), (
+t1_iso       meta/muse-spark-1.3                      low      score=1.00 25s in=252 out=3216 r=2371 $0.0140 Meta 24/24 PASSED 24/24 | 
+t7_hungarian meta/muse-spark-1.3                      low      score=1.00 18s in=102 out=1710 r=1332 $0.0074 Meta 3/3 paras=3 words=127 hu=64
+t3_extract   meta/muse-spark-1.3                      xhigh    score=1.00 23s in=407 out=1752 r=1599 $0.0080 Meta 9/9 due=2026-09-06 total=1028.7
+t4_reason    meta/muse-spark-1.3                      xhigh    score=1.00 24s in=121 out=1946 r=1888 $0.0084 Meta 6/6 got=[1060, 31, 60, 576, 130, 60]
+t5_needle    meta/muse-spark-1.3                      xhigh    score=1.00 10s in=51507 out=530 r=471 $0.0666 Meta 3/3
+t6_format    meta/muse-spark-1.3                      xhigh    score=1.00 28s in=56 out=2146 r=1982 $0.0092 Meta 5/5 lines=7
+t8_vision    meta/muse-spark-1.3                      xhigh    score=1.00 12s in=231 out=1228 r=1157 $0.0055 Meta 3/3 got={'rows': 5, 'total_qty': 556, 'total_cost': 154.1} want={'rows': 5, 'total_qty': 5
+t7_hungarian meta/muse-spark-1.3                      xhigh    score=1.00 37s in=102 out=2075 r=1672 $0.0089 Meta 3/3 paras=3 words=138 hu=75
+t9_tools     meta/muse-spark-1.3                      xhigh    score=1.00 14s in=3342 out=742 r=490 $0.0047 Meta 3/3 calls=[('get_weather', {'city': 'Budapest'}), ('convert_c_to_f', {'celsius': 21.0}), (
+t2_bugfix    meta/muse-spark-1.3                      xhigh    score=1.00 143s in=492 out=8673 r=8103 $0.0375 Meta 12/12 PASSED 12/12 | 
+t1_iso       meta/muse-spark-1.3                      xhigh    score=1.00 315s in=252 out=22476 r=21264 $0.0958 Meta 24/24 PASSED 24/24 | 
+t4_reason    meta/muse-spark-1.3                      default  score=1.00 6s in=121 out=901 r=852 $0.0039 Meta 6/6 got=[1060, 31, 60, 576, 130, 60]
+t1_iso       meta/muse-spark-1.3                      default  score=1.00 49s in=252 out=5830 r=4826 $0.0248 Meta 24/24 PASSED 24/24 | 
+t1_iso       meta/muse-spark-1.3                      default  score=1.00 50s in=252 out=6548 r=5562 $0.0279 Meta 24/24 PASSED 24/24 | 
+t4_reason    meta/muse-spark-1.3                      default  score=1.00 6s in=121 out=1035 r=983 $0.0044 Meta 6/6 got=[1060, 31, 60, 576, 130, 60]
+t2_bugfix    meta/muse-spark-1.3                      default  score=1.00 70s in=492 out=2434 r=2015 $0.0104 Meta 12/12 PASSED 12/12 | 
+t2_bugfix    meta/muse-spark-1.3                      default  score=1.00 72s in=492 out=3547 r=3036 $0.0152 Meta 12/12 PASSED 12/12 | 
+ALLDONE

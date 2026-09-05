@@ -1,0 +1,21 @@
+spark13lo  low      pass=11/11 tests_ok=True 26s turns=6 tools=10 sh=1 w=2 in=20585 out=3140 r=1558 $0.023 err=None
+luna       default  pass=11/11 tests_ok=True 32s turns=8 tools=12 sh=2 w=3 in=21957 out=2696 r=826 $0.005 err=None
+sol        high     pass=11/11 tests_ok=True 41s turns=6 tools=11 sh=2 w=2 in=23955 out=2826 r=1434 $0.048 err=None
+spark13    default  pass=11/11 tests_ok=True 61s turns=6 tools=10 sh=1 w=2 in=24581 out=4606 r=2845 $0.032 err=None
+glmflash   high     pass=11/11 tests_ok=True 46s turns=5 tools=10 sh=1 w=2 in=8880 out=1437 r=230 $0.001 err=None
+sonnet5    default  pass=11/11 tests_ok=True 29s turns=7 tools=11 sh=2 w=2 in=25022 out=2233 r=324 $0.072 err=None
+gem37      default  pass=11/11 tests_ok=True 70s turns=12 tools=19 sh=6 w=2 in=106897 out=8130 r=6726 $0.073 err=None
+spark13lo  low      pass=11/11 tests_ok=True 28s turns=6 tools=10 sh=1 w=2 in=20205 out=3032 r=1398 $0.025 err=None
+spark13    default  pass=11/11 tests_ok=True 50s turns=7 tools=11 sh=2 w=2 in=38246 out=5581 r=3636 $0.046 err=None
+gem38      default  pass=11/11 tests_ok=True 125s turns=28 tools=27 sh=18 w=2 in=328073 out=14099 r=11975 $0.160 err=None
+sol        high     pass=11/11 tests_ok=True 27s turns=6 tools=10 sh=1 w=2 in=13144 out=1824 r=578 $0.031 err=None
+luna       default  pass=11/11 tests_ok=True 25s turns=7 tools=9 sh=1 w=2 in=14725 out=1836 r=580 $0.003 err=None
+spark13xh  xhigh    pass=11/11 tests_ok=True 191s turns=11 tools=15 sh=6 w=2 in=107390 out=10820 r=7889 $0.080 err=None
+glmflash   high     pass=11/11 tests_ok=True 31s turns=8 tools=11 sh=2 w=2 in=16723 out=1482 r=38 $0.003 err=None
+sonnet5    default  pass=11/11 tests_ok=True 28s turns=7 tools=11 sh=2 w=2 in=24157 out=2040 r=163 $0.069 err=None
+gem37      default  pass=11/11 tests_ok=True 66s turns=17 tools=16 sh=7 w=2 in=95732 out=5814 r=4684 $0.067 err=None
+spark13xh  xhigh    pass=11/11 tests_ok=True 183s turns=13 tools=16 sh=5 w=3 in=110426 out=9379 r=6171 $0.102 err={"message": "Provider returned error", "code": 503, "metadata": {"raw": "{\"error\":{\"code\":\"service_overloaded\",\"message\":\"The backend is temporarily overloaded. Please retry.\",\"param\":null,\"type\":\"server_error\"}}", "provider_name": "Meta", "is_byok": false, "provider_error_code": "se
+gem38      default  pass=11/11 tests_ok=True 171s turns=32 tools=31 sh=22 w=2 in=445887 out=20205 r=17278 $0.207 err=None
+astra      high     pass=11/11 tests_ok=True 29s turns=6 tools=11 sh=2 w=2 in=15757 out=1306 r=394 $0.142 err=None
+fable51    default  pass=11/11 tests_ok=True 64s turns=6 tools=11 sh=2 w=2 in=21257 out=3085 r=216 $0.367 err=None
+ALLDONE

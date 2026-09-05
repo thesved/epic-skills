@@ -1,0 +1,56 @@
+```python
+def fill(text: str, width: int) -> str:
+    import re
+    from collections import deque
+
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+
+    text = text.expandtabs().translate(
+        str.maketrans("\t\n\v\f\r", "     ")
+    )
+
+    letter = r"[^\W\d]"
+    punctuation = r"""[\w!"'&.,?]"""
+    hyphen_cut = (
+        rf"(?:(?<={letter}{letter})|(?<={letter}-{letter}))"
+        rf"-(?={letter}-?{letter})"
+    )
+    word_end = rf"(?= |\Z)|(?<={punctuation})(?=--+\w)"
+    separator = (
+        rf"( +|(?<={punctuation})--+(?=\w)"
+        rf"|\S+?(?:{hyphen_cut}|{word_end}))"
+    )
+
+    chunks = deque(part for part in re.split(separator, text) if part)
+    lines = []
+
+    while chunks:
+        if lines and not chunks[0].strip():
+            chunks.popleft()
+
+        line = []
+        used = 0
+
+        while chunks and used + len(chunks[0]) <= width:
+            part = chunks.popleft()
+            line.append(part)
+            used += len(part)
+
+        if chunks and len(chunks[0]) > width:
+            word = chunks[0]
+            cut = width - used
+            dash = word.rfind("-", 0, cut)
+            if dash > 0 and word[:dash].strip("-"):
+                cut = dash + 1
+            line.append(word[:cut])
+            chunks[0] = word[cut:]
+
+        if line and not line[-1].strip():
+            line.pop()
+
+        if line:
+            lines.append("".join(line))
+
+    return "\n".join(lines)
+```

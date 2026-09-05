@@ -1,0 +1,5 @@
+Egyetlen mesterséges intelligencia modell sem a legjobb minden feladatra. Az egyik pontosabban elemez adatokat, a másik jobban fogalmaz, a harmadik pedig gyorsabb vagy olcsóbb. Ha több modellt használsz párhuzamosan, mindig azt választhatod, amelyik az adott munkára a legalkalmasabb.
+
+A több modell csökkenti a hibák és a leállások kockázatát is. A fontos válaszokat össze lehet vetni, így könnyebb észrevenni a tévedéseket. Ha pedig az egyik szolgáltatás átmenetileg nem működik vagy megdrágul, a cég átállhat egy másikra.
+
+Ez nagyobb üzleti rugalmasságot és jobb alkupozíciót ad. Nem függsz teljesen egyetlen szolgáltatótól, könnyebben követheted a fejlődést, és kézben tarthatod a költségeket. A cél nem az, hogy mindenből sokat használj, hanem hogy néhány jól kiválasztott modell együtt megbízhatóbban szolgálja a céget.

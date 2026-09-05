@@ -1,0 +1,76 @@
+```python
+import re
+
+
+def _fill_chunks(text: str) -> list[str]:
+    text = text.expandtabs().translate(
+        str.maketrans({c: " " for c in "\t\n\v\f\r"})
+    )
+    letter = r"[^\W\d]"
+    compound_break = re.compile(
+        rf"(?:(?<={letter}{letter})|(?<={letter}-{letter}))"
+        rf"-(?={letter}-?{letter})"
+    )
+    dash_run = re.compile(r"""(?<=[.,!?&'"\w])--+(?=\w)""")
+
+    chunks = []
+    for match in re.finditer(r" +|[^ ]+", text):
+        word = match.group()
+        if word.startswith(" "):
+            chunks.append(word)
+            continue
+
+        boundaries = {0, len(word)}
+        for hyphen in compound_break.finditer(word):
+            boundaries.add(hyphen.end())
+        for dashes in dash_run.finditer(word):
+            boundaries.update(dashes.span())
+
+        boundaries = sorted(boundaries)
+        chunks.extend(
+            word[start:end]
+            for start, end in zip(boundaries, boundaries[1:])
+        )
+    return chunks
+
+
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+
+    chunks = _fill_chunks(text)
+    lines = []
+    position = 0
+
+    while position < len(chunks):
+        if lines and not chunks[position].strip():
+            position += 1
+
+        parts = []
+        remaining = width
+
+        while position < len(chunks):
+            chunk = chunks[position]
+            if len(chunk) > remaining:
+                break
+            parts.append(chunk)
+            remaining -= len(chunk)
+            position += 1
+
+        if position < len(chunks) and len(chunks[position]) > width:
+            chunk = chunks[position]
+            cut = remaining
+            hyphen = chunk.rfind("-", 0, remaining)
+            if hyphen > 0 and chunk[:hyphen].strip("-"):
+                cut = hyphen + 1
+            parts.append(chunk[:cut])
+            chunks[position] = chunk[cut:]
+
+        if parts and not parts[-1].strip():
+            parts.pop()
+
+        if parts:
+            lines.append("".join(parts))
+
+    return "\n".join(lines)
+```

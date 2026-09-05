@@ -1,0 +1,40 @@
+```python
+import time
+
+class TokenBucket:
+    """Token bucket rate limiter.
+    capacity: max tokens. refill_per_sec: tokens added per second (float ok).
+    now: injectable clock returning seconds (float)."""
+    def __init__(self, capacity, refill_per_sec, now=time.monotonic):
+        if capacity <= 0 or refill_per_sec <= 0:
+            raise ValueError("capacity and refill_per_sec must be positive")
+        self.capacity = capacity
+        self.refill_per_sec = refill_per_sec
+        self._now = now
+        self.tokens = capacity
+        self.last = now()
+
+    def _refill(self):
+        t = self._now()
+        elapsed = t - self.last
+        if elapsed > 0:
+            self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_per_sec)
+            self.last = t
+
+    def try_acquire(self, n=1):
+        """Take n tokens if available. Returns True/False. n > capacity must raise ValueError."""
+        if n > self.capacity:
+            raise ValueError("n cannot exceed capacity")
+        self._refill()
+        if n <= self.tokens:
+            self.tokens -= n
+            return True
+        return False
+
+    def time_until(self, n=1):
+        """Seconds to wait until n tokens are available (0.0 if available now)."""
+        self._refill()
+        if self.tokens >= n:
+            return 0.0
+        return (n - self.tokens) / self.refill_per_sec
+```

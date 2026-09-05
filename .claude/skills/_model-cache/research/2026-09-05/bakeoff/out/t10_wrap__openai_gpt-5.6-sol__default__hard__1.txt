@@ -1,0 +1,81 @@
+```python
+import re
+
+
+_WORD_SEPARATOR = re.compile(
+    r'''(\s+|[^\s\w]*\w+[^0-9\W]-(?=\w+[^0-9\W])|(?<=[\w!"'&.,?])-{2,}(?=\w))'''
+)
+
+_WHITESPACE_TRANSLATION = str.maketrans({
+    "\t": " ",
+    "\n": " ",
+    "\v": " ",
+    "\f": " ",
+    "\r": " ",
+    " ": " ",
+})
+
+
+def _split_chunks(text: str) -> list[str]:
+    text = text.expandtabs(8).translate(_WHITESPACE_TRANSLATION)
+    return [chunk for chunk in _WORD_SEPARATOR.split(text) if chunk]
+
+
+def _split_long_chunk(
+    chunks: list[str],
+    current_line: list[str],
+    current_length: int,
+    width: int,
+) -> None:
+    available = max(width - current_length, 1)
+    chunk = chunks[-1]
+    end = available
+
+    if len(chunk) > available:
+        hyphen = chunk.rfind("-", 0, available)
+        if hyphen > 0 and any(character != "-" for character in chunk[:hyphen]):
+            end = hyphen + 1
+
+    current_line.append(chunk[:end])
+    chunks[-1] = chunk[end:]
+
+
+def fill(text: str, width: int) -> str:
+    chunks = _split_chunks(text)
+
+    if width <= 0:
+        raise ValueError("invalid width %r (must be > 0)" % width)
+
+    chunks.reverse()
+    lines: list[str] = []
+
+    while chunks:
+        current_line: list[str] = []
+        current_length = 0
+
+        if lines and chunks[-1].strip() == "":
+            chunks.pop()
+
+        while chunks:
+            chunk_length = len(chunks[-1])
+            if current_length + chunk_length > width:
+                break
+            current_line.append(chunks.pop())
+            current_length += chunk_length
+
+        if chunks and len(chunks[-1]) > width:
+            _split_long_chunk(
+                chunks,
+                current_line,
+                current_length,
+                width,
+            )
+
+        if current_line and current_line[-1].strip() == "":
+            current_line.pop()
+
+        if current_line:
+            lines.append("".join(current_line))
+
+    return "\n".join(lines)
+```

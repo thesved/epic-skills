@@ -1,0 +1,38 @@
+```python
+import re
+_chunk_pat = re.compile(r'(\s+|[^\s\w]*\w+[^0-9\W]-(?=\w+[^0-9\W])|(?<=[\w\x21\x22\x27\x26\x2e\x2c\x3f])-{2,}(?=\w))')
+def fill(text: str, width: int) -> str:
+    if width <= 0:
+        raise ValueError('invalid width %r (must be > 0)' % (width,))
+    a = text.expandtabs(8)
+    a = a.translate({9: 32, 10: 32, 11: 32, 12: 32, 13: 32})
+    parts = [s for s in _chunk_pat.split(a) if s]
+    parts.reverse()
+    res = []
+    while parts:
+        cur = []
+        cl = 0
+        lim = width
+        if parts[-1].strip() == '' and res:
+            parts.pop()
+        while parts:
+            n = len(parts[-1])
+            if cl + n <= lim:
+                cur.append(parts.pop())
+                cl += n
+            else:
+                break
+        if parts and len(parts[-1]) > lim:
+            if lim < 1:
+                take = 1
+            else:
+                take = lim - cl
+            cur.append(parts[-1][:take])
+            parts[-1] = parts[-1][take:]
+            cl = sum(len(x) for x in cur)
+        if cur and cur[-1].strip() == '':
+            cur.pop()
+        if cur:
+            res.append(''.join(cur))
+    return '\n'.join(res)
+```

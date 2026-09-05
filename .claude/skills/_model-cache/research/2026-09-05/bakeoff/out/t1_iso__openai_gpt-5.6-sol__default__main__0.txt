@@ -1,0 +1,70 @@
+```python
+import re
+
+
+def parse_duration(s: str) -> float:
+    number = r"[0-9]+(?:[.,][0-9]+)?"
+    pattern = re.compile(
+        rf"\AP(?:"
+        rf"(?P<W>{number})W"
+        rf"|"
+        rf"(?P<Y>{number})Y?"
+        rf")\Z"
+    )
+
+    pattern = re.compile(
+        rf"\AP(?:"
+        rf"(?P<W>{number})W"
+        rf"|"
+        rf"(?P<Y>{number})Y"
+        rf"|"
+        rf"(?P<date_time>"
+        rf"(?P<years>{number})Y)?"
+        rf"(?P<months>{number})M)?"
+        rf"(?P<days>{number})D)?"
+        rf"(?:T"
+        rf"(?P<hours>{number})H)?"
+        rf"(?P<minutes>{number})M)?"
+        rf"(?P<seconds>{number})S)?"
+        rf")?"
+        rf")\Z"
+    )
+
+    match = pattern.fullmatch(s)
+    if match is None:
+        raise ValueError("Invalid ISO 8601 duration")
+
+    if match.group("W") is not None:
+        components = [("W", match.group("W"), 7 * 86400)]
+    elif match.group("Y") is not None:
+        components = [("Y", match.group("Y"), 365 * 86400)]
+    else:
+        components = [
+            ("Y", match.group("years"), 365 * 86400),
+            ("M", match.group("months"), 30 * 86400),
+            ("D", match.group("days"), 86400),
+            ("H", match.group("hours"), 3600),
+            ("M", match.group("minutes"), 60),
+            ("S", match.group("seconds"), 1),
+        ]
+        components = [component for component in components if component[1] is not None]
+
+        if not components:
+            raise ValueError("Duration must contain at least one component")
+
+        if "T" in s and not any(
+            match.group(name) is not None
+            for name in ("hours", "minutes", "seconds")
+        ):
+            raise ValueError("T must be followed by a time component")
+
+    for _, value, _ in components[:-1]:
+        if "." in value or "," in value:
+            raise ValueError("Only the last component may have a fraction")
+
+    total = 0.0
+    for _, value, multiplier in components:
+        total += float(value.replace(",", ".")) * multiplier
+
+    return float(total)
+```

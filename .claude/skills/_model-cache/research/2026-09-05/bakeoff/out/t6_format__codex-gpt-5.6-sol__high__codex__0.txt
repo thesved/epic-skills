@@ -1,0 +1,7 @@
+- version control preserves configuration history for easier auditing and recovery
+- teams can review configuration changes before they reach shared environments
+- tracked files keep development testing and production settings more consistent
+- reverting faulty configuration becomes fast predictable and well documented
+- clear diffs reveal accidental changes and risky operational assumptions
+- shared configuration reduces undocumented knowledge and onboarding friction
+- branches support safe experimentation without disrupting stable team workflows
