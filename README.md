@@ -32,6 +32,7 @@ The skills are designed to chain. A typical session:
 /ask           →  (the inverse) Claude asks YOU only when genuinely blocked
 /chrome        →  drive a real Chrome over CDP to verify/QA the change in-browser
 /mobbin  <q>   →  real app screens/flows from mobbin.com as image files + JSON, for any vision model
+/power-map <g> →  who decides, who vetoes, what each wants: actor graph + leverage point + ordered moves
 /wrap          →  close the session so a cold start resumes with zero context loss
 ```
 
